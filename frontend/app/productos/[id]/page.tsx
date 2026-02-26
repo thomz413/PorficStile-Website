@@ -13,6 +13,8 @@ import {
 	getStrapiImageUrl,
 	type StrapiProduct,
 } from "@/lib/strapi";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { createProductMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 // ---------------------------
 // Componente mejorado para manejar tallas y cantidad
@@ -27,6 +29,7 @@ export default function ProductDetailPage() {
 	const [loading, setLoading] = useState(true);
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [whatsappNumber, setWhatsappNumber] = useState<string | undefined>();
+	const { convertAndFormatPrice, currencyInfo, isLoading } = useCurrency();
 
 	// Size & quantity states
 	const [selectedTalla, setSelectedTalla] = useState<string | undefined>();
@@ -38,40 +41,37 @@ export default function ProductDetailPage() {
 				getProductById(productId),
 				getSettings(),
 			]);
+
+			// set product + settings
 			setProduct(productData);
 			setWhatsappNumber(settings?.numeroWhatsapp);
+
+			// initialize favorite from localStorage (moved aquí para evitar setState sincrónico en un effect)
+			try {
+				const favsRaw = localStorage.getItem("moda-peru-favs") || "{}";
+				const favs = JSON.parse(favsRaw) as Record<string, boolean>;
+				setIsFavorite(Boolean(favs[productId]));
+			} catch (e) {
+				// ignore
+			}
+
+			// when product loads, pick default talla (first available)
+			const tallas = productData?.tallaProducto || [];
+			if (tallas.length > 0) {
+				const firstAvailable = tallas.find((t) => t.disponible) || tallas[0];
+				setSelectedTalla(firstAvailable?.talla);
+				setCantidad(1);
+			} else {
+				// no tallas: use global stock
+				setSelectedTalla(undefined);
+				setCantidad(1);
+			}
+
 			setLoading(false);
 		}
 
 		load();
 	}, [productId]);
-
-	// initialize favorite from localStorage
-	useEffect(() => {
-		if (!product) return;
-		try {
-			const favsRaw = localStorage.getItem("moda-peru-favs") || "{}";
-			const favs = JSON.parse(favsRaw) as Record<string, boolean>;
-			setIsFavorite(Boolean(favs[productId]));
-		} catch (e) {
-			// ignore
-		}
-	}, [product, productId]);
-
-	// when product loads, pick default talla (first available)
-	useEffect(() => {
-		if (!product) return;
-		const tallas = product.tallaProducto || [];
-		if (tallas.length > 0) {
-			const firstAvailable = tallas.find((t) => t.disponible) || tallas[0];
-			setSelectedTalla(firstAvailable?.talla);
-			setCantidad(1);
-		} else {
-			// no tallas: use global stock
-			setSelectedTalla(undefined);
-			setCantidad(1);
-		}
-	}, [product]);
 
 	function toggleFavorite() {
 		setIsFavorite((s) => {
@@ -133,13 +133,43 @@ export default function ProductDetailPage() {
 	const isTallaAvailable = tallas.length === 0 ? product.disponible : Boolean(selectedTallaObj?.disponible);
 
 	// Price display
-	const priceDisplay = (value?: number) => (value != null ? `S/. ${value.toFixed(2)}` : "-");
+	const priceDisplay = (value?: number) => {
+		if (value != null) {
+			return convertAndFormatPrice(value);
+		}
+		return "-";
+	};
 
-	// WhatsApp message builder
-	const buildWhatsAppMessage = (baseLabel: string) => {
-		const price = product.enOferta && product.precioDescuento ? product.precioDescuento : product.precio;
-		const tallaPart = selectedTalla ? `Talla: ${selectedTalla}` : "";
-		return `${baseLabel} ${product.nombre} - ${priceDisplay(price)}${tallaPart ? ` - ${tallaPart}` : ""} - Cant: ${cantidad}`;
+	// WhatsApp message configuration
+	const createWhatsAppConfig = (action: 'inquiry' | 'order' | 'stock'): WhatsAppMessageConfig => {
+		const baseConfig = {
+			productName: product.nombre,
+			productPrice: product.enOferta && product.precioDescuento ? product.precioDescuento : product.precio,
+			currency: currencyInfo.code,
+			category: product.categoria?.nombre,
+		};
+
+		switch (action) {
+			case 'order':
+				return {
+					...baseConfig,
+					type: 'product_inquiry',
+					quantity: cantidad,
+					size: selectedTalla,
+				};
+			case 'stock':
+				return {
+					...baseConfig,
+					type: 'stock_notification',
+					quantity: cantidad,
+					size: selectedTalla,
+				};
+			default:
+				return {
+					...baseConfig,
+					type: 'product_inquiry',
+				};
+		}
 	};
 
 	return (
@@ -207,15 +237,20 @@ export default function ProductDetailPage() {
 											{product.porcentajeDescuento}% descuento
 										</span>
 									)}
+									{currencyInfo.code !== 'PEN' && !isLoading && (
+										<span className="text-xs font-medium text-muted-foreground">
+											({currencyInfo.code})
+										</span>
+									)}
 								</div>
 								<div className="flex items-baseline gap-3">
 									{product.enOferta && product.porcentajeDescuento ? (
 										<>
-											<span className="text-2xl text-muted-foreground line-through font-semibold">S/. {product.precio.toFixed(2)}</span>
-											<p className="text-4xl font-black text-primary">S/. {product.precioDescuento!.toFixed(2)}</p>
+											<span className="text-2xl text-muted-foreground line-through font-semibold">{priceDisplay(product.precio)}</span>
+											<p className="text-4xl font-black text-primary">{priceDisplay(product.precioDescuento!)}</p>
 										</>
 									) : (
-										<p className="text-4xl font-black text-primary">S/. {product.precio.toFixed(2)}</p>
+										<p className="text-4xl font-black text-primary">{priceDisplay(product.precio)}</p>
 									)}
 								</div>
 							</div>
@@ -319,14 +354,14 @@ export default function ProductDetailPage() {
 									) : product.disponible || tallas.length > 0 ? (
 										<WhatsAppCTA
 											whatsappNumber={whatsappNumber}
-											message={buildWhatsAppMessage("Hola, me interesa:")}
+											messageConfig={createWhatsAppConfig('order')}
 											label={product.disponible || tallas.length > 0 ? "Pedir por WhatsApp" : "Avisar cuando haya stock"}
 											className="w-full justify-center bg-primary border-primary hover:bg-primary/90"
 										/>
 									) : (
 										<WhatsAppCTA
 											whatsappNumber={whatsappNumber}
-											message={`Hola, quisiera que me avisen cuando haya stock de: ${product.nombre}`}
+											messageConfig={createWhatsAppConfig('stock')}
 											label="Avisar cuando haya stock"
 											className="w-full justify-center bg-secondary border-secondary hover:bg-secondary/90"
 										/>
@@ -352,7 +387,7 @@ export default function ProductDetailPage() {
 										<p className="text-foreground leading-relaxed mb-4">Escríbenos por WhatsApp para dudas o pedidos de este producto.</p>
 										<WhatsAppCTA
 											whatsappNumber={whatsappNumber}
-											message={`Hola, tengo dudas sobre: ${product.nombre}`}
+											messageConfig={createWhatsAppConfig('inquiry')}
 											label="Escribir por WhatsApp"
 											className="w-full justify-center"
 										/>
@@ -371,5 +406,5 @@ export default function ProductDetailPage() {
 				</div>
 			</footer>
 		</main>
-		);
+	);
 }

@@ -2,10 +2,12 @@
 
 import { MouseEvent, useCallback } from "react";
 import { MessageCircle } from "lucide-react";
+import { generateWhatsAppMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 interface WhatsAppCTAProps {
 	whatsappNumber?: string | null;
 	message?: string;
+	messageConfig?: WhatsAppMessageConfig;
 	variant?: "button" | "sticky" | "card";
 	className?: string;
 	label?: string;
@@ -13,13 +15,19 @@ interface WhatsAppCTAProps {
 
 export default function WhatsAppCTA({
 	whatsappNumber,
-	message = "Hola, me interesa conocer más",
+	message,
+	messageConfig,
 	variant = "button",
 	className = "",
 	label = "Escribir por WhatsApp",
 }: WhatsAppCTAProps) {
-	const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-		message,
+	// Generate intelligent message if config is provided
+	const finalMessage = messageConfig 
+		? generateWhatsAppMessage(messageConfig)
+		: message || "Hola, me interesa conocer más";
+
+	const whatsappURL = `https://wa.me/${whatsappNumber?.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+		finalMessage,
 	)}`;
 
 	const openWhatsApp = useCallback(
@@ -49,6 +57,7 @@ export default function WhatsAppCTA({
 				onClick={openWhatsApp}
 				aria-label={ariaLabel}
 				className="fixed bottom-8 right-8 z-40 flex items-center justify-center h-16 w-16 rounded-none bg-secondary text-white shadow-2xl hover:bg-secondary/90 transition-smooth hover:scale-110 border-2 border-primary group"
+				title="Contactar por WhatsApp"
 			>
 				<MessageCircle className="h-7 w-7 group-hover:rotate-12 transition-transform" />
 			</button>

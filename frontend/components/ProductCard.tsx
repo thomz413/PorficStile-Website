@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { useState } from "react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ProductCardProps {
 	id: string;
@@ -29,6 +30,7 @@ export default function ProductCard({
 	porcentajeDescuento,
 }: ProductCardProps) {
 	const [isFavorite, setIsFavorite] = useState(false);
+	const { convertAndFormatPrice, currencyInfo, isLoading } = useCurrency();
 
 	return (
 		<Link href={`/productos/${id}`}>
@@ -101,21 +103,21 @@ export default function ProductCard({
 					<div className="flex items-end justify-between gap-3">
 						<div>
 							<p className="text-xs text-muted-foreground uppercase font-medium tracking-wide mb-1">
-								Precio
+								Precio {currencyInfo.code !== 'PEN' && !isLoading ? `(${currencyInfo.code})` : ''}
 							</p>
 							<div className="flex items-baseline gap-2">
 								{enOferta && precioDescuento ? (
 									<>
 										<span className="text-sm text-muted-foreground line-through font-semibold">
-											S/. {precio.toFixed(2)}
+											{convertAndFormatPrice(precio)}
 										</span>
 										<span className="text-2xl font-black text-primary">
-											S/. {precioDescuento.toFixed(2)}
+											{convertAndFormatPrice(precioDescuento)}
 										</span>
 									</>
 								) : (
 									<span className="text-2xl font-black text-primary">
-										S/. {precio.toFixed(2)}
+										{convertAndFormatPrice(precio)}
 									</span>
 								)}
 							</div>

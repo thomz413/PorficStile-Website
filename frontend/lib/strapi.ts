@@ -185,11 +185,35 @@ function pickCategoryAttr(src: any): StrapiCategory {
 	});
 }
 
+const VALID_TALLAS = ["XS", "S", "M", "L", "XL", "XXL"];
+
 function normalizeProductRaw(raw: any) {
 	const src = raw?.attributes ?? raw;
 
 	const img = pickImageAttr(src.imagen ?? src.imagenHero ?? src.imagen);
 	const categoria = pickCategoryAttr(src.categoria);
+
+	const tallaProducto = Array.isArray(src.tallaProducto)
+		? src.tallaProducto
+			.map((t: any) => {
+				const talla =
+					typeof t.talla === "string"
+						? t.talla.trim().toUpperCase()
+						: "";
+
+				if (!VALID_TALLAS.includes(talla)) {
+					console.warn("Invalid talla from Strapi:", t.talla);
+					return null;
+				}
+
+				return {
+					talla,
+					disponible: safeBoolean(t.disponible),
+					stock: safeNumber(t.stock, 0),
+				};
+			})
+			.filter(Boolean)
+		: [];
 
 	return {
 		id: safeNumber(raw.id ?? src.id, 0),
@@ -198,7 +222,9 @@ function normalizeProductRaw(raw: any) {
 		descripcion: src.descripcion ?? "",
 		precio: safeNumber(src.precio, 0),
 		precioDescuento:
-			src.precioDescuento == null ? undefined : safeNumber(src.precioDescuento),
+			src.precioDescuento == null
+				? undefined
+				: safeNumber(src.precioDescuento),
 		enOferta: safeBoolean(src.enOferta),
 		porcentajeDescuento:
 			src.porcentajeDescuento == null
@@ -209,7 +235,7 @@ function normalizeProductRaw(raw: any) {
 		cantidadStock: safeNumber(src.cantidadStock, 0),
 		slug: safeString(src.slug),
 		imagen: img,
-		tallaProducto: src.tallaProducto,
+		tallaProducto, // ← normalized safely
 	};
 }
 
@@ -292,6 +318,7 @@ export async function getFeaturedProducts(): Promise<StrapiProduct[]> {
 
 		return items.map((raw: any) => {
 			const normalized = normalizeProductRaw(raw);
+
 			return ProductSchema.parse(normalized);
 		});
 	} catch (err) {
@@ -347,8 +374,7 @@ export async function getProducts(): Promise<StrapiProduct[]> {
 
 		return items.map((raw: any) => {
 			const normalized = normalizeProductRaw(raw);
-			console.log("Normalized above");
-			console.log(normalized);
+
 			return ProductSchema.parse(normalized);
 		});
 	} catch (err) {

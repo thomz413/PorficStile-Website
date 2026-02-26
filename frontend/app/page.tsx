@@ -3,7 +3,12 @@ import { ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import {getFeaturedProducts, getSettings, getStrapiImageUrl} from "@/lib/strapi";
+import {
+	getFeaturedProducts,
+	getSettings,
+	getStrapiImageUrl,
+} from "@/lib/strapi";
+import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import type { StrapiSettings } from "@/lib/strapi";
 
 export const metadata = {
@@ -27,7 +32,12 @@ export default async function Home() {
 		siteSettings?.subtituloHero ||
 		"Ropa y textiles de calidad. Envíos a todo el Perú.";
 	const estadisticas = siteSettings?.estadisticas;
-	const whatsappNumber = siteSettings?.numeroWhatsapp;
+	const whatsappNumber = settings?.numeroWhatsapp;
+
+	// WhatsApp message configurations
+	const generalInquiryConfig: WhatsAppMessageConfig = {
+		type: 'general_inquiry'
+	};
 	const heroImageUrl = siteSettings?.imagenHero?.url;
 
 	return (
@@ -76,7 +86,9 @@ export default async function Home() {
 								{heroTitle.split(" ").map((word, i) => (
 									<span
 										key={i}
-										className={i % 2 === 1 ? "text-accent block md:inline" : "block"}
+										className={
+											i % 2 === 1 ? "text-accent block md:inline" : "block"
+										}
 									>
 										{word}{" "}
 									</span>
@@ -92,7 +104,7 @@ export default async function Home() {
 						{/* Action Buttons - stacked full-width on small screens */}
 						<div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mt-8 sm:mt-12">
 							<Link
-								href="/products"
+								href="/productos"
 								className="inline-flex items-center justify-center gap-3 rounded-none bg-white px-6 sm:px-10 py-3 sm:py-5 font-black text-black hover:bg-accent transition-all duration-500 group shadow-2xl hover:-translate-y-1 uppercase tracking-widest text-sm w-full sm:w-auto"
 							>
 								Explorar Catálogo
@@ -190,7 +202,7 @@ export default async function Home() {
 					{/* CTA Button */}
 					<div className="mt-10 md:mt-16 text-center">
 						<Link
-							href="/products"
+							href="/productos"
 							className="inline-flex items-center gap-3 rounded-none border-2 border-primary px-6 py-3 md:px-8 md:py-4 font-semibold text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-lg transition-smooth text-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group"
 						>
 							Ver todos los productos
@@ -366,7 +378,7 @@ export default async function Home() {
 							<ul className="space-y-2 text-sm">
 								<li>
 									<Link
-										href="/products"
+										href="/productos"
 										className="text-muted-foreground hover:text-primary transition-smooth"
 									>
 										Tienda
@@ -389,7 +401,9 @@ export default async function Home() {
 							</h4>
 							<div className="space-y-2 text-sm text-muted-foreground">
 								<p>Tienda online. Envíos desde Perú.</p>
-								<p className="text-primary font-medium">Atendemos por WhatsApp</p>
+								<p className="text-primary font-medium">
+									Atendemos por WhatsApp
+								</p>
 							</div>
 						</div>
 					</div>

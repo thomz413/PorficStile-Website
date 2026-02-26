@@ -9,6 +9,7 @@ import {
 	getSettings,
 	getStrapiImageUrl,
 } from "@/lib/strapi";
+import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 export const metadata = {
 	title: "Tienda - Moda Peru",
@@ -36,6 +37,12 @@ export default async function ProductsPage({
 
 	const whatsappNumber = settings?.numeroWhatsapp;
 
+	// WhatsApp message configuration for general inquiries
+	const generalInquiryConfig: WhatsAppMessageConfig = {
+		type: 'general_inquiry',
+		category: selectedCategory || 'Todos los productos'
+	};
+
 	return (
 		<>
 			<Header />
@@ -62,7 +69,7 @@ export default async function ProductsPage({
 									{/* Category filters */}
 									<div className="flex flex-wrap gap-3">
 										<Link
-											href="/products"
+											href="/productos"
 											className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
 												!selectedCategory
 													? "bg-primary text-primary-foreground border-primary shadow-sm"
@@ -76,7 +83,7 @@ export default async function ProductsPage({
 											return (
 												<Link
 													key={category.id ?? category.documentId}
-													href={`/products?categoria=${encodeURIComponent(
+													href={`/productos?categoria=${encodeURIComponent(
 														category.nombre,
 													)}`}
 													className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
@@ -143,7 +150,7 @@ export default async function ProductsPage({
 						</p>
 						<WhatsAppCTA
 							whatsappNumber={whatsappNumber}
-							message="Hola, tengo una consulta sobre los productos."
+							messageConfig={generalInquiryConfig}
 							label="Escribir por WhatsApp"
 						/>
 					</div>
@@ -154,7 +161,7 @@ export default async function ProductsPage({
 			<WhatsAppCTA
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
-				message="Hola, me interesa saber más."
+				messageConfig={generalInquiryConfig}
 			/>
 
 			{/* Footer */}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import CurrencySelector from "./CurrencySelector";
 
 export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function Header() {
 					{/* Desktop Navigation */}
 					<nav className="hidden gap-8 md:flex">
 						<Link
-							href="/products"
+							href="/productos"
 							className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-3 py-2 tracking-wide uppercase relative group"
 						>
 							Tienda
@@ -51,6 +52,11 @@ export default function Header() {
 
 					{/* Right Actions */}
 					<div className="flex items-center gap-2 sm:gap-4">
+						{/* Currency Selector */}
+						<div className="hidden sm:block">
+							<CurrencySelector />
+						</div>
+						
 						{/* Mobile Menu Button */}
 						<button
 							onClick={() => setIsOpen(!isOpen)}
@@ -71,8 +77,12 @@ export default function Header() {
 				{isOpen && (
 					<nav className="border-t border-border/50 bg-background pb-6 md:hidden animate-slide-up">
 						<div className="flex flex-col gap-2 pt-6">
+							{/* Mobile Currency Selector */}
+							<div className="px-6 py-3">
+								<CurrencySelector />
+							</div>
 							<Link
-								href="/products"
+								href="/productos"
 								className="text-base font-medium text-foreground hover:text-primary transition-smooth px-6 py-3 rounded hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
 							>
 								Tienda

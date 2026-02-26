@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { getSettings } from "@/lib/strapi";
+import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 export const metadata = {
 	title: "Contacto - Moda Peru",
@@ -11,6 +12,37 @@ export const metadata = {
 export default async function ContactoPage() {
 	const settings = await getSettings();
 	const whatsappNumber = settings?.numeroWhatsapp;
+
+	// WhatsApp message configurations for different contact purposes
+	const configs: { label: string; config: WhatsAppMessageConfig }[] = [
+		{
+			label: "Productos y precios",
+			config: {
+				type: 'price_inquiry',
+				category: 'General'
+			}
+		},
+		{
+			label: "Pedido al por mayor",
+			config: {
+				type: 'bulk_order',
+				businessType: 'wholesale'
+			}
+		},
+		{
+			label: "Marcas y colaboraciones",
+			config: {
+				type: 'collaboration',
+				businessType: 'brand'
+			}
+		},
+		{
+			label: "Otras consultas",
+			config: {
+				type: 'general_inquiry'
+			}
+		}
+	];
 
 	return (
 		<main className="min-h-screen bg-background">
@@ -47,30 +79,15 @@ export default async function ContactoPage() {
 						</div>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
-								variant="card"
-								label="Productos y precios"
-								message="Hola, quisiera saber más sobre productos y precios."
-							/>
-							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
-								variant="card"
-								label="Pedido al por mayor"
-								message="Hola, me interesa hacer un pedido al por mayor."
-							/>
-							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
-								variant="card"
-								label="Marcas y colaboraciones"
-								message="Hola, me gustaría hablar sobre producción para mi marca."
-							/>
-							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
-								variant="card"
-								label="Otras consultas"
-								message="Hola, tengo una consulta general."
-							/>
+							{configs.map((item, index) => (
+								<WhatsAppCTA
+									key={index}
+									whatsappNumber={whatsappNumber}
+									variant="card"
+									label={item.label}
+									messageConfig={item.config}
+								/>
+							))}
 						</div>
 					</div>
 
@@ -133,7 +150,9 @@ export default async function ContactoPage() {
 			<WhatsAppCTA
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
-				message="Hola, me gustaría hacer una consulta."
+				messageConfig={{
+					type: 'general_inquiry'
+				}}
 			/>
 		</main>
 	);

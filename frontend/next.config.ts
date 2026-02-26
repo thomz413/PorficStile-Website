@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 				pathname: "/uploads/**",
 			},
 		],
-		dangerouslyAllowLocalIP: true, // 👈 THIS
+		dangerouslyAllowLocalIP: true,
 	},
 };
 
