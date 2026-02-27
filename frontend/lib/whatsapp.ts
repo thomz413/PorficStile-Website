@@ -1,14 +1,13 @@
 // lib/whatsapp.ts
 export interface WhatsAppMessageConfig {
-  type: 'product_inquiry' | 'general_inquiry' | 'bulk_order' | 'stock_notification' | 'custom_order' | 'collaboration' | 'price_inquiry';
+  type: 'product_order' | 'general_question' | 'custom_order';
   productName?: string;
   productPrice?: number;
   currency?: string;
   size?: string;
   quantity?: number;
   category?: string;
-  customMessage?: string;
-  businessType?: 'retail' | 'wholesale' | 'dropshipping' | 'brand';
+  customNote?: string;
 }
 
 export interface ProductInfo {
@@ -22,292 +21,123 @@ export interface ProductInfo {
 }
 
 export function generateWhatsAppMessage(config: WhatsAppMessageConfig): string {
-  const { type, productName, productPrice, currency, size, quantity, category, customMessage, businessType } = config;
+  const { type, productName, productPrice, currency, size, quantity, category, customNote } = config;
   
-  const timestamp = new Date().toLocaleString('es-PE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
   let message = '';
 
   switch (type) {
-    case 'product_inquiry':
-      message = `🛍️ *CONSULTA DE PRODUCTO*
-      
-📅 ${timestamp}
+    case 'product_order':
+      message = `🛒 ¡Hola! Quiero comprar:
 
-🔹 *Producto:* ${productName || 'No especificado'}
-${productPrice ? `💰 *Precio:* ${currency || 'S/.'} ${productPrice.toFixed(2)}` : ''}
-${size ? `📏 *Talla:* ${size}` : ''}
-${quantity ? `🔢 *Cantidad:* ${quantity}` : ''}
-${category ? `🏷️ *Categoría:* ${category}` : ''}
+📦 ${productName}
+${productPrice ? `💰 ${currency || 'S/.'} ${productPrice.toFixed(2)}` : ''}
+${size ? `📏 Talla: ${size}` : ''}
+${quantity ? `🔢 Cantidad: ${quantity}` : ''}
 
-❓ *¿Qué información necesitas?*
-• ¿Tienen stock disponible?
-• ¿Cuáles son las formas de pago?
-• ¿Hacen envíos a mi ciudad?
-• ¿Hay descuentos por volumen?
-• ¿Cuál es el tiempo de entrega?
+${customNote ? `📝 Nota: ${customNote}` : ''}
 
-💬 *Escribe tu consulta específica aquí:*
-
----
-📞 *Moda Peru - Ropa y Textiles Peruanos*
-🌐 www.modaperu.com`;
-
-      break;
-
-    case 'bulk_order':
-      message = `📦 *PEDIDO AL POR MAYOR*
-      
-📅 ${timestamp}
-
-🏢 *Tipo de negocio:* ${businessType === 'retail' ? 'Tienda minorista' : businessType === 'wholesale' ? 'Distribuidor mayorista' : businessType === 'dropshipping' ? 'Dropshipping' : 'Marca propia'}
-
-${productName ? `🔹 *Producto(s) de interés:* ${productName}` : ''}
-${quantity ? `📊 *Cantidad estimada:* ${quantity} unidades` : ''}
-${category ? `🏷️ *Categoría:* ${category}` : ''}
-
-💼 *Información que necesitamos:*
-• ¿Cuál es tu negocio y dónde está ubicado?
-• ¿Qué volumen de compras mensual necesitas?
-• ¿Buscas catálogo completo o productos específicos?
-• ¿Necesitas personalización o etiquetado propio?
-
-🎯 *Beneficios para mayoristas:*
-• Descuentos progresivos por volumen
-• Prioridad en producción
-• Opciones de financiamiento
-• Soporte personalizado
-
-💬 *Cuéntanos más sobre tu proyecto:*
-
----
-📞 *Moda Peru - Ventas Corporativas*
-🌐 www.modaperu.com`;
-
-      break;
-
-    case 'stock_notification':
-      message = `🔔 *NOTIFICACIÓN DE STOCK*
-      
-📅 ${timestamp}
-
-🔹 *Producto:* ${productName || 'No especificado'}
-
-✅ *¡Estoy interesado/a!*
-Por favor, avísenme cuando este producto esté disponible nuevamente.
-
-📱 *Mis datos de contacto:*
-• Nombre: [Tu nombre]
-• WhatsApp: [Tu número - opcional]
-• Email: [Tu email - opcional]
-
-📦 *Información de pedido:*
-${quantity ? `• Cantidad deseada: ${quantity} unidades` : ''}
-${size ? `• Talla requerida: ${size}` : ''}
-
-⚡ *¿Necesitas algo más?*
-• ¿Quieres que te avisen por otros medios?
-• ¿Tienes fecha límite para recibirlo?
-• ¿Necesitas productos similares?
-
-💬 *Deja tus datos y te contactaremos:*
-
----
-📞 *Moda Peru - Servicio al Cliente*
-🌐 www.modaperu.com`;
-
+¿Hay stock y cómo puedo pagar?`;
       break;
 
     case 'custom_order':
-      message = `🎨 *PEDIDO PERSONALIZADO*
-      
-📅 ${timestamp}
+      message = `🎨 ¡Hola! Quiero un pedido personalizado:
 
-👔 *Tipo de personalización:*
-• Diseño propio
-• Logo/branding
-• Colores específicos
-• Tallas especiales
-• Materiales personalizados
+${productName ? `📦 Basado en: ${productName}` : '🎨 Producto personalizado'}
+${size ? `📏 Talla: ${size}` : ''}
+${quantity ? `🔢 Cantidad: ${quantity}` : ''}
 
-${productName ? `🔹 *Producto base:* ${productName}` : ''}
-${quantity ? `📊 *Cantidad:* ${quantity} unidades` : ''}
+${customNote ? `✏️ Detalles: ${customNote}` : '✏️ Cuéntame qué necesitas...'}
 
-📋 *Detalles del proyecto:*
-• Describe tu idea o requisito
-• Adjunta referencias si tienes
-• Menciona fecha límite
-• Presupuesto estimado (opcional)
-
-🎯 *Nuestro proceso:*
-1. Consulta inicial (gratis)
-2. Diseño y cotización
-3. Aprobación de muestra
-4. Producción
-5. Entrega
-
-💬 *Cuéntanos sobre tu proyecto:*
-
----
-📞 *Moda Peru - Producción Personalizada*
-🌐 www.modaperu.com`;
-
+¿Pueden hacerlo y cuál sería el precio?`;
       break;
 
-    case 'collaboration':
-      message = `🤝 *COLABORACIÓN / MARCA BLANCA*
-      
-📅 ${timestamp}
-
-🏷️ *Tipo de colaboración:*
-• Marca blanca (producción para tu marca)
-• Distribución exclusiva
-• Diseño conjunto
-• Dropshipping
-• Franquicia
-
-${businessType ? `🏢 *Tu negocio:* ${businessType}` : ''}
-
-📋 *Sobre tu proyecto:*
-• Describe tu marca o negocio
-• ¿Qué tipo de productos necesitas?
-• ¿Cuál es tu mercado objetivo?
-• Volumen estimado mensual
-
-🎯 *¿Qué ofrecemos?*
-• Producción de alta calidad
-• Diseño y desarrollo
-• Logística y distribución
-• Soporte continuo
-• Precios competitivos
-
-💬 *Cuéntanos más sobre tu marca:*
-
----
-📞 *Moda Peru - Desarrollo de Negocios*
-🌐 www.modaperu.com`;
-
-      break;
-
-    case 'price_inquiry':
-      message = `💰 *CONSULTA DE PRECIOS*
-      
-📅 ${timestamp}
-
-${productName ? `🔹 *Producto(s):* ${productName}` : ''}
-${category ? `🏷️ *Categoría:* ${category}` : ''}
-
-💵 *Información que necesitas:*
-• Lista de precios actualizada
-• Descuentos por volumen
-• Precios para distribuidores
-• Costos de envío
-• Formas de pago
-
-📊 *Para cotizar mejor:*
-• ¿Qué cantidad necesitas?
-• ¿Es para revender o uso personal?
-• ¿A qué país/ciudad se envía?
-• ¿Con qué frecuencia comprarás?
-
-💬 *Especifica qué productos te interesan:*
-
----
-📞 *Moda Peru - Ventas*
-🌐 www.modaperu.com`;
-
-      break;
-
-    case 'general_inquiry':
+    case 'general_question':
     default:
-      message = `👋 *CONSULTA GENERAL*
-      
-📅 ${timestamp}
+      message = `👋 ¡Hola! 
 
-🔍 *Tipo de consulta:*
-• Información de productos
-• Tiempos de entrega
-• Métodos de pago
-• Envíos internacionales
-• Política de devoluciones
-• Atención al cliente
+${productName ? `📦 Vi el producto: ${productName}` : '📦 Estoy viendo sus productos'}
 
-${productName ? `🔹 *Producto de interés:* ${productName}` : ''}
-${category ? `🏷️ *Categoría:* ${category}` : ''}
+${customNote ? `❓ ${customNote}` : '❓ Tengo una pregunta sobre los productos...'}
 
-💬 *¿En qué podemos ayudarte?*
-• Escribe tu pregunta específica
-• Menciona si eres cliente nuevo
-• Indica tu país/ciudad para envíos
-
-⏰ *Horario de atención:*
-• Lunes a Viernes: 9:00 AM - 6:00 PM
-• Sábados: 9:00 AM - 2:00 PM
-• Domingos: Cerrado
-
-💬 *Escribe tu consulta:*
-
----
-📞 *Moda Peru - Atención al Cliente*
-🌐 www.modaperu.com`;
+¿Me pueden ayudar?`;
+      break;
   }
 
   return message;
 }
 
-// Helper function to create product-specific messages
-export function createProductMessage(
+// Helper function for multi-size orders
+export function createMultiSizeOrderMessage(
+  product: ProductInfo,
+  sizeSelections: { [size: string]: number },
+  customNote?: string
+): string {
+  const totalQuantity = Object.values(sizeSelections).reduce((sum, qty) => sum + qty, 0);
+  const sizeDetails = Object.entries(sizeSelections)
+    .filter(([_, qty]) => qty > 0)
+    .map(([size, qty]) => `${qty}x talla ${size}`)
+    .join('\n');
+
+  const config: WhatsAppMessageConfig = {
+    type: 'product_order',
+    productName: product.nombre,
+    productPrice: product.enOferta && product.precioDescuento ? product.precioDescuento : product.precio,
+    currency: 'PEN',
+    category: product.categoria,
+    quantity: totalQuantity,
+    size: sizeDetails,
+    customNote: customNote || `Pedido múltiple:\n${sizeDetails}`
+  };
+
+  return generateWhatsAppMessage(config);
+}
+
+// Helper function for product orders (most common use case)
+export function createProductOrderMessage(
   product: ProductInfo,
   quantity: number = 1,
   size?: string,
   customNote?: string
 ): string {
   const config: WhatsAppMessageConfig = {
-    type: 'product_inquiry',
+    type: 'product_order',
     productName: product.nombre,
     productPrice: product.enOferta && product.precioDescuento ? product.precioDescuento : product.precio,
+    currency: 'PEN',
     category: product.categoria,
     quantity,
     size,
-    customMessage: customNote
+    customNote
   };
 
   return generateWhatsAppMessage(config);
 }
 
-// Helper function for bulk orders
-export function createBulkOrderMessage(
-  products: string[],
-  businessType: 'retail' | 'wholesale' | 'dropshipping' | 'brand',
-  estimatedQuantity?: number
+// Helper for general questions
+export function createGeneralQuestionMessage(
+  productName?: string,
+  question?: string
 ): string {
   const config: WhatsAppMessageConfig = {
-    type: 'bulk_order',
-    productName: products.join(', '),
-    businessType,
-    quantity: estimatedQuantity
+    type: 'general_question',
+    productName,
+    customNote: question
   };
 
   return generateWhatsAppMessage(config);
 }
 
-// Helper function for stock notifications
-export function createStockNotificationMessage(
-  productName: string,
+// Helper for custom orders
+export function createCustomOrderMessage(
+  productName?: string,
   quantity?: number,
-  size?: string
+  details?: string
 ): string {
   const config: WhatsAppMessageConfig = {
-    type: 'stock_notification',
+    type: 'custom_order',
     productName,
     quantity,
-    size
+    customNote: details
   };
 
   return generateWhatsAppMessage(config);

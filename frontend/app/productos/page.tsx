@@ -14,7 +14,7 @@ import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 export const metadata = {
 	title: "Tienda - Moda Peru",
 	description:
-		"Ropa y textiles peruanos. Buena calidad, precios bajos. Envíos a todo el Perú.",
+		"Catálogo completo de ropa peruana. Buena calidad, precios justos y envíos a todo el Perú. Compra fácil por WhatsApp.",
 };
 
 interface ProductsPageProps {
@@ -37,9 +37,9 @@ export default async function ProductsPage({
 
 	const whatsappNumber = settings?.numeroWhatsapp;
 
-	// WhatsApp message configuration for general inquiries
-	const generalInquiryConfig: WhatsAppMessageConfig = {
-		type: 'general_inquiry',
+	// WhatsApp message configuration for general questions
+	const generalQuestionConfig: WhatsAppMessageConfig = {
+		type: 'general_question',
 		category: selectedCategory || 'Todos los productos'
 	};
 
@@ -51,10 +51,10 @@ export default async function ProductsPage({
 				<section className="border-b border-border py-12 md:py-16">
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 						<h1 className="text-4xl md:text-5xl font-black text-foreground mb-4">
-							{selectedCategory ? selectedCategory : "Todos los productos"}
+							{selectedCategory ? selectedCategory : "Nuestros productos"}
 						</h1>
 						<p className="text-lg text-muted-foreground max-w-2xl">
-							Ropa y textiles a buen precio. Filtra por categoría.
+							Ropa de buena calidad a precios justos. Filtra por categoría para encontrar lo que buscas.
 						</p>
 					</div>
 				</section>
@@ -150,7 +150,7 @@ export default async function ProductsPage({
 						</p>
 						<WhatsAppCTA
 							whatsappNumber={whatsappNumber}
-							messageConfig={generalInquiryConfig}
+							messageConfig={generalQuestionConfig}
 							label="Escribir por WhatsApp"
 						/>
 					</div>
@@ -161,7 +161,7 @@ export default async function ProductsPage({
 			<WhatsAppCTA
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
-				messageConfig={generalInquiryConfig}
+				messageConfig={generalQuestionConfig}
 			/>
 
 			{/* Footer */}

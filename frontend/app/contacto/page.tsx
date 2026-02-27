@@ -6,7 +6,7 @@ import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 export const metadata = {
 	title: "Contacto - Moda Peru",
 	description:
-		"Contacto por WhatsApp. Pedidos y consultas para nuestra tienda de ropa.",
+		"Contáctanos para pedidos y consultas. Atención personalizada por WhatsApp. Ropa de calidad a precios justos.",
 };
 
 export default async function ContactoPage() {
@@ -16,30 +16,30 @@ export default async function ContactoPage() {
 	// WhatsApp message configurations for different contact purposes
 	const configs: { label: string; config: WhatsAppMessageConfig }[] = [
 		{
-			label: "Productos y precios",
+			label: "Comprar productos",
 			config: {
-				type: 'price_inquiry',
+				type: 'product_order',
 				category: 'General'
 			}
 		},
 		{
-			label: "Pedido al por mayor",
+			label: "Precios al por mayor",
 			config: {
-				type: 'bulk_order',
-				businessType: 'wholesale'
+				type: 'custom_order',
+				customNote: 'Soy un negocio y necesito precios al por mayor'
 			}
 		},
 		{
-			label: "Marcas y colaboraciones",
+			label: "Diseños personalizados",
 			config: {
-				type: 'collaboration',
-				businessType: 'brand'
+				type: 'custom_order',
+				customNote: 'Necesito productos con mi diseño/logo'
 			}
 		},
 		{
 			label: "Otras consultas",
 			config: {
-				type: 'general_inquiry'
+				type: 'general_question'
 			}
 		}
 	];
@@ -59,7 +59,7 @@ export default async function ContactoPage() {
 							Escríbenos por <span className="text-secondary">WhatsApp</span>
 						</h1>
 						<p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-							Pedidos, cotizaciones y dudas. Te respondemos a la brevedad.
+							Pedidos, cotizaciones y consultas. Te respondemos rápidamente.
 						</p>
 					</div>
 				</div>
@@ -74,7 +74,7 @@ export default async function ContactoPage() {
 								¿En qué podemos ayudarte?
 							</h2>
 							<p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
-								Elige el tema que mejor describa tu consulta.
+								Elige la opción que mejor describa lo que necesitas.
 							</p>
 						</div>
 
@@ -151,7 +151,7 @@ export default async function ContactoPage() {
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
 				messageConfig={{
-					type: 'general_inquiry'
+					type: 'general_question'
 				}}
 			/>
 		</main>

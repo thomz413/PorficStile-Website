@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart } from "lucide-react";
-import { useState } from "react";
+import { Heart, Eye } from "lucide-react";
+import { getStrapiImageUrl } from "@/lib/strapi";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import WhatsAppCTA from "@/components/WhatsAppCTA";
+import { useImprovedToast } from "@/components/ImprovedToast";
+import {useRouter} from "next/navigation";
 
 interface ProductCardProps {
 	id: string;
@@ -16,6 +20,10 @@ interface ProductCardProps {
 	enOferta?: boolean;
 	precioDescuento?: number;
 	porcentajeDescuento?: number;
+	categoria?: {
+		nombre: string;
+	};
+	whatsappNumber?: string | null;
 }
 
 export default function ProductCard({
@@ -24,113 +32,160 @@ export default function ProductCard({
 	precio,
 	imagen,
 	disponible,
-	cantidadStock = 0,
-	enOferta = false,
+	cantidadStock,
+	enOferta,
 	precioDescuento,
 	porcentajeDescuento,
+	categoria,
+	whatsappNumber,
 }: ProductCardProps) {
-	const [isFavorite, setIsFavorite] = useState(false);
+	const router = useRouter();
+
+
+	const [isLiked, setIsLiked] = useState(false);
+	const [showQuickActions, setShowQuickActions] = useState(false);
 	const { convertAndFormatPrice, currencyInfo, isLoading } = useCurrency();
+	const { addToast } = useImprovedToast();
+
+	const imageUrl = getStrapiImageUrl(imagen);
+	const precioFinal = enOferta && precioDescuento ? precioDescuento : precio;
+	const precioFormateado = convertAndFormatPrice(precioFinal);
+	const precioOriginalFormateado = convertAndFormatPrice(precio);
+
+	// WhatsApp message for quick order
+	const quickOrderConfig = {
+		type: 'product_order' as const,
+		productName: nombre,
+		productPrice: precioFinal,
+		currency: 'PEN',
+		category: categoria?.nombre,
+		quantity: 1
+	};
+
+	const handleLike = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const newLikedState = !isLiked;
+		setIsLiked(newLikedState);
+		
+		addToast({
+			type: newLikedState ? 'success' : 'info',
+			title: newLikedState ? '¡Favorito agregado!' : 'Favorito eliminado',
+			message: newLikedState ? `${nombre} está ahora en tus favoritos ❤️` : `${nombre} ya no está en tus favoritos`,
+			duration: 3000
+		});
+	};
 
 	return (
-		<Link href={`/productos/${id}`}>
-			<div className="group overflow-hidden rounded-lg bg-card border-2 border-border transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-3 active:scale-95">
-				{/* Image Container */}
-				<div className="relative aspect-square w-full overflow-hidden bg-linear-to-br from-muted to-muted/80">
-					<Image
-						src={imagen}
-						alt={nombre}
-						fill
-						className="object-cover transition-all duration-500 group-hover:scale-110"
-						sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-					/>
-
-					{/* Overlay gradient on hover */}
-					<div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-					{/* Stock Indicator */}
-					{!disponible && (
-						<div className="absolute inset-0 bg-black/75 flex items-center justify-center backdrop-blur-sm">
-							<span className="text-white font-semibold text-lg">Agotado</span>
-						</div>
-					)}
-
-					{/* Favorite Button */}
-					<button
-						onClick={(e) => {
-							e.preventDefault(); // evita que el Link lo capture
-							setIsFavorite(!isFavorite);
-						}}
-						className="absolute right-4 top-4 rounded-full bg-white p-3 shadow-lg hover:bg-accent transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary opacity-0 group-hover:opacity-100 transform group-hover:scale-110"
-						aria-label={
-							isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"
-						}
-					>
-						<Heart
-							className={`h-6 w-6 transition-all duration-300 ${
-								isFavorite
-									? "fill-primary text-primary scale-125"
-									: "text-primary hover:scale-110"
-							}`}
-						/>
-					</button>
-
-					{/* Sale Badge */}
-					{enOferta && (
-						<div className="absolute top-4 left-4 bg-gradient-to-r from-primary to-primary/80 text-white rounded-lg px-4 py-2 border-2 border-white shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-							<span className="text-xs font-semibold">
-								{porcentajeDescuento ? `${porcentajeDescuento}% off` : "Oferta"}
-							</span>
-						</div>
-					)}
-
-					{/* Low Stock Badge */}
-					{disponible && cantidadStock > 0 && cantidadStock <= 5 && (
-						<div className="absolute bottom-4 left-4 bg-primary text-white rounded-none px-4 py-2 animate-slide-up border-2 border-white">
-							<span className="text-sm font-medium">
-								Quedan {cantidadStock}
-							</span>
-						</div>
-					)}
+		<div 
+			className="group relative bg-card border border-border rounded-none overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:cursor-pointer"
+			onClick={() => router.push(`/productos/${id}`)}
+			onMouseEnter={() => setShowQuickActions(true)}
+			onMouseLeave={() => setShowQuickActions(false)}
+		>
+			{/* Badge de oferta */}
+			{enOferta && (
+				<div className="absolute top-3 left-3 z-10 bg-destructive text-white text-xs font-black px-3 py-1 rounded-sm">
+					-{porcentajeDescuento}%
 				</div>
+			)}
 
-				{/* Content */}
-				<div className="p-6 flex flex-col gap-4 bg-card relative">
-					<h3 className="font-black text-base text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-300 tracking-wide group-hover:translate-x-1">
-						{nombre}
-					</h3>
+			{/* Badge de stock */}
+			{!disponible && (
+				<div className="absolute top-3 right-3 z-10 bg-muted text-muted-foreground text-xs font-black px-3 py-1 rounded-sm">
+					Agotado
+				</div>
+			)}
 
-					<div className="flex items-end justify-between gap-3">
-						<div>
-							<p className="text-xs text-muted-foreground uppercase font-medium tracking-wide mb-1">
-								Precio {currencyInfo.code !== 'PEN' && !isLoading ? `(${currencyInfo.code})` : ''}
-							</p>
-							<div className="flex items-baseline gap-2">
-								{enOferta && precioDescuento ? (
-									<>
-										<span className="text-sm text-muted-foreground line-through font-semibold">
-											{convertAndFormatPrice(precio)}
-										</span>
-										<span className="text-2xl font-black text-primary">
-											{convertAndFormatPrice(precioDescuento)}
-										</span>
-									</>
-								) : (
-									<span className="text-2xl font-black text-primary">
-										{convertAndFormatPrice(precio)}
-									</span>
-								)}
-							</div>
-						</div>
+			{/* Quick actions overlay */}
+			<div className={`absolute top-3 right-3 z-10 flex flex-col gap-2 transition-all duration-300 ${showQuickActions ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
+				<button
+					onClick={handleLike}
+					className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all duration-200"
+					title={isLiked ? "Quitar de favoritos" : "Agregar a favoritos"}
+				>
+					<Heart 
+						className={`h-4 w-4 transition-colors duration-200 ${isLiked ? 'fill-red-500 text-red-500' : 'text-foreground'}`} 
+					/>
+				</button>
+			</div>
 
-						{disponible && (
-							<span className="text-xs font-medium text-secondary bg-secondary/10 px-4 py-2 rounded-none border border-secondary">
-								En stock
+			{/* Imagen del producto */}
+			<div className="relative aspect-square overflow-hidden bg-muted">
+				<Image
+					src={imageUrl}
+					alt={nombre}
+					fill
+					className="object-cover transition-transform duration-500 group-hover:scale-105"
+					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+				/>
+			</div>
+
+			{/* Contenido */}
+			<div className="p-4 space-y-3">
+				{/* Categoría */}
+				{categoria?.nombre && (
+					<div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+						{categoria.nombre}
+					</div>
+				)}
+
+				{/* Nombre */}
+				<h3 className="font-semibold text-foreground line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-primary transition-colors duration-200">
+					{nombre}
+				</h3>
+
+				{/* Precios */}
+				<div className="space-y-1">
+					<div className="flex items-center gap-2 flex-wrap">
+						{enOferta && precioDescuento ? (
+							<>
+								<span className="text-lg font-black text-destructive">
+									{precioFormateado}
+								</span>
+								<span className="text-sm text-muted-foreground line-through">
+									{precioOriginalFormateado}
+								</span>
+							</>
+						) : (
+							<span className="text-lg font-black text-foreground">
+								{precioFormateado}
+							</span>
+						)}
+						{currencyInfo.code !== 'PEN' && !isLoading && (
+							<span className="text-xs text-muted-foreground">
+								({currencyInfo.code})
 							</span>
 						)}
 					</div>
+
+					{cantidadStock !== undefined && cantidadStock > 0 && (
+						<div className="text-xs text-muted-foreground">
+							{cantidadStock} disponibles
+						</div>
+					)}
+				</div>
+
+				{/* Acciones */}
+				<div className="flex gap-2 pt-2">
+					{whatsappNumber && disponible ? (
+						<WhatsAppCTA
+							whatsappNumber={whatsappNumber}
+							messageConfig={quickOrderConfig}
+							label="Pedir"
+							className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 border-primary text-sm py-2"
+						/>
+					) : (
+						<Link
+							href={`/productos/${id}`}
+							className="flex-1 inline-flex items-center justify-center gap-2 rounded-none bg-muted px-4 py-2 font-medium text-muted-foreground hover:bg-muted/90 transition-smooth border border-border text-sm"
+						>
+							<Eye className="h-4 w-4" />
+							Ver
+						</Link>
+					)}
 				</div>
 			</div>
-		</Link>
+		</div>
 	);
 }

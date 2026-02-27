@@ -12,9 +12,9 @@ import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import type { StrapiSettings } from "@/lib/strapi";
 
 export const metadata = {
-	title: "Moda Peru - Ropa y Textiles",
+	title: "Moda Peru - Ropa de Calidad",
 	description:
-		"Ropa y textiles peruanos. Alta calidad, precios bajos. Envíos a todo el Perú. Pedidos por WhatsApp.",
+		"Ropa peruana de buena calidad a precios justos. Envíos a todo el Perú. Compra por WhatsApp fácil y rápido.",
 };
 
 export default async function Home() {
@@ -30,13 +30,15 @@ export default async function Home() {
 	const heroTitle = siteSettings?.tituloHero || "Moda Peru";
 	const heroSubtitle =
 		siteSettings?.subtituloHero ||
-		"Ropa y textiles de calidad. Envíos a todo el Perú.";
+		"Ropa de calidad a precios justos. Envíos a todo el Perú.";
 	const estadisticas = siteSettings?.estadisticas;
 	const whatsappNumber = settings?.numeroWhatsapp;
 
+	console.log(whatsappNumber);
+
 	// WhatsApp message configurations
-	const generalInquiryConfig: WhatsAppMessageConfig = {
-		type: 'general_inquiry'
+	const generalQuestionConfig: WhatsAppMessageConfig = {
+		type: 'general_question'
 	};
 	const heroImageUrl = siteSettings?.imagenHero?.url;
 
@@ -115,18 +117,11 @@ export default async function Home() {
 							{whatsappNumber ? (
 								<WhatsAppCTA
 									whatsappNumber={whatsappNumber}
-									message="Hola, me interesa conocer más sobre sus productos."
+									messageConfig={generalQuestionConfig}
 									label="Contactar"
-									className="w-full sm:w-auto bg-black/40 backdrop-blur-xl border-white/20 hover:bg-white/10 text-white border px-6 sm:px-10 py-3 sm:py-5 font-bold uppercase tracking-widest text-sm transition-all duration-300"
+									className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary"
 								/>
-							) : (
-								<button
-									className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-5 border border-white/10 text-white bg-black/30 font-semibold rounded-none"
-									disabled
-								>
-									Contactar
-								</button>
-							)}
+							) : null}
 						</div>
 					</div>
 				</div>
@@ -187,6 +182,7 @@ export default async function Home() {
 										enOferta={product.enOferta}
 										precioDescuento={product.precioDescuento}
 										porcentajeDescuento={product.porcentajeDescuento}
+										whatsappNumber={whatsappNumber}
 									/>
 								</div>
 							))}
@@ -418,7 +414,7 @@ export default async function Home() {
 			<WhatsAppCTA
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
-				message="Hola, me interesa saber más."
+				messageConfig={generalQuestionConfig}
 			/>
 		</main>
 	);
