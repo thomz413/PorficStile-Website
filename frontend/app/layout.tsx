@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { ImprovedToastProvider } from "@/components/ImprovedToast";
+import { ToastProvider } from "@/components/ImprovedToast";
 import HeaderWrapper from "@/components/HeaderWrapper";
 
 const geistSans = Geist({
@@ -17,9 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Moda Peru - Ropa y Textiles",
+	title: "Atlantis Porfic Stile - Moda Premium Peruana",
 	description:
-		"Ropa y textiles peruanos. Alta calidad, precios bajos. Envíos a todo el Perú. Pedidos por WhatsApp.",
+		"Descubre colecciones exclusivas de Atlantis Porfic Stile. Moda premium peruana con diseño único y calidad excepcional. Tienda física en Galería Santa Lucía.",
+	icons: {
+		icon: "/favicon.ico",
+	},
 };
 
 export default function RootLayout({
@@ -34,9 +37,7 @@ export default function RootLayout({
 			>
 				<CurrencyProvider>
 					<CartProvider>
-						<ImprovedToastProvider>
-							{children}
-						</ImprovedToastProvider>
+						<ToastProvider>{children}</ToastProvider>
 					</CartProvider>
 				</CurrencyProvider>
 			</body>

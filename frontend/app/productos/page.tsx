@@ -12,9 +12,9 @@ import {
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 export const metadata = {
-	title: "Tienda - Moda Peru",
+	title: "Tienda - Atlantis Porfic Stile",
 	description:
-		"Catálogo completo de ropa peruana. Buena calidad, precios justos y envíos a todo el Perú. Compra fácil por WhatsApp.",
+		"Catálogo completo de ropa de calidad. Tienda física en Galería Santa Lucía. Envíos a nivel nacional.",
 };
 
 interface ProductsPageProps {
@@ -39,8 +39,8 @@ export default async function ProductsPage({
 
 	// WhatsApp message configuration for general questions
 	const generalQuestionConfig: WhatsAppMessageConfig = {
-		type: 'general_question',
-		category: selectedCategory || 'Todos los productos'
+		type: "general_question",
+		category: selectedCategory || "Todos los productos",
 	};
 
 	return (
@@ -48,29 +48,30 @@ export default async function ProductsPage({
 			<Header />
 			<main className="min-h-screen bg-background">
 				{/* Page Header */}
-				<section className="border-b border-border py-12 md:py-16">
+				<section className="border-b border-border py-8 md:py-12">
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-						<h1 className="text-4xl md:text-5xl font-black text-foreground mb-4">
-							{selectedCategory ? selectedCategory : "Nuestros productos"}
+						<h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
+							{selectedCategory ? selectedCategory : "Atlantis"}
 						</h1>
-						<p className="text-lg text-muted-foreground max-w-2xl">
-							Ropa de buena calidad a precios justos. Filtra por categoría para encontrar lo que buscas.
+						<p className="text-base md:text-lg text-muted-foreground max-w-2xl">
+							Ropa de calidad con estilo único. Envíos a nivel nacional y
+							provincias del Perú.
 						</p>
 					</div>
 				</section>
 
 				{/* Products Section */}
-				<section className="py-20 md:py-32 bg-background">
+				<section className="py-16 md:py-24 lg:py-32 bg-background">
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 						{products && products.length > 0 ? (
 							<>
 								{/* Filters + count */}
-								<div className="mb-10 space-y-6">
+								<div className="mb-8 md:mb-10 space-y-6">
 									{/* Category filters */}
-									<div className="flex flex-wrap gap-3">
+									<div className="flex flex-wrap gap-2 md:gap-3">
 										<Link
 											href="/productos"
-											className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
+											className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
 												!selectedCategory
 													? "bg-primary text-primary-foreground border-primary shadow-sm"
 													: "bg-background text-muted-foreground hover:text-foreground hover:border-primary/60"
@@ -86,7 +87,7 @@ export default async function ProductsPage({
 													href={`/productos?categoria=${encodeURIComponent(
 														category.nombre,
 													)}`}
-													className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
+													className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
 														isActive
 															? "bg-primary text-primary-foreground border-primary shadow-sm"
 															: "bg-background text-muted-foreground hover:text-foreground hover:border-primary/60"
@@ -109,7 +110,7 @@ export default async function ProductsPage({
 									</div>
 								</div>
 
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
 									{products.map((product) => (
 										<ProductCard
 											key={product.id}
@@ -142,10 +143,10 @@ export default async function ProductsPage({
 				{/* CTA Section */}
 				<section className="border-t border-border bg-card py-12 md:py-16">
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-						<h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-6">
+						<h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-6">
 							¿No encuentras algo?
 						</h2>
-						<p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+						<p className="text-base md:text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
 							Escríbenos por WhatsApp para pedidos a medida o dudas.
 						</p>
 						<WhatsAppCTA

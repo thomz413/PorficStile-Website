@@ -4,9 +4,9 @@ import { getSettings } from "@/lib/strapi";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 export const metadata = {
-	title: "Contacto - Moda Peru",
+	title: "Contacto - Atlantis Porfic Stile",
 	description:
-		"Contáctanos para pedidos y consultas. Atención personalizada por WhatsApp. Ropa de calidad a precios justos.",
+		"Visítanos en Galería Santa Lucía Piso 7 Tienda 709 Stand A. Contáctanos para pedidos y consultas. Atención personalizada.",
 };
 
 export default async function ContactoPage() {
@@ -16,32 +16,38 @@ export default async function ContactoPage() {
 	// WhatsApp message configurations for different contact purposes
 	const configs: { label: string; config: WhatsAppMessageConfig }[] = [
 		{
-			label: "Comprar productos",
+			label: "Ver productos",
 			config: {
-				type: 'product_order',
-				category: 'General'
-			}
+				type: "general_question",
+			},
+		},
+		{
+			label: "Pedir por WhatsApp",
+			config: {
+				type: "custom_order",
+				customNote: "Quiero hacer un pedido desde el carrito",
+			},
 		},
 		{
 			label: "Precios al por mayor",
 			config: {
-				type: 'custom_order',
-				customNote: 'Soy un negocio y necesito precios al por mayor'
-			}
+				type: "custom_order",
+				customNote: "Soy un negocio y necesito precios al por mayor",
+			},
 		},
 		{
 			label: "Diseños personalizados",
 			config: {
-				type: 'custom_order',
-				customNote: 'Necesito productos con mi diseño/logo'
-			}
+				type: "custom_order",
+				customNote: "Necesito productos con mi diseño/logo",
+			},
 		},
 		{
 			label: "Otras consultas",
 			config: {
-				type: 'general_question'
-			}
-		}
+				type: "general_question",
+			},
+		},
 	];
 
 	return (
@@ -56,10 +62,11 @@ export default async function ContactoPage() {
 							Contacto
 						</p>
 						<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-							Escríbenos por <span className="text-secondary">WhatsApp</span>
+							Contáctanos por <span className="text-primary">WhatsApp</span>
 						</h1>
 						<p className="text-base md:text-lg text-muted-foreground leading-relaxed">
 							Pedidos, cotizaciones y consultas. Te respondemos rápidamente.
+							Envíos a nivel nacional y provincias.
 						</p>
 					</div>
 				</div>
@@ -67,80 +74,92 @@ export default async function ContactoPage() {
 
 			{/* Contact options */}
 			<section className="py-16 md:py-20 bg-muted/40">
-				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start">
-					<div className="space-y-8">
-						<div className="space-y-3">
-							<h2 className="text-2xl md:text-3xl font-semibold text-foreground">
-								¿En qué podemos ayudarte?
-							</h2>
-							<p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
-								Elige la opción que mejor describa lo que necesitas.
-							</p>
-						</div>
-
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							{configs.map((item, index) => (
-								<WhatsAppCTA
-									key={index}
-									whatsappNumber={whatsappNumber}
-									variant="card"
-									label={item.label}
-									messageConfig={item.config}
-								/>
-							))}
-						</div>
-					</div>
-
-					<div className="space-y-8 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-lg">
-						<div>
-							<h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">
-								Datos de contacto
-							</h3>
-							<p className="text-sm text-muted-foreground">
-								Horarios y datos referenciales. Confirma por WhatsApp al
-								coordinar.
-							</p>
-						</div>
-
-						<div className="space-y-4 text-sm">
-							<div>
-								<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-									Operación
-								</p>
-								<p className="font-medium text-foreground">
-									Negocio 100% online con envíos desde Perú
+				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+					<div className="space-y-12 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-12 lg:space-y-0">
+						<div className="space-y-8">
+							<div className="space-y-3">
+								<h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+									¿En qué podemos ayudarte?
+								</h2>
+								<p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
+									Elige la opción que mejor describa lo que necesitas. Te
+									responderemos por WhatsApp rápidamente.
 								</p>
 							</div>
 
+							<div className="bg-muted/50 rounded-lg p-4 border border-border">
+								<h3 className="font-semibold text-foreground mb-2">
+									🚚 Entrega Rápida
+								</h3>
+								<p className="text-sm text-muted-foreground">
+									Envíos a nivel nacional y provincias. Entregas en 24-48h.
+								</p>
+							</div>
+
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+								{configs.map((item, index) => (
+									<WhatsAppCTA
+										key={index}
+										whatsappNumber={whatsappNumber}
+										variant="card"
+										label={item.label}
+										messageConfig={item.config}
+									/>
+								))}
+							</div>
+						</div>
+
+						<div className="space-y-8 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-lg">
 							<div>
-								<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-									Horario referencial
+								<h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">
+									Datos de contacto
+								</h3>
+								<p className="text-sm text-muted-foreground">
+									Horarios y datos referenciales. Confirma por WhatsApp al
+									coordinar.
 								</p>
-								<p className="font-medium text-foreground">
-									Lunes a sábado: 9:00 am – 7:00 pm
-								</p>
+							</div>
+
+							<div className="space-y-4 text-sm">
+								<div>
+									<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+										Operación
+									</p>
+									<p className="font-medium text-foreground">
+										Negocio 100% online con envíos desde Perú
+									</p>
+								</div>
+
+								<div>
+									<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+										Horario referencial
+									</p>
+									<p className="font-medium text-foreground">
+										Lunes a sábado: 9:00 am – 7:00 pm
+									</p>
+									<p className="text-xs text-muted-foreground">
+										Fuera de horario te respondemos cuando estemos disponibles.
+									</p>
+								</div>
+
+								<div>
+									<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+										Formas de atención
+									</p>
+									<ul className="mt-1 space-y-1 text-foreground">
+										<li>• WhatsApp</li>
+										<li>• Envíos a todo el Perú</li>
+										<li>• Pedidos a medida</li>
+									</ul>
+								</div>
+							</div>
+
+							<div className="pt-4 border-t border-border/60">
 								<p className="text-xs text-muted-foreground">
-									Fuera de horario te respondemos cuando estemos disponibles.
+									Cambios, devoluciones o garantías: cuéntanos tu caso por
+									WhatsApp y, si hace falta, envía fotos.
 								</p>
 							</div>
-
-							<div>
-								<p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-									Formas de atención
-								</p>
-								<ul className="mt-1 space-y-1 text-foreground">
-									<li>• WhatsApp</li>
-									<li>• Envíos a todo el Perú</li>
-									<li>• Pedidos a medida</li>
-								</ul>
-							</div>
-						</div>
-
-						<div className="pt-4 border-t border-border/60">
-							<p className="text-xs text-muted-foreground">
-								Cambios, devoluciones o garantías: cuéntanos tu caso por
-								WhatsApp y, si hace falta, envía fotos.
-							</p>
 						</div>
 					</div>
 				</div>
@@ -151,7 +170,7 @@ export default async function ContactoPage() {
 				whatsappNumber={whatsappNumber}
 				variant="sticky"
 				messageConfig={{
-					type: 'general_question'
+					type: "general_question",
 				}}
 			/>
 		</main>

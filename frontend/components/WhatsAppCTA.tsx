@@ -22,11 +22,11 @@ export default function WhatsAppCTA({
 	label = "Escribir por WhatsApp",
 }: WhatsAppCTAProps) {
 	// Generate intelligent message if config is provided
-	const finalMessage = messageConfig 
+	const finalMessage = messageConfig
 		? generateWhatsAppMessage(messageConfig)
 		: message || "Hola, me interesa conocer más";
 
-	const whatsappURL = `https://wa.me/${whatsappNumber?.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+	const whatsappURL = `https://wa.me/${whatsappNumber?.replace(/[^\d]/g, "")}?text=${encodeURIComponent(
 		finalMessage,
 	)}`;
 

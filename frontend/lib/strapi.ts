@@ -57,17 +57,12 @@ type ImageType = z.infer<typeof ImageSchema>;
 const tallaEnum = z.enum(["XS", "S", "M", "L", "XL", "XXL"]);
 
 const TallaProductoSchema = z.object({
-	talla: z.preprocess(
-		(v) => {
-			if (typeof v !== "string") return v;
-			return v.trim().toUpperCase();
-		},
-		tallaEnum
-	),
+	talla: z.preprocess((v) => {
+		if (typeof v !== "string") return v;
+		return v.trim().toUpperCase();
+	}, tallaEnum),
 
-	disponible: z
-		.preprocess((v) => safeBoolean(v), z.boolean())
-		.default(true),
+	disponible: z.preprocess((v) => safeBoolean(v), z.boolean()).default(true),
 
 	stock: z
 		.preprocess((v) => safeNumber(v, 0), z.number().int().min(0))
@@ -195,24 +190,22 @@ function normalizeProductRaw(raw: any) {
 
 	const tallaProducto = Array.isArray(src.tallaProducto)
 		? src.tallaProducto
-			.map((t: any) => {
-				const talla =
-					typeof t.talla === "string"
-						? t.talla.trim().toUpperCase()
-						: "";
+				.map((t: any) => {
+					const talla =
+						typeof t.talla === "string" ? t.talla.trim().toUpperCase() : "";
 
-				if (!VALID_TALLAS.includes(talla)) {
-					console.warn("Invalid talla from Strapi:", t.talla);
-					return null;
-				}
+					if (!VALID_TALLAS.includes(talla)) {
+						console.warn("Invalid talla from Strapi:", t.talla);
+						return null;
+					}
 
-				return {
-					talla,
-					disponible: safeBoolean(t.disponible),
-					stock: safeNumber(t.stock, 0),
-				};
-			})
-			.filter(Boolean)
+					return {
+						talla,
+						disponible: safeBoolean(t.disponible),
+						stock: safeNumber(t.stock, 0),
+					};
+				})
+				.filter(Boolean)
 		: [];
 
 	return {
@@ -222,9 +215,7 @@ function normalizeProductRaw(raw: any) {
 		descripcion: src.descripcion ?? "",
 		precio: safeNumber(src.precio, 0),
 		precioDescuento:
-			src.precioDescuento == null
-				? undefined
-				: safeNumber(src.precioDescuento),
+			src.precioDescuento == null ? undefined : safeNumber(src.precioDescuento),
 		enOferta: safeBoolean(src.enOferta),
 		porcentajeDescuento:
 			src.porcentajeDescuento == null
@@ -301,9 +292,7 @@ function buildProductQuery() {
 /** Get featured productos (destacado = true) */
 export async function getFeaturedProducts(): Promise<StrapiProduct[]> {
 	try {
-		const qs =
-			"filters[destacado][$eq]=true&" +
-			buildProductQuery();
+		const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
 
 		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
 			next: { revalidate: 60 },

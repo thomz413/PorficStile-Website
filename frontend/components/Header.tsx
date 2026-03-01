@@ -6,9 +6,13 @@ import { useState } from "react";
 import CurrencySelector from "./CurrencySelector";
 import Cart from "./Cart";
 import { useCart } from "@/contexts/CartContext";
-import { getSettings } from "@/lib/strapi";
+import Image from "next/image";
 
-export default function Header({ whatsappNumber }: { whatsappNumber?: string | null }) {
+export default function Header({
+	whatsappNumber,
+}: {
+	whatsappNumber?: string | null;
+}) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
 	const { getTotalItems } = useCart();
@@ -19,15 +23,24 @@ export default function Header({ whatsappNumber }: { whatsappNumber?: string | n
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="flex h-20 items-center justify-between">
 						{/* Logo */}
-						<Link href="/" className="flex items-center gap-3 group">
-							<div className="flex items-center justify-center text-3xl font-black text-primary transition-all duration-300 group-hover:scale-125 group-hover:rotate-12">
-								✦
+						<Link href="/" className="flex items-center group">
+							<div className="flex items-center justify-center gap-3">
+								<Image
+									src="/Atlantis.png"
+									alt="Atlantis logo"
+									width={40}
+									height={40}
+									className="object-contain rounded-sm transition-all duration-300 group-hover:scale-105 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
+								/>
 							</div>
+
 							<div className="hidden sm:flex flex-col leading-tight">
-								<span className="text-xs font-black text-accent tracking-widest uppercase">
-									Moda
+								<span className="text-xs font-black text-foreground tracking-widest uppercase">
+									Atlantis
 								</span>
-								<span className="text-lg font-black text-foreground">PERU</span>
+								<span className="text-lg font-black text-primary">
+									Porfic Stile
+								</span>
 							</div>
 						</Link>
 
@@ -62,7 +75,7 @@ export default function Header({ whatsappNumber }: { whatsappNumber?: string | n
 							<div className="hidden sm:block">
 								<CurrencySelector />
 							</div>
-							
+
 							{/* Cart Button */}
 							<button
 								onClick={() => setIsCartOpen(true)}
@@ -76,7 +89,7 @@ export default function Header({ whatsappNumber }: { whatsappNumber?: string | n
 									</span>
 								)}
 							</button>
-							
+
 							{/* Mobile Menu Button */}
 							<button
 								onClick={() => setIsOpen(!isOpen)}
@@ -126,9 +139,9 @@ export default function Header({ whatsappNumber }: { whatsappNumber?: string | n
 			</header>
 
 			{/* Cart */}
-			<Cart 
-				isOpen={isCartOpen} 
-				onClose={() => setIsCartOpen(false)} 
+			<Cart
+				isOpen={isCartOpen}
+				onClose={() => setIsCartOpen(false)}
 				whatsappNumber={whatsappNumber}
 			/>
 		</>

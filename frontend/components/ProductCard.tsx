@@ -7,8 +7,8 @@ import { Heart, Eye } from "lucide-react";
 import { getStrapiImageUrl } from "@/lib/strapi";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import { useImprovedToast } from "@/components/ImprovedToast";
-import {useRouter} from "next/navigation";
+import { useToast } from "@/components/ImprovedToast";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
 	id: string;
@@ -41,11 +41,10 @@ export default function ProductCard({
 }: ProductCardProps) {
 	const router = useRouter();
 
-
 	const [isLiked, setIsLiked] = useState(false);
 	const [showQuickActions, setShowQuickActions] = useState(false);
 	const { convertAndFormatPrice, currencyInfo, isLoading } = useCurrency();
-	const { addToast } = useImprovedToast();
+	const { addToast } = useToast();
 
 	const imageUrl = getStrapiImageUrl(imagen);
 	const precioFinal = enOferta && precioDescuento ? precioDescuento : precio;
@@ -54,12 +53,12 @@ export default function ProductCard({
 
 	// WhatsApp message for quick order
 	const quickOrderConfig = {
-		type: 'product_order' as const,
+		type: "product_order" as const,
 		productName: nombre,
 		productPrice: precioFinal,
-		currency: 'PEN',
+		currency: "PEN",
 		category: categoria?.nombre,
-		quantity: 1
+		quantity: 1,
 	};
 
 	const handleLike = (e: React.MouseEvent) => {
@@ -67,17 +66,19 @@ export default function ProductCard({
 		e.stopPropagation();
 		const newLikedState = !isLiked;
 		setIsLiked(newLikedState);
-		
+
 		addToast({
-			type: newLikedState ? 'success' : 'info',
-			title: newLikedState ? '¡Favorito agregado!' : 'Favorito eliminado',
-			message: newLikedState ? `${nombre} está ahora en tus favoritos ❤️` : `${nombre} ya no está en tus favoritos`,
-			duration: 3000
+			type: newLikedState ? "success" : "info",
+			title: newLikedState ? "¡Favorito agregado!" : "Favorito eliminado",
+			message: newLikedState
+				? `${nombre} está ahora en tus favoritos ❤️`
+				: `${nombre} ya no está en tus favoritos`,
+			duration: 3000,
 		});
 	};
 
 	return (
-		<div 
+		<div
 			className="group relative bg-card border border-border rounded-none overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:cursor-pointer"
 			onClick={() => router.push(`/productos/${id}`)}
 			onMouseEnter={() => setShowQuickActions(true)}
@@ -98,14 +99,16 @@ export default function ProductCard({
 			)}
 
 			{/* Quick actions overlay */}
-			<div className={`absolute top-3 right-3 z-10 flex flex-col gap-2 transition-all duration-300 ${showQuickActions ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
+			<div
+				className={`absolute top-3 right-3 z-10 flex flex-col gap-2 transition-all duration-300 ${showQuickActions ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"}`}
+			>
 				<button
 					onClick={handleLike}
 					className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all duration-200"
 					title={isLiked ? "Quitar de favoritos" : "Agregar a favoritos"}
 				>
-					<Heart 
-						className={`h-4 w-4 transition-colors duration-200 ${isLiked ? 'fill-red-500 text-red-500' : 'text-foreground'}`} 
+					<Heart
+						className={`h-4 w-4 transition-colors duration-200 ${isLiked ? "fill-red-500 text-red-500" : "text-foreground"}`}
 					/>
 				</button>
 			</div>
@@ -152,7 +155,7 @@ export default function ProductCard({
 								{precioFormateado}
 							</span>
 						)}
-						{currencyInfo.code !== 'PEN' && !isLoading && (
+						{currencyInfo.code !== "PEN" && !isLoading && (
 							<span className="text-xs text-muted-foreground">
 								({currencyInfo.code})
 							</span>

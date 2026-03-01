@@ -8,7 +8,9 @@ export default function CurrencySelector() {
 	const { currency, setCurrency, isLoading } = useCurrency();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const currentCurrency = SUPPORTED_CURRENCIES.find(c => c.code === currency) || SUPPORTED_CURRENCIES[0];
+	const currentCurrency =
+		SUPPORTED_CURRENCIES.find((c) => c.code === currency) ||
+		SUPPORTED_CURRENCIES[0];
 
 	const handleCurrencyChange = (currencyCode: string) => {
 		setCurrency(currencyCode);
@@ -26,12 +28,17 @@ export default function CurrencySelector() {
 				<span className="text-lg">{currentCurrency.symbol}</span>
 				<span>{currentCurrency.code}</span>
 				<svg
-					className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+					className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 				>
-					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth={2}
+						d="M19 9l-7 7-7-7"
+					/>
 				</svg>
 			</button>
 
@@ -42,7 +49,7 @@ export default function CurrencySelector() {
 						onClick={() => setIsOpen(false)}
 					/>
 					<ul
-						className="absolute right-0 top-full mt-2 w-48 bg-background border border-border rounded-lg shadow-lg z-20 overflow-hidden"
+						className="absolute right-0 top-full mt-2 w-48 bg-background border border-border rounded-lg shadow-lg z-20 overflow-hidden max-h-60 overflow-y-auto"
 						role="listbox"
 					>
 						{SUPPORTED_CURRENCIES.map((currencyOption) => (
@@ -51,17 +58,21 @@ export default function CurrencySelector() {
 									onClick={() => handleCurrencyChange(currencyOption.code)}
 									className={`w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between ${
 										currency === currencyOption.code
-											? 'bg-primary/10 text-primary font-medium'
-											: 'text-foreground'
+											? "bg-primary/10 text-primary font-medium"
+											: "text-foreground"
 									}`}
 									role="option"
 									aria-selected={currency === currencyOption.code}
 								>
 									<div className="flex items-center gap-3">
-										<span className="text-lg font-medium">{currencyOption.symbol}</span>
+										<span className="text-lg font-medium">
+											{currencyOption.symbol}
+										</span>
 										<div>
 											<div className="font-medium">{currencyOption.code}</div>
-											<div className="text-xs text-muted-foreground">{currencyOption.name}</div>
+											<div className="text-xs text-muted-foreground">
+												{currencyOption.name}
+											</div>
 										</div>
 									</div>
 									{currency === currencyOption.code && (
