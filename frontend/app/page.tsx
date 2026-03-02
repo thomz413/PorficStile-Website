@@ -151,18 +151,12 @@ export default async function Home() {
 
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
 					<div className="text-center mb-16 md:mb-24">
-						<div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20 mb-6">
-							<span className="w-2 h-2 bg-primary rounded-full"></span>
-							<p className="text-primary font-semibold text-sm tracking-widest uppercase">
-								Colección Destacada
-							</p>
-						</div>
 						<h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-tight mb-6">
-							Piezas Exclusivas
+							Productos Destacados
 						</h2>
 						<p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
 							Conoce nuestras piezas más populares, diseñadas con alta calidad y
-							estilo único.
+							variedad.
 						</p>
 					</div>
 

@@ -22,17 +22,14 @@ export default function Header({
 			<header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/95 backdrop-blur-md transition-all duration-300 shadow-sm">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="flex h-20 items-center justify-between">
-						{/* Logo */}
-						<Link href="/" className="flex items-center group">
-							<div className="flex items-center justify-center gap-3">
-								<Image
-									src="/Atlantis.png"
-									alt="Atlantis logo"
-									width={40}
-									height={40}
-									className="object-contain rounded-sm transition-all duration-300 group-hover:scale-105 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
-								/>
-							</div>
+						<Link href="/" className="flex items-center gap-4 group">
+							<Image
+								src="/Atlantis.png"
+								alt="Atlantis logo"
+								width={50}
+								height={50}
+								className="object-contain rounded-sm transition-all duration-300 group-hover:scale-105 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
+							/>
 
 							<div className="hidden sm:flex flex-col leading-tight">
 								<span className="text-xs font-black text-foreground tracking-widest uppercase">
