@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -5,34 +7,34 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #faf6f1;
+  --background: #f0f0e5;
   --foreground: #1a1410;
-  --card: #ffffff;
+  --card: #f0f0e5;
   --card-foreground: #1a1410;
-  --popover: #ffffff;
+  --popover: #dbdbda;
   --popover-foreground: #1a1410;
   --primary: #c84c2c;
-  --primary-foreground: #ffffff;
+  --primary-foreground: #dbdbda;
   --secondary: #3d6b42;
-  --secondary-foreground: #ffffff;
+  --secondary-foreground: #dbdbda;
   --muted: #e8dfd4;
   --muted-foreground: #6b5f50;
-  --accent: #e8b44f;
+  --accent: #daa520;
   --accent-foreground: #1a1410;
   --destructive: #d84040;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #dbdbda;
   --border: #e8dfd4;
-  --input: #ffffff;
+  --input: #dbdbda;
   --ring: #c84c2c;
   --chart-1: #c84c2c;
   --chart-2: #3d6b42;
-  --chart-3: #e8b44f;
+  --chart-3: #daa520;
   --chart-4: #8b6f47;
   --chart-5: #a1463c;
   --radius: 0.75rem;
   --sidebar: #2a2118;
   --sidebar-foreground: #faf6f1;
-  --sidebar-primary: #e8b44f;
+  --sidebar-primary: #daa520;
   --sidebar-primary-foreground: #1a1410;
   --sidebar-accent: #c84c2c;
   --sidebar-accent-foreground: #ffffff;
@@ -53,7 +55,7 @@
   --secondary-foreground: #1a1410;
   --muted: #3d3228;
   --muted-foreground: #a89c90;
-  --accent: #f5c86a;
+  --accent: #daa520;
   --accent-foreground: #1a1410;
   --destructive: #ef5252;
   --destructive-foreground: #faf6f1;
@@ -62,12 +64,12 @@
   --ring: #e85d3f;
   --chart-1: #e85d3f;
   --chart-2: #52a862;
-  --chart-3: #f5c86a;
+  --chart-3: #daa520;
   --chart-4: #a39170;
   --chart-5: #c16a4d;
   --sidebar: #0f0d0a;
   --sidebar-foreground: #faf6f1;
-  --sidebar-primary: #f5c86a;
+  --sidebar-primary: #daa520;
   --sidebar-primary-foreground: #1a1410;
   --sidebar-accent: #e85d3f;
   --sidebar-accent-foreground: #faf6f1;
@@ -78,6 +80,7 @@
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-inter: 'Inter', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -231,5 +234,178 @@
   
   .text-serif {
     font-family: Georgia, 'Times New Roman', serif;
+  }
+  
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-gold-shiny {
+    background: linear-gradient(135deg, 
+      #b8860b 0%, 
+      #ffd700 20%, 
+      #ffed4e 35%, 
+      #ffd700 50%, 
+      #daa520 65%, 
+      #b8860b 80%, 
+      #8b6914 100%
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 8s ease-in-out infinite;
+    position: relative;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+  }
+  
+  .text-gold-shiny::before {
+    display: none;
+  }
+  
+  .text-gold-shimmer {
+    background: linear-gradient(135deg, 
+      #8b6914 0%, 
+      #a47a1e 20%, 
+      #d3a84c 40%, 
+      #e6be69 60%, 
+      #b58f3e 80%, 
+      #a47a1e 100%
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: gold-shine-text 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    position: relative;
+    filter: drop-shadow(0 0 15px rgba(184, 134, 11, 0.3));
+  }
+  
+  .text-gold-shimmer::before {
+    display: none;
+  }
+  
+  .text-gold-dark {
+    background: linear-gradient(135deg, 
+      #8b6914 0%, 
+      #a47a1e 20%, 
+      #d3a84c 40%, 
+      #e6be69 60%, 
+      #b58f3e 80%, 
+      #a47a1e 100%
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: gold-shine-text 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    position: relative;
+    filter: drop-shadow(0 0 20px rgba(184, 134, 11, 0.4)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.2));
+  }
+  
+  .text-gold-dark::before {
+    display: none;
+  }
+  
+  .bg-gold-shimmer {
+    background: linear-gradient(135deg, 
+      #8b6914 0%, 
+      #a47a1e 20%, 
+      #d3a84c 40%, 
+      #e6be69 60%, 
+      #b58f3e 80%, 
+      #a47a1e 100%
+    );
+    background-size: 300% 300%;
+    animation: gold-shine-bg 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    box-shadow: 
+      0 6px 24px rgba(184, 134, 11, 0.3),
+      0 3px 12px rgba(184, 134, 11, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      inset 0 0.5px 0 rgba(139, 69, 19, 0.3);
+    position: relative;
+  }
+  
+  .bg-gold-shimmer::before {
+    display: none;
+  }
+  
+  @keyframes gold-shine-text {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 25%;
+    }
+    50% {
+      background-position: 100% 75%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+  }
+  
+  @keyframes gold-shine-bg {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 25%;
+    }
+    50% {
+      background-position: 100% 75%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+  }
+  
+  @keyframes gold-shine-overlay {
+    0% {
+      left: -100%;
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+  
+  .bg-gold-shiny {
+    background: linear-gradient(135deg, 
+      #a47a1e 0%, 
+      #d3a84c 20%, 
+      #ffec94 40%, 
+      #e6be69 60%, 
+      #ffd87c 80%, 
+      #b58f3e 100%
+    );
+    background-size: 300% 300%;
+    animation: shimmer 16s ease-in-out infinite;
+    box-shadow: 
+      0 4px 15px rgba(255, 215, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+  
+  @keyframes gold-shine {
+    0% {
+      left: -100%;
+    }
+    20% {
+      left: 100%;
+    }
+    100% {
+      left: 100%;
+    }
   }
 }

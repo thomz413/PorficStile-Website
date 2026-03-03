@@ -22,54 +22,49 @@ export default function Header({
 			<header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/95 backdrop-blur-md transition-all duration-300 shadow-sm">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="flex h-20 items-center justify-between">
-						<Link href="/" className="flex items-center gap-4 group">
+						<Link href="/" className="flex items-center gap-3 group">
 							<Image
-								src="/Atlantis.png"
-								alt="Atlantis logo"
-								width={50}
-								height={50}
-								className="object-contain rounded-sm transition-all duration-300 group-hover:scale-105 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
+								src="/Atlantis.svg"
+								alt="Atlantis nombre"
+								width={40}
+								height={40}
+								className="object-contain transition-all duration-300 group-hover:scale-105 w-10 h-8 sm:w-14 sm:h-10 md:w-16 md:h-10 lg:w-20 lg:h-12 filter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]"
 							/>
 
-							<div className="hidden sm:flex flex-col leading-tight">
-								<span className="text-xs font-black text-foreground tracking-widest uppercase">
-									Atlantis
-								</span>
-								<span className="text-lg font-black text-primary">
-									Porfic Stile
-								</span>
-							</div>
+							<span className="text-base sm:text-lg font-black text-gold-shimmer font-inter uppercase tracking-widest hidden sm:block">
+								PORFIC STILE
+							</span>
 						</Link>
 
 						{/* Desktop Navigation */}
-						<nav className="hidden gap-8 md:flex">
+						<nav className="hidden lg:flex items-center gap-8">
 							<Link
 								href="/productos"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-3 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Tienda
-								<span className="absolute bottom-0 left-0 w-0 h-1 bg-primary group-hover:w-full transition-all duration-300"></span>
+								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full"></span>
 							</Link>
 							<Link
 								href="/nosotros"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-3 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Nosotros
-								<span className="absolute bottom-0 left-0 w-0 h-1 bg-primary group-hover:w-full transition-all duration-300"></span>
+								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full"></span>
 							</Link>
 							<Link
 								href="/contacto"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-3 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Contacto
-								<span className="absolute bottom-0 left-0 w-0 h-1 bg-primary group-hover:w-full transition-all duration-300"></span>
+								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full"></span>
 							</Link>
 						</nav>
 
 						{/* Right Actions */}
-						<div className="flex items-center gap-2 sm:gap-4">
+						<div className="flex items-center gap-3 sm:gap-4">
 							{/* Currency Selector */}
-							<div className="hidden sm:block">
+							<div className="hidden lg:block">
 								<CurrencySelector />
 							</div>
 
@@ -90,7 +85,7 @@ export default function Header({
 							{/* Mobile Menu Button */}
 							<button
 								onClick={() => setIsOpen(!isOpen)}
-								className="md:hidden rounded-lg p-2.5 hover:bg-muted transition-smooth focus:outline-none focus:ring-2 focus:ring-primary"
+								className="lg:hidden fixed right-4 top-4 z-50 p-2 rounded-lg hover:bg-muted transition-smooth focus:outline-none focus:ring-2 focus:ring-primary"
 								aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
 								aria-expanded={isOpen}
 							>

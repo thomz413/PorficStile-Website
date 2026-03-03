@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
@@ -50,9 +51,20 @@ export default async function ProductsPage({
 				{/* Page Header */}
 				<section className="border-b border-border py-8 md:py-12">
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-						<h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
-							{selectedCategory ? selectedCategory : "Atlantis"}
-						</h1>
+						<div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+							{!selectedCategory && (
+								<Image
+									src="/Atlantis.svg"
+									alt="Atlantis logo"
+									width={200}
+									height={60}
+									className="object-contain w-32 h-auto sm:w-40 md:w-48"
+								/>
+							)}
+							<h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
+								{selectedCategory || ""}
+							</h1>
+						</div>
 						<p className="text-base md:text-lg text-muted-foreground max-w-2xl">
 							Ropa de calidad con estilo único. Envíos a nivel nacional y
 							provincias del Perú.

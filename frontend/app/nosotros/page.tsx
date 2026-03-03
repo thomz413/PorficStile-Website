@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
+import Image from "next/image";
 import { getSettings } from "@/lib/strapi";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
@@ -28,24 +29,38 @@ export default async function NosotrosPage() {
 	return (
 		<main className="min-h-screen bg-background">
 			<Header />
+{/* Hero */}
+<section className="border-b border-borderbg-linear-to-b from-background via-background to-secondary/15 py-16 md:py-24">
+  <div className=" mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    {/* keep the column narrow for readability, but align content to the left */}
+    <div className="max-w-2xl space-y-4">
+      <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">
+        Nuestra empresa
+      </p>
 
-			{/* Hero */}
-			<section className="border-b border-border bg-linear-to-b from-background via-background to-secondary/10 py-16 md:py-24">
-				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-					<div className="max-w-2xl space-y-4">
-						<p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">
-							Nuestra empresa
-						</p>
-						<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-							Atlantis <span className="text-secondary">Porfic Stile</span>
-						</h1>
-						<p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-							{descripcionTienda}
-						</p>
-					</div>
-				</div>
-			</section>
+      {/* stacked and left-aligned */}
+      <div className="flex flex-col items-start gap-2">
+        <Image
+          src="/Atlantis.svg"
+          alt="Atlantis logo"
+          width={300}
+          height={80}
+          className="object-contain transition-all duration-300 w-40 sm:w-48 md:w-56 lg:w-64 h-auto filter drop-shadow-[0_0_12px_rgba(255,215,0,0.4)]"
+        />
 
+        <h1 className="text-1xl md:text-2xl lg:text-4xl font-bold tracking-tight text-foreground leading-tight">
+          <span className="font-inter uppercase tracking-widest text-gold-dark leading-none">
+            PORFIC STILE
+          </span>
+        </h1>
+      </div>
+
+      <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+        {descripcionTienda}
+      </p>
+    </div>
+  </div>
+</section>
 			{/* Stats / Highlights */}
 			<section className="bg-linear-to-r from-secondary to-secondary/90 text-white py-12 md:py-16 relative overflow-hidden">
 				<div className="absolute inset-0 pattern-geometric opacity-10" />

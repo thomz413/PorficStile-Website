@@ -238,7 +238,7 @@ export default function ProductDetailPage() {
 				enOferta: product.enOferta,
 				categoria: product.categoria,
 				imagen: product.imagen,
-				tallas: tallas,
+				tallas: product.tallaProducto,
 			},
 			selectedItems,
 		);
