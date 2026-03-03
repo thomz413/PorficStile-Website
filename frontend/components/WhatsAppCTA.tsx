@@ -56,7 +56,7 @@ export default function WhatsAppCTA({
 				type="button"
 				onClick={openWhatsApp}
 				aria-label={ariaLabel}
-				className="fixed bottom-8 right-8 z-40 flex items-center justify-center h-16 w-16 rounded-none bg-secondary text-white shadow-2xl hover:bg-secondary/90 transition-smooth hover:scale-110 border-2 border-primary group"
+				className="fixed bottom-8 right-8 z-40 flex items-center justify-center h-16 w-16 rounded-none bg-secondary text-white shadow-2xl hover:bg-secondary/90 transition-smooth hover:scale-110 border-2 group"
 				title="Contactar por WhatsApp"
 			>
 				<MessageCircle className="h-7 w-7 group-hover:rotate-12 transition-transform" />

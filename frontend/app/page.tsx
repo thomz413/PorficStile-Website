@@ -121,13 +121,13 @@ export default async function Home() {
             {/* Brand Values */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-black text-gold-shimmer mb-2">
-                  100%
-                </div>
-                <p className="text-white/80 text-sm uppercase tracking-wider">
-                  Diseño Peruano
-                </p>
+              <div className="text-3xl md:text-4xl font-black text-gold-shimmer mb-2">
+                Variedad
               </div>
+              <p className="text-white/80 text-sm uppercase tracking-wider">
+                Muchas opciones para elegir
+              </p>
+            </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-black text-gold-shimmer mb-2">
                   Premium
