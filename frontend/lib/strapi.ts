@@ -106,6 +106,11 @@ const ProductSchema = z.object({
 });
 export type StrapiProduct = z.infer<typeof ProductSchema>;
 
+
+// ----------------------------
+// Statistics
+// ----------------------------
+
 const StatisticSchema = z.object({
 	id: z.number().int().optional().default(0),
 	textoArriba: z.string().optional().default(""),
