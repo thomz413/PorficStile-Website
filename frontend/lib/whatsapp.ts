@@ -1,4 +1,3 @@
-// lib/whatsapp.ts
 export interface WhatsAppMessageConfig {
 	type: "product_order" | "general_question" | "custom_order";
 	productName?: string;
