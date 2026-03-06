@@ -1,7 +1,15 @@
-import { CategorySchema, StrapiCategory } from "@/lib/strapi/types/category";
-import { SettingsSchema, StrapiSettings } from "@/lib/strapi/types/settings";
+import { z } from "zod";
+import { CategorySchema } from "@/lib/strapi/types/category";
+import { SettingsSchema } from "@/lib/strapi/types/settings";
 import { ImageSchema, ImageType } from "./strapi/types/shared";
-import { Producto, ProductoSchema } from "./strapi/types/product";
+import { ProductoSchema, Producto } from "./strapi/types/product";
+import { VarianteSchema, Variante } from "./strapi/types/product";
+import qs from "qs";
+
+// Export types for backward compatibility
+export type { Producto, Variante, ImageType };
+export type StrapiCategory = z.infer<typeof CategorySchema>;
+export type StrapiSettings = z.infer<typeof SettingsSchema>;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -79,7 +87,7 @@ function pickImageAttr(src: any): ImageType {
   });
 }
 
-function pickCategoryAttr(src: any): StrapiCategory {
+function pickCategoryAttr(src: any) {
   const emptyCategory = {
     id: 0,
     documentId: "",
@@ -161,8 +169,8 @@ function normalizeSettingsRaw(raw: any) {
 function normalizeProductRaw(raw: any) {
   const src = raw?.attributes ?? raw;
 
-  // main product image (if you use imagen or imagenHero)
-  const img = pickImageAttr(src.imagen ?? src.imagenHero ?? src.imagenPrincipal ?? null);
+  // main product image (prioritize imagenPrincipal)
+  const img = pickImageAttr(src.imagenPrincipal ?? src.imagen ?? src.imagenHero ?? null);
   const categoria = pickCategoryAttr(src.categoria);
 
   const tallaProducto = Array.isArray(src.tallaProducto)
@@ -201,73 +209,72 @@ function normalizeProductRaw(raw: any) {
     nombre: safeString(src.nombre),
     descripcion: src.descripcion ?? "",
     precio: safeNumber(src.precio, 0),
-    precioDescuento:
-      src.precioDescuento == null ? undefined : safeNumber(src.precioDescuento),
     enOferta: safeBoolean(src.enOferta),
-    porcentajeDescuento:
-      src.porcentajeDescuento == null
-        ? undefined
-        : safeNumber(src.porcentajeDescuento),
+    precioOferta: src.precioOferta == null ? undefined : safeNumber(src.precioOferta),
+    tipoDescuento: src.tipoDescuento ?? undefined,
+    valorDescuento: src.valorDescuento == null ? undefined : safeNumber(src.valorDescuento),
+    fechaInicioOferta: src.fechaInicioOferta ?? null,
+    fechaFinOferta: src.fechaFinOferta ?? null,
+    mostrarPrecioOferta: safeBoolean(src.mostrarPrecioOferta ?? true),
+    textoBadgeOferta: safeString(src.textoBadgeOferta),
     categoria,
     disponible: safeBoolean(src.disponible),
     cantidadStock: safeNumber(src.cantidadStock, 0),
     slug: safeString(src.slug),
-    imagen: img,
+    imagenPrincipal: img,
     galeria,
     variantes,
-    tallaProducto, // ← normalized safely
     destacado: safeBoolean(src.destacado ?? true),
   };
 }
 
 /**
- * Build product query string that requests only necessary fields and populates
- * the minimal nested data for imagen / galeria / categoria / variantes.imagenes
+ * Build product query safely using qs.stringify.
+ * This avoids malformed nested populate strings and 400 errors.
  */
-function buildProductQuery() {
-  return (
-    // top-level product fields
-    "fields[0]=id" +
-    "&fields[1]=documentId" +
-    "&fields[2]=nombre" +
-    "&fields[3]=descripcion" +
-    "&fields[4]=precio" +
-    "&fields[5]=precioDescuento" +
-    "&fields[6]=enOferta" +
-    "&fields[7]=porcentajeDescuento" +
-    "&fields[8]=disponible" +
-    "&fields[9]=cantidadStock" +
-    "&fields[10]=slug" +
-    "&fields[11]=destacado" +
-    // imagen (media) - only need url + name
-    "&populate[imagen][fields][0]=url" +
-    "&populate[imagen][fields][1]=name" +
-    // galeria (multiple media) - only url + name
-    "&populate[galeria][fields][0]=url" +
-    "&populate[galeria][fields][1]=name" +
-    // categoria (relation) - only the fields we need
-    "&populate[categoria][fields][0]=id" +
-    "&populate[categoria][fields][1]=documentId" +
-    "&populate[categoria][fields][2]=nombre" +
-    "&populate[categoria][fields][3]=descripcion" +
-    // variantes (relation) - include variant fields and populate only imagenes (url + name)
-    "&populate[variantes][fields][0]=id" +
-    "&populate[variantes][fields][1]=sku" +
-    "&populate[variantes][fields][2]=talla" +
-    "&populate[variantes][fields][3]=color" +
-    "&populate[variantes][fields][4]=stock" +
-    "&populate[variantes][fields][5]=disponible" +
-    "&populate[variantes][fields][6]=precioSobreescribir" +
-    "&populate[variantes][fields][7]=enOferta" +
-    "&populate[variantes][fields][8]=precioOferta" +
-    "&populate[variantes][fields][9]=tipoDescuento" +
-    "&populate[variantes][fields][10]=valorDescuento" +
-    "&populate[variantes][fields][11]=fechaInicioOferta" +
-    "&populate[variantes][fields][12]=fechaFinOferta" +
-    // populate variant images (only url + name)
-    "&populate[variantes][populate][imagenes][fields][0]=url" +
-    "&populate[variantes][populate][imagenes][fields][1]=name"
-  );
+export function buildProductQuery() {
+  const queryObj = {
+    fields: [
+      "id",
+      "documentId",
+      "nombre",
+      "descripcion",
+      "precio",
+      "enOferta",
+      "precioOferta",
+      "tipoDescuento",
+      "valorDescuento",
+      "disponible",
+      "cantidadStock",
+      "slug",
+      "destacado",
+    ],
+    populate: {
+      imagenPrincipal: { fields: ["url", "name"] },
+      galeria: { fields: ["url", "name"] },
+      categoria: { fields: ["id", "documentId", "nombre", "descripcion"] },
+      variante: {
+        fields: [
+          "id",
+          "sku",
+          "talla",
+          "color",
+          "stock",
+          "disponible",
+          "precioSobreescribir",
+          "enOferta",
+          "precioOferta",
+          "tipoDescuento",
+          "valorDescuento",
+          "fechaInicioOferta",
+          "fechaFinOferta",
+        ],
+      },
+    },
+  };
+
+  // encodeValuesOnly keeps bracket structure readable for Strapi
+  return qs.stringify(queryObj, { encodeValuesOnly: true });
 }
 
 /** Get featured productos (destacado = true) */
@@ -304,6 +311,8 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 export async function getProducts(): Promise<Producto[]> {
   try {
     const qs = buildProductQuery();
+
+    console.log(`${STRAPI_URL}/api/productos?${qs}`);
 
     const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
       next: { revalidate: 60 },

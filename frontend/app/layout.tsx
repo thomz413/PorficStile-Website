@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { ToastProvider } from "@/components/ImprovedToast";
+import { Toaster } from "@/components/ui/sonner";
 import HeaderWrapper from "@/components/HeaderWrapper";
 
 const geistSans = Geist({
@@ -37,7 +37,8 @@ export default function RootLayout({
 			>
 				<CurrencyProvider>
 					<CartProvider>
-						<ToastProvider>{children}</ToastProvider>
+						{children}
+						<Toaster />
 					</CartProvider>
 				</CurrencyProvider>
 			</body>

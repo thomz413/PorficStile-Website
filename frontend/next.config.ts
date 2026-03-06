@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	images: {
+		domains: ["placehold.co", "localhost"],
 		remotePatterns: [
 			{
 				protocol: "http",
@@ -10,6 +11,7 @@ const nextConfig: NextConfig = {
 				pathname: "/uploads/**",
 			},
 		],
+		dangerouslyAllowLocalIP: true,
 	},
 };
 

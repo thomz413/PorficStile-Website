@@ -58,7 +58,7 @@ export const ProductoSchema = z.object({
   categoria: CategorySchema.optional(),
 
   // after normalization this will be a flat array of variants
-  variantes: z.array(VarianteSchema).optional().default([]),
+  variante: z.array(VarianteSchema).optional().default([]),
 
   galeria: z.array(ImageSchema).optional().default([]),
 

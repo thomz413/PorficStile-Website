@@ -1,188 +1,167 @@
-import Link from "next/link";
-import Image from "next/image";
-import Header from "@/components/Header";
+"use client";
+
+import { useState, useEffect } from "react";
+import { getProducts, getCategories } from "@/lib/strapi";
 import ProductCard from "@/components/ProductCard";
-import WhatsAppCTA from "@/components/WhatsAppCTA";
-import {
-	getCategories,
-	getProducts,
-	getProductsByCategory,
-	getSettings,
-	getStrapiImageUrl,
-} from "@/lib/strapi";
-import { WhatsAppMessageConfig } from "@/lib/whatsapp";
+import StickyCart from "@/components/StickyCart";
+import { Producto, StrapiCategory } from "@/lib/strapi";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { Filter, Grid, List } from "lucide-react";
+import Header from "@/components/Header";
 
-export const metadata = {
-	title: "Tienda - Atlantis Porfic Stile",
-	description:
-		"Catálogo completo de ropa de calidad. Tienda física en Galería Santa Lucía. Envíos a nivel nacional.",
-};
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Producto[]>([]);
+  const [categories, setCategories] = useState<StrapiCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const { convertAndFormatPrice } = useCurrency();
 
-interface ProductsPageProps {
-	searchParams?: {
-		categoria?: string;
-	};
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsData, categoriesData] = await Promise.all([
+          getProducts(),
+          getCategories(),
+        ]);
+        
+        setProducts(productsData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-export default async function ProductsPage({
-	searchParams,
-}: ProductsPageProps) {
-	const selectedCategory = searchParams?.categoria ?? "";
+    fetchData();
+  }, []);
 
-	// Fetch settings, categories and productss from Strapi in parallel
-	const [settings, categories, products] = await Promise.all([
-		getSettings(),
-		getCategories(),
-		selectedCategory ? getProductsByCategory(selectedCategory) : getProducts(),
-	]);
+  const filteredProducts = selectedCategory
+    ? products.filter((product) => product.categoria?.nombre === selectedCategory)
+    : products;
 
-	const whatsappNumber = settings?.numeroWhatsapp;
+  const handleCategoryFilter = async (categoryName: string) => {
+    setSelectedCategory(categoryName === selectedCategory ? null : categoryName);
+  };
 
-	// WhatsApp message configuration for general questions
-	const generalQuestionConfig: WhatsAppMessageConfig = {
-		type: "general_question",
-		category: selectedCategory || "Todos los productos",
-	};
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </main>
+    );
+  }
 
-	return (
-		<>
-			<Header />
-			<main className="min-h-screen bg-background">
-				{/* Page Header */}
-				<section className="border-b border-border py-8 md:py-12">
-					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-						<div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-							{!selectedCategory && (
-								<Image
-									src="/Atlantis.svg"
-									alt="Atlantis logo"
-									width={200}
-									height={60}
-									className="object-contain w-32 h-auto sm:w-40 md:w-48"
-								/>
-							)}
-							<h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
-								{selectedCategory || ""}
-							</h1>
-						</div>
-						<p className="text-base md:text-lg text-muted-foreground max-w-2xl">
-							Ropa de calidad con estilo único. Envíos a nivel nacional y
-							provincias del Perú.
-						</p>
-					</div>
-				</section>
+  return (
+    <main className="min-h-screen bg-background">
+      <Header />
 
-				{/* Products Section */}
-				<section className="py-16 md:py-24 lg:py-32 bg-background">
-					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-						{products && products.length > 0 ? (
-							<>
-								{/* Filters + count */}
-								<div className="mb-8 md:mb-10 space-y-6">
-									{/* Category filters */}
-									<div className="flex flex-wrap gap-2 md:gap-3">
-										<Link
-											href="/productos"
-											className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
-												!selectedCategory
-													? "bg-primary text-primary-foreground border-primary shadow-sm"
-													: "bg-background text-muted-foreground hover:text-foreground hover:border-primary/60"
-											}`}
-										>
-											Todos
-										</Link>
-										{categories.map((category) => {
-											const isActive = selectedCategory === category.nombre;
-											return (
-												<Link
-													key={category.id ?? category.documentId}
-													href={`/productos?categoria=${encodeURIComponent(
-														category.nombre,
-													)}`}
-													className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-black uppercase tracking-[0.16em] transition-smooth ${
-														isActive
-															? "bg-primary text-primary-foreground border-primary shadow-sm"
-															: "bg-background text-muted-foreground hover:text-foreground hover:border-primary/60"
-													}`}
-												>
-													{category.nombre}
-												</Link>
-											);
-										})}
-									</div>
+      {/* Header Section */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12 animate-fade-in-up">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Nuestros Productos
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Descubre nuestra colección exclusiva de ropa premium peruana con diseño único y calidad excepcional.
+            </p>
+          </div>
 
-									<div className="flex items-center justify-between text-sm text-muted-foreground">
-										<p>
-											<span className="text-foreground font-medium">
-												{products.length}
-											</span>{" "}
-											productos
-											{selectedCategory ? ` en ${selectedCategory}` : ""}
-										</p>
-									</div>
-								</div>
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8 animate-fade-in animation-delay-200">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover-scale ${
+                selectedCategory === null
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              }`}
+            >
+              Todos
+            </button>
+            {categories.map((category, index) => (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryFilter(category.nombre)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover-scale animation-delay-${(index + 3) * 100}`}
+                style={{ animationDelay: `${(index + 3) * 100}ms` }}
+              >
+                {category.nombre}
+              </button>
+            ))}
+          </div>
 
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-									{products.map((product) => (
-										<ProductCard
-											key={product.id}
-											id={String(product.documentId)}
-											nombre={product.nombre}
-											precio={product.precio}
-											imagen={getStrapiImageUrl(product.imagen?.url)}
-											disponible={product.disponible}
-											cantidadStock={product.cantidadStock}
-											enOferta={product.enOferta}
-											precioDescuento={product.precioDescuento}
-											porcentajeDescuento={product.porcentajeDescuento}
-										/>
-									))}
-								</div>
-							</>
-						) : (
-							<div className="text-center py-20">
-								<h2 className="text-3xl font-semibold text-foreground mb-4">
-									Sin productos
-								</h2>
-								<p className="text-muted-foreground text-lg mb-8">
-									No hay productos en esta categoría. Pronto tendremos más.
-								</p>
-							</div>
-						)}
-					</div>
-				</section>
+          {/* View Mode Toggle */}
+          <div className="flex justify-end mb-6 animate-fade-in animation-delay-500">
+            <div className="flex gap-2 bg-muted p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded transition-all duration-200 ${
+                  viewMode === "grid"
+                    ? "bg-background shadow-sm"
+                    : "hover:bg-background/50"
+                }`}
+              >
+                <Grid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-2 rounded transition-all duration-200 ${
+                  viewMode === "list"
+                    ? "bg-background shadow-sm"
+                    : "hover:bg-background/50"
+                }`}
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
-				{/* CTA Section */}
-				<section className="border-t border-border bg-card py-12 md:py-16">
-					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-						<h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-6">
-							¿No encuentras algo?
-						</h2>
-						<p className="text-base md:text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-							Escríbenos por WhatsApp para pedidos a medida o dudas.
-						</p>
-						<WhatsAppCTA
-							whatsappNumber={whatsappNumber}
-							messageConfig={generalQuestionConfig}
-							label="Escribir por WhatsApp"
-						/>
-					</div>
-				</section>
-			</main>
-
-			{/* Sticky WhatsApp Button */}
-			<WhatsAppCTA
-				whatsappNumber={whatsappNumber}
-				variant="sticky"
-				messageConfig={generalQuestionConfig}
-			/>
-
-			{/* Footer */}
-			<footer className="border-t border-border bg-background py-12">
-				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
-					<p>© 2024 Moda Peru. Tienda online con envíos a todo el Perú.</p>
-				</div>
-			</footer>
-		</>
-	);
+          {/* Products Grid/List */}
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-12 animate-fade-in">
+              <Filter className="h-12 w-12 mx-auto mb-4 text-muted-foreground animate-float" />
+              <h3 className="text-lg font-medium mb-2">
+                {selectedCategory
+                  ? `No hay productos en "${selectedCategory}"`
+                  : "No hay productos disponibles"}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Intenta seleccionar otra categoría o ajusta los filtros.
+              </p>
+            </div>
+          ) : (
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                  : "space-y-4"
+              }
+            >
+              {filteredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ProductCard
+                    product={product}
+                    className={viewMode === "list" ? "flex flex-row" : ""}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      
+      {/* Sticky Cart */}
+      <StickyCart />
+    </main>
+  );
 }
