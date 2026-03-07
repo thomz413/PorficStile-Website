@@ -7,7 +7,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import StickyCart from "@/components/StickyCart";
+import StickyCart from "@/components/StickyCart"; // For sticky button functionality
 import {
 	getFeaturedProducts,
 	getSettings,
@@ -75,10 +75,12 @@ export default function Home() {
 			{/* Conditional Header - Shows after scrolling past hero */}
 			<div
 				className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-					showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+					showHeader
+						? "translate-y-0 opacity-100"
+						: "-translate-y-full opacity-0"
 				}`}
 			>
-				<Header />
+				<Header whatsappNumber={whatsappNumber} />
 			</div>
 
 			{/* Hero Section */}
@@ -251,7 +253,9 @@ export default function Home() {
 								<div className="w-20 h-20 mx-auto bg-accent/10 rounded-full flex items-center justify-center">
 									<Star className="h-8 w-8 text-accent" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Diseño Único</h3>
+								<h3 className="text-xl font-black text-foreground">
+									Diseño Único
+								</h3>
 								<p className="text-muted-foreground">
 									Piezas originales creadas con atención al detalle
 								</p>
@@ -260,7 +264,9 @@ export default function Home() {
 								<div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
 									<Award className="h-8 w-8 text-primary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Alta Calidad</h3>
+								<h3 className="text-xl font-black text-foreground">
+									Alta Calidad
+								</h3>
 								<p className="text-muted-foreground">
 									Materiales seleccionados y acabados duraderos
 								</p>
@@ -269,7 +275,9 @@ export default function Home() {
 								<div className="w-20 h-20 mx-auto bg-secondary/10 rounded-full flex items-center justify-center">
 									<Heart className="h-8 w-8 text-secondary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Estilo Peruano</h3>
+								<h3 className="text-xl font-black text-foreground">
+									Estilo Peruano
+								</h3>
 								<p className="text-muted-foreground">
 									Diseños que reflejan nuestra cultura
 								</p>
@@ -336,27 +344,40 @@ export default function Home() {
 							</p>
 							<div className="space-y-2 text-sm text-slate-400">
 								<p>
-									<span className="font-semibold text-white">Dirección de Tienda:</span>{" "}
+									<span className="font-semibold text-white">
+										Dirección de Tienda:
+									</span>{" "}
 									Galería Santa Lucía, Piso 7, Tienda 709
 								</p>
 							</div>
 						</div>
 
 						<div>
-							<h4 className="font-semibold text-white mb-4 text-lg">Colecciones</h4>
+							<h4 className="font-semibold text-white mb-4 text-lg">
+								Colecciones
+							</h4>
 							<ul className="space-y-3 text-sm">
 								<li>
-									<Link href="/productos" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/productos"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Todas las Piezas
 									</Link>
 								</li>
 								<li>
-									<Link href="/productos?destacado=true" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/productos?destacado=true"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Colección Destacada
 									</Link>
 								</li>
 								<li>
-									<Link href="/nosotros" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/nosotros"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Nuestra Historia
 									</Link>
 								</li>
@@ -364,20 +385,31 @@ export default function Home() {
 						</div>
 
 						<div>
-							<h4 className="font-semibold text-white mb-4 text-lg">Servicios</h4>
+							<h4 className="font-semibold text-white mb-4 text-lg">
+								Servicios
+							</h4>
 							<ul className="space-y-3 text-sm">
 								<li>
-									<Link href="/contacto" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/contacto"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Asesoría Personal
 									</Link>
 								</li>
 								<li>
-									<Link href="/contacto" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/contacto"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Pedidos a Medida
 									</Link>
 								</li>
 								<li>
-									<Link href="/contacto" className="text-slate-300 hover:text-accent transition-colors">
+									<Link
+										href="/contacto"
+										className="text-slate-300 hover:text-accent transition-colors"
+									>
 										Mayoristas
 									</Link>
 								</li>
@@ -387,7 +419,9 @@ export default function Home() {
 
 					<div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
 						<div className="text-center md:text-left">
-							<p className="text-slate-400 text-sm">© 2025 Atlantis Porfic Stile. Todos los derechos reservados.</p>
+							<p className="text-slate-400 text-sm">
+								© 2025 Atlantis Porfic Stile. Todos los derechos reservados.
+							</p>
 						</div>
 						{whatsappNumber && (
 							<div className="flex items-center gap-2 text-sm">
@@ -413,9 +447,6 @@ export default function Home() {
 					className="border border-white"
 				/>
 			)}
-
-			{/* Sticky Cart */}
-			<StickyCart />
 		</main>
 	);
 }

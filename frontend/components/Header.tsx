@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import CurrencySelector from "./CurrencySelector";
-import Cart from "./Cart";
+import StickyCart from "./StickyCart";
 import { useCart } from "@/contexts/CartContext";
 import Image from "next/image";
 
@@ -43,7 +43,7 @@ export default function Header({
 						<nav className="flex items-center gap-8">
 							<Link
 								href="/productos"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300  px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Tienda
 								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
@@ -51,7 +51,7 @@ export default function Header({
 
 							<Link
 								href="/nosotros"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Nosotros
 								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
@@ -59,7 +59,7 @@ export default function Header({
 
 							<Link
 								href="/contacto"
-								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 tracking-wide uppercase relative group"
+								className="text-sm font-black text-foreground hover:text-primary transition-all duration-300 px-4 py-2 tracking-wide uppercase relative group"
 							>
 								Contacto
 								<span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
@@ -186,10 +186,10 @@ export default function Header({
 				</div>
 			</header>
 
-			{/* Cart */}
-			<Cart
-				isOpen={isCartOpen}
-				onClose={() => setIsCartOpen(false)}
+			{/* Cart Sidebar */}
+			<StickyCart
+				externalOpen={isCartOpen}
+				onExternalClose={() => setIsCartOpen(false)}
 				whatsappNumber={whatsappNumber}
 			/>
 		</>

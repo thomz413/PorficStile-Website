@@ -1,221 +1,313 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 import { getStrapiImageUrl } from "@/lib/strapi";
 
-interface ProductGalleryProps {
-  product: Producto;
-  selectedVariant?: Variante | null;
-  className?: string;
+interface GalleryImage {
+	url: string;
+	name?: string;
+	alt?: string;
+	source?: "variant" | "product";
 }
 
-export default function ProductGallery({ product, selectedVariant, className = "" }: ProductGalleryProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
+interface ProductGalleryProps {
+	product: Producto;
+	selectedVariant?: Variante | null;
+	className?: string;
+}
 
-  // Build gallery array with variant image override logic
-  const getGalleryImages = () => {
-    const images: Array<{ url: string; name: string; alt?: string }> = [];
+export default function ProductGallery({
+	product,
+	selectedVariant,
+	className = "",
+}: ProductGalleryProps) {
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [isZoomed, setIsZoomed] = useState(false);
 
-    // Priority: 1. Variant images, 2. imagenPrincipal, 3. galeria
-    if (selectedVariant?.imagenes && selectedVariant.imagenes.length > 0) {
-      // Add variant images first
-      selectedVariant.imagenes.forEach((img) => {
-        images.push({
-          url: getStrapiImageUrl(img.url),
-          name: img.name,
-          alt: img.name || `${product.nombre} - ${selectedVariant.talla}${selectedVariant.color ? ` - ${selectedVariant.color}` : ''}`,
-        });
-      });
-    }
+	// for swipe handling
+	const touchStartX = useRef<number | null>(null);
+	const touchEndX = useRef<number | null>(null);
 
-    // Add imagenPrincipal if exists and not already added
-    if (product.imagenPrincipal?.url) {
-      const alreadyAdded = selectedVariant?.imagenes.some(
-        (img) => img.url === product.imagenPrincipal?.url
-      );
-      if (!alreadyAdded) {
-        images.push({
-          url: getStrapiImageUrl(product.imagenPrincipal.url),
-          name: product.imagenPrincipal.name || "",
-          alt: product.imagenPrincipal.name || product.nombre || "",
-        });
-      }
-    }
+	// Build gallery array with variant image override logic (defensive checks)
+	const gallery = useMemo<GalleryImage[]>(() => {
+		const imgs: GalleryImage[] = [];
 
-    // Add galeria images
-    if (product.galeria && product.galeria.length > 0) {
-      product.galeria.forEach((img) => {
-        const alreadyAdded = images.some(
-          (existingImg) => existingImg.url === img.url
-        );
-        if (!alreadyAdded) {
-          images.push({
-            url: getStrapiImageUrl(img.url),
-            name: img.name ?? "",
-            alt: img.name ?? product.nombre ?? "",
-          });
-        }
-      });
-    }
+		// helper to push unique by url
+		const pushIfUnique = (img: GalleryImage) => {
+			if (!img?.url) return;
+			if (!imgs.some((i) => i.url === img.url)) imgs.push(img);
+		};
 
-    return images.length > 0 ? images : [{
-      url: "https://placehold.co/600x600?text=No+Imagen",
-      name: "No Image",
-      alt: product.nombre ?? "",
-    }];
-  };
+		// Variant-first: support several common shapes (imagenPrincipal, imagenes, galeria)
 
-  const gallery = getGalleryImages();
+		// Product-level images next
+		if (product.imagenPrincipal?.url) {
+			pushIfUnique({
+				url: getStrapiImageUrl(product.imagenPrincipal.url),
+				name: product.imagenPrincipal.name ?? "",
+				alt: product.imagenPrincipal.alternativeText ?? product.nombre ?? "",
+				source: "product",
+			});
+		}
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
-  };
+		if (Array.isArray(product.galeria)) {
+			product.galeria.forEach((img) =>
+				pushIfUnique({
+					url: getStrapiImageUrl(img.url),
+					name: img.name ?? "",
+					alt: img.alternativeText ?? product.nombre ?? "",
+					source: "product",
+				}),
+			);
+		}
 
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
-  };
+		// final fallback placeholder
+		if (imgs.length === 0) {
+			imgs.push({
+				url: "https://placehold.co/800x800?text=No+Imagen",
+				name: "No Image",
+				alt: product.nombre ?? "Sin imagen",
+				source: "product",
+			});
+		}
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
+		return imgs;
+	}, [product]);
 
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
-  };
+	// reset index when gallery changes (e.g., variant change) and keep index in bounds
+	useEffect(() => {
+		setCurrentIndex((prev) => {
+			if (gallery.length === 0) return 0;
+			return Math.min(prev, gallery.length - 1);
+		});
+		// prefer showing the first variant image when switching variants
+		// if a variant is selected and its images exist, go to 0
+		// otherwise keep current clamped index
+		if (selectedVariant) setCurrentIndex(0);
+	}, [gallery, selectedVariant]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "ArrowLeft") {
-      goToPrevious();
-    } else if (e.key === "ArrowRight") {
-      goToNext();
-    } else if (e.key === "Escape") {
-      setIsZoomed(false);
-    }
-  };
+	// Keyboard navigation (global keydown)
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (isZoomed && e.key === "Escape") {
+				setIsZoomed(false);
+				return;
+			}
+			if (e.key === "ArrowLeft") {
+				setCurrentIndex((i) => (i === 0 ? gallery.length - 1 : i - 1));
+			} else if (e.key === "ArrowRight") {
+				setCurrentIndex((i) => (i === gallery.length - 1 ? 0 : i + 1));
+			}
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [gallery.length, isZoomed]);
 
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: any) => handleKeyDown(e);
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleGlobalKeyDown);
-    };
-  }, [currentIndex, gallery.length, isZoomed]);
+	// simple swipe support
+	const onTouchStart = (e: React.TouchEvent) => {
+		touchStartX.current = e.touches[0]?.clientX ?? null;
+		touchEndX.current = null;
+	};
+	const onTouchMove = (e: React.TouchEvent) => {
+		touchEndX.current = e.touches[0]?.clientX ?? null;
+	};
+	const onTouchEnd = () => {
+		const start = touchStartX.current;
+		const end = touchEndX.current;
+		if (start == null || end == null) return;
+		const delta = start - end;
+		const threshold = 50; // px
+		if (delta > threshold) {
+			// swipe left -> next
+			setCurrentIndex((i) => (i === gallery.length - 1 ? 0 : i + 1));
+		} else if (delta < -threshold) {
+			// swipe right -> previous
+			setCurrentIndex((i) => (i === 0 ? gallery.length - 1 : i - 1));
+		}
+		touchStartX.current = null;
+		touchEndX.current = null;
+	};
 
-  if (gallery.length === 0) {
-    return (
-      <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`}>
-        <div className="aspect-square flex items-center justify-center">
-          <span className="text-gray-500">No hay imágenes disponibles</span>
-        </div>
-      </div>
-    );
-  }
+	// Preload next image to make transitions smoother
+	useEffect(() => {
+		const nextIndex = (currentIndex + 1) % gallery.length;
+		const img = new window.Image();
+		img.src = gallery[nextIndex].url;
+	}, [currentIndex, gallery]);
 
-  const currentImage = gallery[currentIndex];
+	// Zoom modal: lock body scroll when open
+	useEffect(() => {
+		if (isZoomed) {
+			const prev = document.body.style.overflow;
+			document.body.style.overflow = "hidden";
+			return () => {
+				document.body.style.overflow = prev;
+			};
+		}
+	}, [isZoomed]);
 
-  return (
-    <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`}>
-      {/* Main Image */}
-      <div className="relative aspect-square group">
-        <Image
-          src={currentImage.url}
-          alt={currentImage.alt || ''}
-          fill
-          className={`object-cover transition-all duration-300 cursor-zoom-in ${
-            isZoomed ? "scale-150" : "scale-100 hover:scale-105"
-          }`}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          priority={currentIndex === 0}
-        />
+	const goToPrevious = () => {
+		setCurrentIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+	};
 
-        {/* Zoom Button */}
-        <button
-          onClick={toggleZoom}
-          className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          aria-label={isZoomed ? "Cerrar zoom" : "Abrir zoom"}
-        >
-          <ZoomIn className="h-4 w-4" />
-        </button>
+	const goToNext = () => {
+		setCurrentIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+	};
 
-        {/* Navigation Arrows */}
-        {gallery.length > 1 && (
-          <>
-            <button
-              onClick={goToPrevious}
-              className="absolute left-4 top-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="Imagen anterior"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="Siguiente imagen"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </>
-        )}
-      </div>
+	const goToSlide = (index: number) => {
+		setCurrentIndex(index);
+	};
 
-      {/* Thumbnail Strip */}
-      {gallery.length > 1 && (
-        <div className="flex gap-2 p-4 overflow-x-auto">
-          {gallery.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`flex-shrink-0 relative w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                index === currentIndex
-                  ? "border-blue-500 scale-105"
-                  : "border-gray-300 hover:border-gray-400"
-              }`}
-              aria-label={`Ver imagen ${index + 1} de ${gallery.length}`}
-            >
-              <Image
-                src={image.url}
-                alt={image.alt || ''}
-                fill
-                className="object-cover"
-                sizes="64px"
-              />
-              {index === currentIndex && (
-                <div className="absolute inset-0 bg-blue-500/20 pointer-events-none" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+	const toggleZoom = (e?: React.MouseEvent) => {
+		// prevent toggle when clicking inside modal content (handled where appropriate)
+		if (e) e.stopPropagation();
+		setIsZoomed((z) => !z);
+	};
 
-      {/* Image Counter */}
-      {gallery.length > 1 && (
-        <div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-          {currentIndex + 1} / {gallery.length}
-        </div>
-      )}
+	// Accessible labels
+	const currentImage = gallery[currentIndex];
 
-      {/* Zoom Modal */}
-      {isZoomed && (
-        <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-          onClick={toggleZoom}
-        >
-          <div className="relative max-w-4xl max-h-full">
-            <Image
-              src={currentImage.url}
-              alt={currentImage.alt || ''}
-              width={1200}
-              height={800}
-              className="object-contain"
-              sizes="100vw"
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
+	return (
+		<div
+			className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`}
+		>
+			{/* Main image area */}
+			<div
+				className="relative aspect-square group touch-none select-none"
+				onTouchStart={onTouchStart}
+				onTouchMove={onTouchMove}
+				onTouchEnd={onTouchEnd}
+			>
+				<Image
+					src={currentImage.url}
+					alt={currentImage.alt ?? product.nombre ?? ""}
+					fill
+					className={`object-cover transition-transform duration-300 ${
+						isZoomed
+							? "scale-150 cursor-zoom-out"
+							: "hover:scale-105 cursor-zoom-in"
+					}`}
+					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+					priority={currentIndex === 0}
+					aria-hidden={false}
+				/>
+
+				{/* zoom button */}
+				<button
+					onClick={toggleZoom}
+					className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
+					aria-label={isZoomed ? "Cerrar zoom" : "Abrir zoom"}
+				>
+					<ZoomIn className="h-4 w-4" />
+				</button>
+
+				{/* navigation arrows */}
+				{gallery.length > 1 && (
+					<>
+						<button
+							onClick={goToPrevious}
+							className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+							aria-label="Imagen anterior"
+						>
+							<ChevronLeft className="h-5 w-5" />
+						</button>
+						<button
+							onClick={goToNext}
+							className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+							aria-label="Siguiente imagen"
+						>
+							<ChevronRight className="h-5 w-5" />
+						</button>
+					</>
+				)}
+			</div>
+
+			{/* thumbnail strip */}
+			{gallery.length > 1 && (
+				<div className="flex gap-2 p-3 overflow-x-auto">
+					{gallery.map((image, index) => (
+						<button
+							key={image.url}
+							onClick={() => goToSlide(index)}
+							className={`flex-shrink-0 relative w-16 h-16 rounded-md overflow-hidden border-2 transition-transform duration-150 focus:outline-none ${
+								index === currentIndex
+									? "border-blue-500 scale-105"
+									: "border-gray-300 hover:scale-105"
+							}`}
+							aria-label={`Ver imagen ${index + 1} de ${gallery.length}`}
+							aria-current={index === currentIndex}
+						>
+							<Image
+								src={image.url}
+								alt={image.alt ?? ""}
+								fill
+								className="object-cover"
+								sizes="64px"
+								loading={index === 0 ? "eager" : "lazy"}
+							/>
+							{index === currentIndex && (
+								<div className="absolute inset-0 bg-blue-500/20 pointer-events-none" />
+							)}
+						</button>
+					))}
+				</div>
+			)}
+
+			{/* image counter */}
+			{gallery.length > 1 && (
+				<div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+					{currentIndex + 1} / {gallery.length}
+				</div>
+			)}
+
+			{/* zoom modal */}
+			{isZoomed && (
+				<div
+					className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+					onClick={toggleZoom}
+					role="dialog"
+					aria-modal="true"
+					aria-label="Imagen ampliada"
+				>
+					{/* stopPropagation so clicking image area doesn't close */}
+					<div
+						className="relative max-w-[95vw] max-h-[95vh]"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<Image
+							src={currentImage.url}
+							alt={currentImage.alt ?? product.nombre ?? ""}
+							width={1200}
+							height={1200}
+							className="object-contain"
+							sizes="(max-width: 768px) 90vw, 80vw"
+						/>
+
+						{/* prev/next inside modal for convenience */}
+						{gallery.length > 1 && (
+							<>
+								<button
+									onClick={goToPrevious}
+									className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
+									aria-label="Imagen anterior (en modal)"
+								>
+									<ChevronLeft className="h-5 w-5" />
+								</button>
+								<button
+									onClick={goToNext}
+									className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
+									aria-label="Siguiente imagen (en modal)"
+								>
+									<ChevronRight className="h-5 w-5" />
+								</button>
+							</>
+						)}
+					</div>
+				</div>
+			)}
+		</div>
+	);
 }

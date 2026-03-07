@@ -264,7 +264,7 @@ html, body {
   }
   
   .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.2s ease-out;
   }
   
   .animate-float {
