@@ -55,7 +55,7 @@ export const ProductoSchema = z.object({
 	textoBadgeOferta: z.string().optional().default(""),
 
 	disponible: z.boolean().default(true),
-	cantidadStock: z.number().default(0),
+	cantidadStock: z.number().optional(),
 
 	categoria: CategorySchema.optional(),
 

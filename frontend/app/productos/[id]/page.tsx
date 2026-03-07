@@ -1,3 +1,4 @@
+// app/product/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -84,7 +85,7 @@ export default function ProductDetailPage() {
 				if (productData?.variantes && productData.variantes.length > 0) {
 					const firstAvailable =
 						productData.variantes.find((v) => {
-							// available meaning either stock number > 0 OR disponible === true when stock is null
+							// variant-level precedence: number stock > disponible
 							if (typeof v.stock === "number") return v.stock > 0;
 							return v.disponible ?? false;
 						}) || productData.variantes[0];
@@ -135,10 +136,32 @@ export default function ProductDetailPage() {
 		return finalPrice;
 	};
 
-	// Stock/availability logic per user's rule:
-	// - If stock is a number -> that number takes precedence (availability = stock > 0, limit = stock)
-	// - Else (stock is null/undefined) -> rely on disponible flag: if disponible true -> unlimited, else unavailable
+	// Helper: whether product has variants
+	const productHasVariants = () =>
+		Array.isArray(product?.variantes) && product!.variantes.length > 0;
+
+	// Helper: returns effective numeric stock (number) or undefined when "unlimited" or not applicable
+	const getEffectiveStockLevel = (variant?: Variante | null) => {
+		// Variant present -> consider variant.stock only
+		if (variant) {
+			if (typeof variant.stock === "number") return variant.stock;
+			return undefined;
+		}
+		// No variant passed: only use product-level stock if product has NO variants
+		if (!productHasVariants()) {
+			if (typeof product?.cantidadStock === "number") return product!.cantidadStock;
+			return undefined;
+		}
+		// product has variants and no variant selected -> no effective stock (must pick a variant)
+		return undefined;
+	};
+
+	// Stock/availability rules implemented exactly as requested:
+	// - If variant provided -> variant rules (stock number > 0 takes precedence; else use disponible)
+	// - Else if product has NO variants -> product-level rules (cantidadStock number > 0 takes precedence; else use disponible)
+	// - Else (product has variants but no variant selected) -> require variant selection
 	const getLevelStockInfo = (variant?: Variante | null) => {
+		// Variant-level logic (if variant passed)
 		if (variant) {
 			const stock = typeof variant.stock === "number" ? variant.stock : null;
 			if (stock !== null) {
@@ -149,7 +172,7 @@ export default function ProductDetailPage() {
 					message: available ? `${stock} disponibles` : "Agotado",
 				};
 			}
-			// no stock number at variant level -> rely on disponible flag
+			// no numeric stock -> rely on disponible flag for variant
 			const disponible = variant.disponible ?? false;
 			return {
 				available: disponible,
@@ -158,11 +181,18 @@ export default function ProductDetailPage() {
 			};
 		}
 
-		// Product-level
+		// No variant passed. If product has variants -> force selection (don't fallback to product-level).
+		if (productHasVariants()) {
+			return {
+				available: false,
+				stock: undefined,
+				message: "Selecciona una variante",
+			};
+		}
+
+		// Product has no variants: product-level rules
 		const stock =
-			typeof product?.cantidadStock === "number"
-				? product?.cantidadStock
-				: null;
+			typeof product?.cantidadStock === "number" ? product?.cantidadStock : null;
 		if (stock !== null) {
 			const available = stock > 0;
 			return {
@@ -185,7 +215,7 @@ export default function ProductDetailPage() {
 		desiredQty: number,
 	) => {
 		const info = getLevelStockInfo(variant ?? null);
-		if (!info.available) return { ok: false, reason: "No disponible" };
+		if (!info.available) return { ok: false, reason: info.message || "No disponible" };
 		if (typeof info.stock === "number") {
 			if (info.stock <= 0) return { ok: false, reason: "Agotado" };
 			if (desiredQty > info.stock) {
@@ -217,7 +247,7 @@ export default function ProductDetailPage() {
 			if (existingIndex >= 0) {
 				const copy = [...prev];
 				const existing = copy[existingIndex];
-				const stockLevel = existing.variant?.stock ?? product?.cantidadStock;
+				const stockLevel = getEffectiveStockLevel(existing.variant ?? null);
 				let nextQty = existing.quantity + workingQuantity;
 				if (typeof stockLevel === "number")
 					nextQty = Math.min(stockLevel, nextQty);
@@ -245,7 +275,7 @@ export default function ProductDetailPage() {
 			prev.map((p) => {
 				if (p.key !== key) return p;
 				// validate against stock if present
-				const stockLevel = p.variant?.stock ?? product?.cantidadStock;
+				const stockLevel = getEffectiveStockLevel(p.variant ?? null);
 				if (typeof stockLevel === "number") {
 					nextQty = Math.max(1, Math.min(nextQty, stockLevel));
 				} else {
@@ -265,12 +295,12 @@ export default function ProductDetailPage() {
 			selectedItems.length > 0
 				? selectedItems
 				: [
-						{
-							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
-							variant: selectedVariant ?? null,
-							quantity: workingQuantity,
-						},
-					];
+					{
+						key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+						variant: selectedVariant ?? null,
+						quantity: workingQuantity,
+					},
+				];
 
 		// Validate all items
 		for (const it of itemsToAdd) {
@@ -282,7 +312,7 @@ export default function ProductDetailPage() {
 			// Also ensure availability flag
 			const info = getLevelStockInfo(it.variant ?? null);
 			if (!info.available) {
-				toast.error("Uno de los artículos no está disponible");
+				toast.error(info.message || "Uno de los artículos no está disponible");
 				return;
 			}
 		}
@@ -301,15 +331,15 @@ export default function ProductDetailPage() {
 			// include tallas so CartItem matches expected shape
 			tallas: selectedVariant
 				? [
-						{
-							talla: selectedVariant.talla ?? "",
-							stock:
-								typeof selectedVariant.stock === "number"
-									? selectedVariant.stock
-									: 0,
-							disponible: !!selectedVariant.disponible,
-						},
-					]
+					{
+						talla: selectedVariant.talla ?? "",
+						stock:
+							typeof selectedVariant.stock === "number"
+								? selectedVariant.stock
+								: 0,
+						disponible: selectedVariant.disponible,
+					},
+				]
 				: [],
 		};
 
@@ -335,12 +365,12 @@ export default function ProductDetailPage() {
 			selectedItems.length > 0
 				? selectedItems
 				: [
-						{
-							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
-							variant: selectedVariant ?? null,
-							quantity: workingQuantity,
-						},
-					];
+					{
+						key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+						variant: selectedVariant ?? null,
+						quantity: workingQuantity,
+					},
+				];
 
 		const lines = itemsToSend.map((it) => {
 			const name =
@@ -496,9 +526,8 @@ export default function ProductDetailPage() {
 									value={workingQuantity}
 									onChange={(e) => {
 										let val = parseInt(e.target.value) || 1;
-										// enforce stock limits if present
-										const stockLevel =
-											selectedVariant?.stock ?? product?.cantidadStock;
+										// enforce stock limits if present (only when effective stock exists)
+										const stockLevel = getEffectiveStockLevel(selectedVariant ?? null);
 										if (typeof stockLevel === "number") {
 											val = Math.max(1, Math.min(val, stockLevel));
 										} else {
@@ -512,9 +541,8 @@ export default function ProductDetailPage() {
 									variant="outline"
 									size="sm"
 									onClick={() => {
-										// +1 respecting stock
-										const stockLevel =
-											selectedVariant?.stock ?? product?.cantidadStock;
+										// +1 respecting stock (only if effective stock available)
+										const stockLevel = getEffectiveStockLevel(selectedVariant ?? null);
 
 										if (typeof stockLevel === "number") {
 											// if stock exists, clamp
@@ -536,9 +564,9 @@ export default function ProductDetailPage() {
 							{/* Stock helper */}
 							<p className="text-sm text-gray-600 mt-2">
 								{stockInfoForWorking.message}
-								{typeof (selectedVariant?.stock ?? product?.cantidadStock) ===
+								{typeof (getEffectiveStockLevel(selectedVariant ?? null)) ===
 									"number" &&
-									` — ${selectedVariant?.stock ?? product?.cantidadStock} en total`}
+									` — ${getEffectiveStockLevel(selectedVariant ?? null)} en total`}
 							</p>
 						</div>
 
@@ -549,7 +577,7 @@ export default function ProductDetailPage() {
 								<div className="space-y-2 mt-2">
 									{selectedItems.map((it) => {
 										const stockLevel =
-											it.variant?.stock ?? product?.cantidadStock;
+											getEffectiveStockLevel(it.variant ?? null);
 										const itemPrice = computeFinalPriceForVariant(
 											it.variant ?? null,
 										);
@@ -700,10 +728,10 @@ export default function ProductDetailPage() {
 												: selectedVariant
 										)
 											? getLevelStockInfo(
-													(selectedItems.length > 0
-														? selectedItems[0].variant
-														: selectedVariant) ?? null,
-												).message
+												(selectedItems.length > 0
+													? selectedItems[0].variant
+													: selectedVariant) ?? null,
+											).message
 											: product.disponible
 												? "Disponible"
 												: "Agotado"}

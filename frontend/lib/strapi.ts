@@ -235,7 +235,7 @@ function normalizeProductRaw(raw: any) {
 		textoBadgeOferta: safeString(src.textoBadgeOferta),
 		categoria,
 		disponible: safeBoolean(src.disponible),
-		cantidadStock: safeNumber(src.cantidadStock, 0),
+		cantidadStock: src.cantidadStock == null ? undefined : safeNumber(src.cantidadStock),
 		slug: safeString(src.slug),
 		imagenPrincipal: img,
 		galeria,
