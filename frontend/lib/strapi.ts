@@ -1,229 +1,12 @@
-import { z } from "zod";
-import { CategorySchema } from "@/lib/strapi/types/category";
-import { SettingsSchema } from "@/lib/strapi/types/settings";
-import { ImageSchema, ImageType } from "./strapi/types/shared";
-import { ProductoSchema, Producto } from "./strapi/types/product";
-import { Variante } from "./strapi/types/product";
+import { Category, CategoriesSchema } from "@/lib/strapi/types/category";
+import { SiteSettingsSchema, SiteSettings } from "@/lib/strapi/types/settings";
+import {
+	ProductoSchema,
+	Producto,
+	ProductosSchema,
+} from "./strapi/types/product";
 import qs from "qs";
-import {cacheLife} from "next/cache";
-
-// Export types for backward compatibility
-export type { Producto, Variante, ImageType };
-export type StrapiCategory = z.infer<typeof CategorySchema>;
-export type StrapiSettings = z.infer<typeof SettingsSchema>;
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-/**
- * Config
- */
-const STRAPI_URL =
-	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
-
-/**
- * Helpers
- */
-function safeString(v: any) {
-	if (v === null || v === undefined) return "";
-	return String(v);
-}
-function safeNumber(v: any, defaultVal = 0) {
-	if (v === null || v === undefined || v === "") return defaultVal;
-	const n = Number(v);
-	return Number.isNaN(n) ? defaultVal : n;
-}
-function safeBoolean(v: any) {
-	return Boolean(v);
-}
-
-export function getStrapiImageUrl(path: string | undefined): string {
-	if (!path) {
-		return "https://placehold.co/400x400?text=No+Imagen";
-	}
-
-	if (path.startsWith("http")) {
-		return path;
-	}
-
-	return `${STRAPI_URL}${path}`;
-}
-
-/**
- * Normalizers
- *
- * Strapi can return:
- * - flattened: { id, nombre, imagen: { url, name } ... }
- * - nested: { id, attributes: { nombre, imagen: { data: { attributes: { url, name } } } } }
- * - image formats inside formats.small.url
- *
- * We request only necessary fields (url + name) for images, and minimal fields for variantes.
- */
-
-/**
- * Convert any Strapi image shape into your ImageType:
- * { url: string, name: string }
- */
-function pickImageAttr(src: any): ImageType {
-	if (!src) return ImageSchema.parse({ url: "", name: "" });
-
-	// possible shapes:
-	// 1) src = { data: { attributes: { url, name, formats: {...} } } }
-	// 2) src = { attributes: { url, name, formats: {...} } }
-	// 3) src = { url: '/uploads/...', name: 'x' }
-	const a = src?.data?.attributes ?? src?.attributes ?? src;
-
-	if (!a) return ImageSchema.parse({ url: "", name: "" });
-
-	// prefer formats.small.url -> formats.thumbnail.url -> url
-	const formats = a.formats ?? null;
-	const smallUrl = formats?.small?.url ?? formats?.thumbnail?.url ?? null;
-
-	const rawUrl = a.url ?? smallUrl ?? "";
-	const finalUrl = rawUrl
-		? rawUrl.startsWith("http")
-			? rawUrl
-			: `${STRAPI_URL}${rawUrl}`
-		: "";
-	const name = a.name ?? a.alternativeText ?? "";
-
-	return ImageSchema.parse({
-		url: finalUrl ? finalUrl : "",
-		name: safeString(name),
-	});
-}
-
-function pickCategoryAttr(src: any) {
-	const emptyCategory = {
-		id: 0,
-		documentId: "",
-		nombre: "",
-		descripcion: "",
-	};
-
-	if (!src) return CategorySchema.parse(emptyCategory);
-
-	const a = src?.data?.attributes ?? src?.attributes ?? src;
-	if (!a) return CategorySchema.parse(emptyCategory);
-
-	return CategorySchema.parse({
-		id: safeNumber(src?.data?.id ?? src?.id ?? a?.id ?? 0),
-		documentId: safeString(a.documentId),
-		nombre: safeString(a.nombre ?? a.name),
-		descripcion: safeString(a.descripcion ?? ""),
-	});
-}
-
-const VALID_TALLAS = ["XS", "S", "M", "L", "XL", "XXL"];
-
-function normalizeVariantRaw(rawVar: any) {
-	// rawVar may be in shapes:
-	// - { id, attributes: { ... } }
-	// - { ... } flattened
-	const v = rawVar?.attributes
-		? { id: rawVar.id, ...rawVar.attributes }
-		: rawVar;
-
-	const imagenesRaw = v.imagenes?.data ?? v.imagenes ?? [];
-	const imagenes = Array.isArray(imagenesRaw)
-		? imagenesRaw.map(pickImageAttr)
-		: [];
-
-	return {
-		id: safeNumber(v.id, 0),
-		sku: safeString(v.sku),
-		talla: typeof v.talla === "string" ? v.talla : null,
-		color: safeString(v.color),
-		stock: v.stock == null ? null : safeNumber(v.stock, 0),
-		disponible: safeBoolean(v.disponible ?? true),
-		precioSobreescribir: v.precioSobreescribir ?? v.precioOverride ?? undefined,
-		imagenes,
-		enOferta: safeBoolean(v.enOferta ?? false),
-		precioOferta:
-			v.precioOferta == null ? undefined : safeNumber(v.precioOferta),
-		tipoDescuento: v.tipoDescuento ?? undefined,
-		valorDescuento:
-			v.valorDescuento == null ? undefined : safeNumber(v.valorDescuento),
-		fechaInicioOferta: v.fechaInicioOferta ?? null,
-		fechaFinOferta: v.fechaFinOferta ?? null,
-	};
-}
-
-function normalizeSettingsRaw(raw: any) {
-	const src = raw?.attributes ?? raw;
-
-	const img = pickImageAttr(src.imagenHero ?? src.imagen);
-	const estadisticasRaw = src.estadisticas ?? [];
-	const estadisticas = Array.isArray(estadisticasRaw)
-		? estadisticasRaw.map((s: any) => {
-				const a = s?.attributes ?? s;
-				return {
-					id: safeNumber(s?.id ?? a?.id ?? 0),
-					textoArriba: safeString(a?.textoArriba),
-					textoAbajo: safeString(a?.textoAbajo),
-				};
-			})
-		: [];
-
-	return {
-		id: safeNumber(raw.id ?? src.id, 0),
-		documentId: safeString(src.documentId),
-		tituloHero: safeString(src.tituloHero),
-		subtituloHero: safeString(src.subtituloHero),
-		descripcionTienda: safeString(src.descripcionTienda),
-		numeroWhatsapp: safeString(src.numeroWhatsapp),
-		textoCTA: src.textoCTA ?? null,
-		imagenHero: img,
-		estadisticas,
-	};
-}
-
-function normalizeProductRaw(raw: any) {
-	const src = raw?.attributes ?? raw;
-
-	// main product image (prioritize imagenPrincipal)
-	const img = pickImageAttr(
-		src.imagenPrincipal ?? src.imagen ?? src.imagenHero ?? null,
-	);
-	const categoria = pickCategoryAttr(src.categoria);
-
-	// variantes: normalized from relation shape (data/attributes) or flattened
-	const variantesRaw = src.variantes?.data ?? src.variantes ?? [];
-	const variantes = Array.isArray(variantesRaw)
-		? variantesRaw.map(normalizeVariantRaw)
-		: [];
-
-	// galeria: array of media
-	const galeriaRaw = src.galeria?.data ?? src.galeria ?? [];
-	const galeria = Array.isArray(galeriaRaw)
-		? galeriaRaw.map(pickImageAttr)
-		: [];
-
-	return {
-		id: safeNumber(raw.id ?? src.id, 0),
-		documentId: safeString(src.documentId),
-		nombre: safeString(src.nombre),
-		descripcion: src.descripcion ?? "",
-		precio: safeNumber(src.precio, 0),
-		enOferta: safeBoolean(src.enOferta),
-		precioOferta:
-			src.precioOferta == null ? undefined : safeNumber(src.precioOferta),
-		tipoDescuento: src.tipoDescuento ?? undefined,
-		valorDescuento:
-			src.valorDescuento == null ? undefined : safeNumber(src.valorDescuento),
-		fechaInicioOferta: src.fechaInicioOferta ?? null,
-		fechaFinOferta: src.fechaFinOferta ?? null,
-		mostrarPrecioOferta: safeBoolean(src.mostrarPrecioOferta ?? true),
-		textoBadgeOferta: safeString(src.textoBadgeOferta),
-		categoria,
-		disponible: safeBoolean(src.disponible),
-		cantidadStock: src.cantidadStock == null ? undefined : safeNumber(src.cantidadStock),
-		slug: safeString(src.slug),
-		imagenPrincipal: img,
-		galeria,
-		variantes,
-		destacado: safeBoolean(src.destacado ?? true),
-	};
-}
+import { STRAPI_URL } from "@/lib/constants";
 
 /**
  * Build product query safely using qs.stringify.
@@ -276,17 +59,12 @@ export function buildProductQuery() {
 
 /** Get featured productos (destacado = true) */
 export async function getFeaturedProducts(): Promise<Producto[]> {
-	'use cache';
-	cacheLife({
-		stale: 300,          // 5 mins
-		revalidate: 900,      // 15 mins
-		expire: 3600,        // 1 hour
-	});
-
 	try {
 		const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
 
 		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
+
+		console.log(`${STRAPI_URL}/api/productos?${qs}`);
 
 		if (!res.ok) {
 			throw new Error(`Strapi API error: ${res.status}`);
@@ -295,10 +73,7 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 		const json = await res.json();
 		const items = json.data ?? [];
 
-		return items.map((raw: any) => {
-			const normalized = normalizeProductRaw(raw);
-			return ProductoSchema.parse(normalized);
-		});
+		return ProductosSchema.parse(items);
 	} catch (err) {
 		console.error("[Strapi] getFeaturedProducts error:", err);
 		return [];
@@ -311,14 +86,6 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 
 /** Get all productos */
 export async function getProducts(): Promise<Producto[]> {
-	'use cache';
-	cacheLife({
-		stale: 120,          // 2 mins
-		revalidate: 600,      // 10 mins
-		expire: 14400,       // 4 hours
-	});
-
-
 	try {
 		const qs = buildProductQuery();
 
@@ -333,10 +100,7 @@ export async function getProducts(): Promise<Producto[]> {
 		const json = await res.json();
 		const items = json.data ?? [];
 
-		return items.map((raw: any) => {
-			const normalized = normalizeProductRaw(raw);
-			return ProductoSchema.parse(normalized);
-		});
+		return ProductosSchema.parse(items);
 	} catch (err) {
 		console.error("[Strapi] getProducts error:", err);
 		return [];
@@ -345,17 +109,12 @@ export async function getProducts(): Promise<Producto[]> {
 
 /** Get product by ID */
 export async function getProductById(id: string): Promise<Producto | null> {
-	'use cache';
-	cacheLife({
-		stale: 30,           // 30 seconds
-		revalidate: 60,       // 1 minute
-		expire: 3600,        // 1 hour
-	});
-
 	try {
 		const qs = buildProductQuery();
 
-		const res = await fetch(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
+		const res = await fetch(
+			`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
+		);
 
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
@@ -363,8 +122,7 @@ export async function getProductById(id: string): Promise<Producto | null> {
 		const item = json.data ?? null;
 		if (!item) return null;
 
-		const normalized = normalizeProductRaw(item);
-		return ProductoSchema.parse(normalized);
+		return ProductoSchema.parse(item);
 	} catch (err) {
 		console.error("[Strapi] getProductById error:", err);
 		return null;
@@ -372,29 +130,14 @@ export async function getProductById(id: string): Promise<Producto | null> {
 }
 
 /** Get all categories */
-export async function getCategories(): Promise<StrapiCategory[]> {
-	'use cache';
-	cacheLife({
-		stale: 3600,         // 1 hour
-		revalidate: 14400,    // 4 hours
-		expire: 86400,       // 1 day
-	});
-
+export async function getCategories(): Promise<Category[]> {
 	try {
 		const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 		const json = await res.json();
 		const items = json.data ?? [];
-		return items.map((raw: any) => {
-			const attr = raw?.attributes ?? raw;
-			const c = {
-				id: safeNumber(raw.id ?? attr.id, 0),
-				documentId: safeString(attr.documentId),
-				nombre: safeString(attr.nombre),
-				descripcion: safeString(attr.descripcion),
-			};
-			return CategorySchema.parse(c);
-		});
+
+		return CategoriesSchema.parse(items);
 	} catch (err) {
 		console.error("[Strapi] getCategories error:", err);
 		return [];
@@ -408,14 +151,14 @@ export async function getProductsByCategory(
 	try {
 		const encoded = encodeURIComponent(category);
 		// NOTE: adjust filter key according to your Strapi field name (categoria vs category)
-		const res = await fetch(`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`);
+		const res = await fetch(
+			`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`,
+		);
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 		const json = await res.json();
 		const items = json.data ?? [];
-		return items.map((raw: any) => {
-			const normalized = normalizeProductRaw(raw);
-			return ProductoSchema.parse(normalized);
-		});
+
+		return ProductosSchema.parse(items);
 	} catch (err) {
 		console.error("[Strapi] getProductsByCategory error:", err);
 		return [];
@@ -423,40 +166,46 @@ export async function getProductsByCategory(
 }
 
 /** Get site settings */
-export async function getSettings(): Promise<StrapiSettings | null> {
-	'use cache';
-	cacheLife({
-		stale: 3600,         // 1 hour
-		revalidate: 43200,    // 12 hours
-		expire: 604800,      // 7 days
-	});
+export async function getSettings(): Promise<SiteSettings | null> {
+	const query = qs.stringify(
+		{
+			fields: [
+				"id",
+				"documentId",
+				"tituloHero",
+				"subtituloHero",
+				"descripcionTienda",
+				"numeroWhatsapp",
+				"textoCTA",
+			],
+			populate: {
+				imagenHero: {
+					fields: ["url", "name", "alternativeText"],
+				},
+				estadisticas: {
+					fields: ["id", "textoArriba", "textoAbajo"],
+				},
+			},
+		},
+		{ encodeValuesOnly: true },
+	);
 
 	try {
-		// only request top-level fields we use + minimal populate for imagenHero and estadisticas
-		const qs =
-			"fields[0]=id" +
-			"&fields[1]=documentId" +
-			"&fields[2]=tituloHero" +
-			"&fields[3]=subtituloHero" +
-			"&fields[4]=descripcionTienda" +
-			"&fields[5]=numeroWhatsapp" +
-			"&fields[6]=textoCTA" +
-			// populate imagenHero but only its 'url' and 'name' fields
-			"&populate[imagenHero][fields][0]=url&populate[imagenHero][fields][1]=name" +
-			// populate estadisticas (relation/component) — you can narrow fields further if needed
-			"&populate[estadisticas]=*";
+		const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
 
-		const res = await fetch(`${STRAPI_URL}/api/configuracion?${qs}`);
 		if (!res.ok) {
+			console.error(`[Strapi] Fetch failed: ${res.statusText}`);
 			return null;
 		}
-		const json = await res.json();
-		const raw = json.data ?? null;
-		if (!raw) return null;
-		const normalized = normalizeSettingsRaw(raw);
-		return SettingsSchema.parse(normalized);
+
+		const { data } = await res.json();
+
+		if (!data) return null;
+
+		// Validation with Zod
+		return SiteSettingsSchema.parse(data);
 	} catch (err) {
-		console.error("[Strapi] getSettings error:", err);
+		console.error("[Strapi] Network error:", err);
 		return null;
 	}
 }

@@ -8,31 +8,31 @@ export const TipoDescuentoEnum = z.enum(["porcentaje", "fijo"]);
 
 /* VARIANTE */
 export const VarianteSchema = z.object({
-	id: z.number().int().optional(),
+	id: z.number().int().nullish(),
 
-	sku: z.string().optional().default(""),
+	sku: z.string().nullish().default(""),
 
-	talla: TallaEnum.optional().nullable(),
+	talla: TallaEnum.nullish(),
 
-	color: z.string().optional(),
+	color: z.string().nullish(),
 
 	// If a number takes precedence over disponible
-	stock: z.union([z.number().int().min(0), z.null()]).optional(),
+	stock: z.number().int().min(0).nullish(),
 	// allow number or null
 
 	// If true then takes precedence if stock is none
 	disponible: z.boolean().default(true),
 
-	precioSobreescribir: z.number().optional(),
+	precioSobreescribir: z.number().nullish(),
 	// keep your spanish name if preferred
 
-	enOferta: z.boolean().optional(),
-	precioOferta: z.number().optional(),
-	tipoDescuento: TipoDescuentoEnum.optional(),
-	valorDescuento: z.number().optional(),
+	enOferta: z.boolean().nullish(),
+	precioOferta: z.number().nullish(),
+	tipoDescuento: TipoDescuentoEnum.nullish(),
+	valorDescuento: z.number().nullish(),
 
-	fechaInicioOferta: z.string().optional().nullable(),
-	fechaFinOferta: z.string().optional().nullable(),
+	fechaInicioOferta: z.string().nullish().nullable(),
+	fechaFinOferta: z.string().nullish().nullable(),
 });
 
 export type Variante = z.infer<typeof VarianteSchema>;
@@ -40,34 +40,36 @@ export type Variante = z.infer<typeof VarianteSchema>;
 /* PRODUCTO */
 export const ProductoSchema = z.object({
 	id: z.number().int(),
-	documentId: z.string().optional().default(""),
+	documentId: z.string().nullish().default(""),
 	nombre: z.string().default(""),
-	descripcion: z.string().optional().nullable().default(""),
+	descripcion: z.string().nullish().nullable().default(""),
 	precio: z.number().default(0),
 
 	enOferta: z.boolean().default(false),
-	precioOferta: z.number().optional(),
-	tipoDescuento: TipoDescuentoEnum.optional(),
-	valorDescuento: z.number().optional(),
-	fechaInicioOferta: z.string().optional().nullable(),
-	fechaFinOferta: z.string().optional().nullable(),
+	precioOferta: z.number().nullish(),
+	tipoDescuento: TipoDescuentoEnum.nullish(),
+	valorDescuento: z.number().nullish(),
+	fechaInicioOferta: z.string().nullish(),
+	fechaFinOferta: z.string().nullish(),
 	mostrarPrecioOferta: z.boolean().default(true),
-	textoBadgeOferta: z.string().optional().default(""),
+	textoBadgeOferta: z.string().nullish().default(""),
 
 	disponible: z.boolean().default(true),
-	cantidadStock: z.number().optional(),
+	cantidadStock: z.number().nullish(),
 
-	categoria: CategorySchema.optional(),
+	categoria: CategorySchema.nullish(),
 
 	// after normalization this will be a flat array of variants
-	variantes: z.array(VarianteSchema).optional().default([]),
+	variantes: z.array(VarianteSchema).nullish().default([]),
 
-	galeria: z.array(ImageSchema).optional().default([]),
+	galeria: z.array(ImageSchema).nullish().default([]),
 
-	imagenPrincipal: ImageSchema.optional().nullable(),
+	imagenPrincipal: ImageSchema.nullish().nullable(),
 
 	destacado: z.boolean().default(true),
-	slug: z.string().optional().default(""),
+	slug: z.string().nullish().default(""),
 });
 
 export type Producto = z.infer<typeof ProductoSchema>;
+
+export const ProductosSchema = z.array(ProductoSchema).default([]);

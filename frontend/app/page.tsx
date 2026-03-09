@@ -7,17 +7,15 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import {
-	getFeaturedProducts,
-	getSettings,
-} from "@/lib/strapi";
-import type { StrapiSettings, Producto } from "@/lib/strapi";
+import { getFeaturedProducts, getSettings } from "@/lib/strapi";
 import type { WhatsAppMessageConfig } from "@/lib/whatsapp";
+import {Producto} from "@/lib/strapi/types/product";
+import {SiteSettings} from "@/lib/strapi/types/settings";
 
 export default function Home() {
 	const [showHeader, setShowHeader] = useState(false);
 	const [products, setProducts] = useState<Producto[]>([]);
-	const [settings, setSettings] = useState<StrapiSettings | null>(null);
+	const [settings, setSettings] = useState<SiteSettings | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	// Handle scroll to show/hide header

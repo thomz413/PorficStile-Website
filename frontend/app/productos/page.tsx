@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { getProducts, getCategories, getSettings } from "@/lib/strapi";
 import ProductCard from "@/components/ProductCard";
 import StickyCart from "@/components/StickyCart";
-import { Producto, StrapiCategory } from "@/lib/strapi";
+import { Producto, Category } from "@/lib/strapi";
 import { Filter, Grid, List } from "lucide-react";
 import Header from "@/components/Header";
-import { Settings } from "@/lib/strapi/types/settings";
+import { SiteSettings } from "@/lib/strapi/types/settings";
 
 export default function ProductsPage() {
 	const [products, setProducts] = useState<Producto[]>([]);
@@ -15,7 +15,7 @@ export default function ProductsPage() {
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-	const [settings, setSettings] = useState<Settings | null>(null);
+	const [settings, setSettings] = useState<SiteSettings | null>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {

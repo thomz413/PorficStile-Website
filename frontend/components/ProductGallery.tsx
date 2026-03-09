@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
-import { getStrapiImageUrl } from "@/lib/strapi";
 
 interface GalleryImage {
 	url: string;
@@ -46,7 +45,7 @@ export default function ProductGallery({
 		// Product-level images next
 		if (product.imagenPrincipal?.url) {
 			pushIfUnique({
-				url: getStrapiImageUrl(product.imagenPrincipal.url),
+				url: product.imagenPrincipal.url,
 				name: product.imagenPrincipal.name ?? "",
 				alt: product.imagenPrincipal.alternativeText ?? product.nombre ?? "",
 				source: "product",
@@ -56,7 +55,7 @@ export default function ProductGallery({
 		if (Array.isArray(product.galeria)) {
 			product.galeria.forEach((img) =>
 				pushIfUnique({
-					url: getStrapiImageUrl(img.url),
+					url: img.url,
 					name: img.name ?? "",
 					alt: img.alternativeText ?? product.nombre ?? "",
 					source: "product",

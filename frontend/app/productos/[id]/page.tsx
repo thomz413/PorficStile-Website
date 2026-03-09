@@ -1,4 +1,3 @@
-// app/product/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,9 +18,6 @@ import { useParams } from "next/navigation";
 import {
 	getProductById,
 	getSettings,
-	getStrapiImageUrl,
-	Producto,
-	Variante,
 } from "@/lib/strapi";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
@@ -29,6 +25,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {Producto, Variante} from "@/lib/strapi/types/product";
 
 type SelectedItem = {
 	key: string; // variant id or "default"
@@ -564,9 +561,6 @@ export default function ProductDetailPage() {
 							{/* Stock helper */}
 							<p className="text-sm text-gray-600 mt-2">
 								{stockInfoForWorking.message}
-								{typeof (getEffectiveStockLevel(selectedVariant ?? null)) ===
-									"number" &&
-									` — ${getEffectiveStockLevel(selectedVariant ?? null)} en total`}
 							</p>
 						</div>
 
@@ -589,9 +583,7 @@ export default function ProductDetailPage() {
 												<div className="flex items-center gap-3">
 													{product.imagenPrincipal?.url && (
 														<Image
-															src={getStrapiImageUrl(
-																product.imagenPrincipal.url,
-															)}
+															src={product.imagenPrincipal.url}
 															alt={product.nombre}
 															width={56}
 															height={56}

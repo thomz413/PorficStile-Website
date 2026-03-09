@@ -6,8 +6,8 @@ import Link from "next/link";
 import { Heart, ShoppingCart, MessageCircle } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
-import { Producto, Variante, getStrapiImageUrl } from "@/lib/strapi";
 import { toast } from "sonner";
+import { Producto, Variante } from "@/lib/strapi/types/product";
 
 interface ProductCardProps {
 	product: Producto;
@@ -28,10 +28,10 @@ export default function ProductCard({
 	const getProductImage = () => {
 		// Priority: imagenPrincipal > galeria[0] > placeholder
 		if (product.imagenPrincipal?.url) {
-			return getStrapiImageUrl(product.imagenPrincipal.url);
+			return product.imagenPrincipal.url;
 		}
 		if (product.galeria && product.galeria.length > 0) {
-			return getStrapiImageUrl(product.galeria[0].url);
+			return product.galeria[0].url;
 		}
 		return "https://placehold.co/400x400?text=No+Imagen";
 	};
@@ -148,21 +148,36 @@ export default function ProductCard({
 	// Get stock information
 	const getStockInfo = () => {
 		if (selectedVariant) {
+
+			let message = "Agotado";
+
+			if (selectedVariant.disponible && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
+				message = `${selectedVariant.stock} disponibles`;
+			} else if (selectedVariant.disponible) {
+				message = `Disponible`;
+			}
+
 			return {
 				available: selectedVariant.disponible,
 				stock: selectedVariant.stock ?? 0,
-				message: selectedVariant.disponible
-					? `${selectedVariant.stock} disponibles`
-					: "Agotado",
+				message: message,
 			};
 		}
+
+		let message = "Agotado";
+
+		if (product.disponible && product.cantidadStock !== undefined && product.cantidadStock !== null) {
+			message = `${product.cantidadStock} disponibles`;
+		} else if (product.disponible) {
+			message = `Disponible`;
+
+		}
+
 
 		return {
 			available: product?.disponible ?? false,
 			stock: product?.cantidadStock ?? 0,
-			message: product?.disponible
-				? `${product?.cantidadStock} disponibles`
-				: "Agotado",
+			message: message,
 		};
 	};
 

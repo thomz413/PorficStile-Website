@@ -84,13 +84,6 @@ export default function Header({
 									</span>
 								)}
 							</button>
-
-							<Link
-								href="/contacto"
-								className="inline-flex items-center px-3 py-2 rounded-md hover:bg-muted transition-colors text-sm"
-							>
-								Contacto
-							</Link>
 						</div>
 					</div>
 
