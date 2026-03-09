@@ -5,6 +5,7 @@ import { ImageSchema, ImageType } from "./strapi/types/shared";
 import { ProductoSchema, Producto } from "./strapi/types/product";
 import { Variante } from "./strapi/types/product";
 import qs from "qs";
+import {cacheLife} from "next/cache";
 
 // Export types for backward compatibility
 export type { Producto, Variante, ImageType };
@@ -185,26 +186,6 @@ function normalizeProductRaw(raw: any) {
 	);
 	const categoria = pickCategoryAttr(src.categoria);
 
-	const tallaProducto = Array.isArray(src.tallaProducto)
-		? src.tallaProducto
-				.map((t: any) => {
-					const talla =
-						typeof t.talla === "string" ? t.talla.trim().toUpperCase() : "";
-
-					if (!VALID_TALLAS.includes(talla)) {
-						console.warn("Invalid talla from Strapi:", t.talla);
-						return null;
-					}
-
-					return {
-						talla,
-						disponible: safeBoolean(t.disponible),
-						stock: safeNumber(t.stock, 0),
-					};
-				})
-				.filter(Boolean)
-		: [];
-
 	// variantes: normalized from relation shape (data/attributes) or flattened
 	const variantesRaw = src.variantes?.data ?? src.variantes ?? [];
 	const variantes = Array.isArray(variantesRaw)
@@ -295,13 +276,17 @@ export function buildProductQuery() {
 
 /** Get featured productos (destacado = true) */
 export async function getFeaturedProducts(): Promise<Producto[]> {
+	'use cache';
+	cacheLife({
+		stale: 300,          // 5 mins
+		revalidate: 900,      // 15 mins
+		expire: 3600,        // 1 hour
+	});
+
 	try {
 		const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
-		console.log(`${STRAPI_URL}/api/productos?${qs}`);
 
-		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
-			next: { revalidate: 60 },
-		});
+		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
 		if (!res.ok) {
 			throw new Error(`Strapi API error: ${res.status}`);
@@ -326,14 +311,20 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 
 /** Get all productos */
 export async function getProducts(): Promise<Producto[]> {
+	'use cache';
+	cacheLife({
+		stale: 120,          // 2 mins
+		revalidate: 600,      // 10 mins
+		expire: 14400,       // 4 hours
+	});
+
+
 	try {
 		const qs = buildProductQuery();
 
 		console.log(`${STRAPI_URL}/api/productos?${qs}`);
 
-		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
-			next: { revalidate: 60 },
-		});
+		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
 		if (!res.ok) {
 			throw new Error(`Strapi API error: ${res.status}`);
@@ -354,13 +345,17 @@ export async function getProducts(): Promise<Producto[]> {
 
 /** Get product by ID */
 export async function getProductById(id: string): Promise<Producto | null> {
+	'use cache';
+	cacheLife({
+		stale: 30,           // 30 seconds
+		revalidate: 60,       // 1 minute
+		expire: 3600,        // 1 hour
+	});
+
 	try {
 		const qs = buildProductQuery();
 
-		const res = await fetch(
-			`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
-			{ next: { revalidate: 60 } },
-		);
+		const res = await fetch(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
 
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
@@ -378,10 +373,15 @@ export async function getProductById(id: string): Promise<Producto | null> {
 
 /** Get all categories */
 export async function getCategories(): Promise<StrapiCategory[]> {
+	'use cache';
+	cacheLife({
+		stale: 3600,         // 1 hour
+		revalidate: 14400,    // 4 hours
+		expire: 86400,       // 1 day
+	});
+
 	try {
-		const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`, {
-			next: { revalidate: 60 },
-		});
+		const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 		const json = await res.json();
 		const items = json.data ?? [];
@@ -408,10 +408,7 @@ export async function getProductsByCategory(
 	try {
 		const encoded = encodeURIComponent(category);
 		// NOTE: adjust filter key according to your Strapi field name (categoria vs category)
-		const res = await fetch(
-			`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`,
-			{ next: { revalidate: 60 } },
-		);
+		const res = await fetch(`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`);
 		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 		const json = await res.json();
 		const items = json.data ?? [];
@@ -427,6 +424,13 @@ export async function getProductsByCategory(
 
 /** Get site settings */
 export async function getSettings(): Promise<StrapiSettings | null> {
+	'use cache';
+	cacheLife({
+		stale: 3600,         // 1 hour
+		revalidate: 43200,    // 12 hours
+		expire: 604800,      // 7 days
+	});
+
 	try {
 		// only request top-level fields we use + minimal populate for imagenHero and estadisticas
 		const qs =
@@ -442,9 +446,7 @@ export async function getSettings(): Promise<StrapiSettings | null> {
 			// populate estadisticas (relation/component) — you can narrow fields further if needed
 			"&populate[estadisticas]=*";
 
-		const res = await fetch(`${STRAPI_URL}/api/configuracion?${qs}`, {
-			next: { revalidate: 60 },
-		});
+		const res = await fetch(`${STRAPI_URL}/api/configuracion?${qs}`);
 		if (!res.ok) {
 			return null;
 		}
