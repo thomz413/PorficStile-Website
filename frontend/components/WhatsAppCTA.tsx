@@ -1,8 +1,8 @@
 "use client";
 
 import { MouseEvent, useCallback } from "react";
-import { MessageCircle } from "lucide-react";
 import { generateWhatsAppMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface WhatsAppCTAProps {
 	whatsappNumber?: string | null;
@@ -59,7 +59,7 @@ export default function WhatsAppCTA({
 				className="fixed bottom-8 right-8 z-40 flex items-center justify-center h-16 w-16 rounded-none bg-secondary text-white shadow-2xl hover:bg-secondary/90 transition-smooth hover:scale-110 border-2 group"
 				title="Contactar por WhatsApp"
 			>
-				<MessageCircle className="h-7 w-7 group-hover:rotate-12 transition-transform" />
+				<FaWhatsapp className="h-7 w-7 group-hover:rotate-12 transition-transform" />
 			</button>
 		);
 	}
@@ -73,7 +73,7 @@ export default function WhatsAppCTA({
 				className={`block rounded-none border-2 border-secondary p-6 bg-secondary/5 hover:bg-secondary/10 transition-smooth text-center group ${className}`}
 			>
 				<div className="flex items-center justify-center mb-3">
-					<MessageCircle className="h-8 w-8 text-secondary group-hover:scale-110 transition-smooth" />
+					<FaWhatsapp className="h-7 w-7 group-hover:rotate-12 transition-transform" />
 				</div>
 				<h3 className="font-semibold text-lg text-foreground mb-2">{label}</h3>
 				<p className="text-sm text-muted-foreground">
@@ -90,7 +90,7 @@ export default function WhatsAppCTA({
 			aria-label={ariaLabel}
 			className={`inline-flex items-center justify-center gap-3 rounded-none bg-secondary px-8 py-4 font-black text-white hover:bg-secondary/90 transition-smooth border-2 border-secondary hover:shadow-lg group uppercase tracking-wide ${className}`}
 		>
-			<MessageCircle className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+			<FaWhatsapp className="h-7 w-7 group-hover:rotate-12 transition-transform" />
 			<span>{label}</span>
 		</button>
 	);

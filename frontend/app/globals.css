@@ -7,6 +7,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --gold-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+
   --background: #f0f0e5;
   --foreground: #1a1410;
   --card: #f0f0e5;
@@ -350,173 +352,218 @@ html, body {
   .font-inter {
     font-family: 'Inter', sans-serif;
   }
-  
+  /* 1. Bright, High-Contrast Shiny Gold Text */
   .text-gold-shiny {
-    background: linear-gradient(135deg, 
-      #b8860b 0%, 
-      #ffd700 20%, 
-      #ffed4e 35%, 
-      #ffd700 50%, 
-      #daa520 65%, 
-      #b8860b 80%, 
-      #8b6914 100%
-    );
-    background-size: 300% 300%;
+    background:
+            var(--gold-noise),
+            linear-gradient(
+                    110deg,
+                    #9c7512 0%,
+                    #d4af37 15%,
+                    #fff4ce 25%,
+                    #d4af37 35%,
+                    #7a5901 50%,
+                    #b8860b 70%,
+                    #ffec99 85%,
+                    #9c7512 100%
+            );
+    background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 8s ease-in-out infinite;
-    position: relative;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+    color: transparent;
+    animation: shimmer-sweep 6s linear infinite;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
   }
-  
-  .text-gold-shiny::before {
-    display: none;
-  }
-  
+
+  /* 2. Softer, Shimmering Gold Text */
   .text-gold-shimmer {
-    background: linear-gradient(135deg, 
-      #8b6914 0%, 
-      #a47a1e 20%, 
-      #d3a84c 40%, 
-      #e6be69 60%, 
-      #b58f3e 80%, 
-      #a47a1e 100%
-    );
-    background-size: 300% 300%;
+    background:
+            var(--gold-noise),
+            linear-gradient(
+                    135deg,
+                    #8b6914 0%,
+                    #b58f3e 20%,
+                    #e6be69 40%,
+                    #fff4ce 50%,
+                    #e6be69 60%,
+                    #8b6914 80%,
+                    #c6a04a 100%
+            );
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: gold-shine-text 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    position: relative;
-    filter: drop-shadow(0 0 15px rgba(184, 134, 11, 0.3));
+    animation: gold-pulse-pan 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    filter: drop-shadow(0 0 12px rgba(230, 190, 105, 0.3));
   }
-  
-  .text-gold-shimmer::before {
-    display: none;
-  }
-  
+
+  /* 3. Deep Antique Bronze/Dark Gold Text */
   .text-gold-dark {
-    background: linear-gradient(135deg, 
-      #8b6914 0%, 
-      #a47a1e 20%, 
-      #d3a84c 40%, 
-      #e6be69 60%, 
-      #b58f3e 80%, 
-      #a47a1e 100%
-    );
-    background-size: 300% 300%;
+    background:
+            var(--gold-noise),
+            linear-gradient(
+                    135deg,
+                    #4a3500 0%,
+                    #8b6914 25%,
+                    #c49a37 45%,
+                    #ffe18a 55%,
+                    #8b6914 75%,
+                    #362600 100%
+            );
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: gold-shine-text 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    position: relative;
-    filter: drop-shadow(0 0 20px rgba(184, 134, 11, 0.4)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.2));
+    animation: gold-pulse-pan 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    /* Darker drop shadow for depth, slight yellow glow */
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 15px rgba(139, 105, 20, 0.4));
   }
-  
-  .text-gold-dark::before {
+
+  /* 7. Refined Satin Gold - No White Fog */
+  .bg-gold-premium-shimmer {
+    background:
+      /* 1. Ultra-fine grain noise */
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+              /* 2. Deep, rich gold gradient */
+            linear-gradient(
+                    135deg,
+                    #5c4512 0%,    /* Darker anchor */
+                    #8b6914 20%,   /* Rich gold */
+                    #d4af37 40%,   /* Metallic mid */
+                    #f2d48a 50%,   /* Soft, warm glow (not white) */
+                    #d4af37 60%,   /* Metallic mid */
+                    #8b6914 80%,   /* Rich gold */
+                    #4a3500 100%   /* Deep shadow */
+            );
+
+    background-size: 200% 200%;
+
+    /* 'Overlay' keeps the darks dark and the lights bright without 'milky' squares */
+    background-blend-mode: overlay, normal;
+
+    animation: gold-pulse-pan 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+    /* Premium "Weighted" Shadow Profile */
+    box-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25), /* Very thin light catch */
+            inset 0 -2px 10px rgba(0, 0, 0, 0.3),    /* Bottom weight */
+            inset 0 0 15px rgba(92, 69, 18, 0.3);    /* Internal depth */
+
+    border: 1px solid #73581c;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  /* Remove the absolute glare if it was causing a square artifact */
+  .bg-gold-premium-shimmer::after {
     display: none;
   }
-  
+
+  /* 4. Beveled, Textured Background Shimmer */
   .bg-gold-shimmer {
-    background: linear-gradient(135deg, 
-      #8b6914 0%, 
-      #a47a1e 20%, 
-      #d3a84c 40%, 
-      #e6be69 60%, 
-      #b58f3e 80%, 
-      #a47a1e 100%
-    );
-    background-size: 300% 300%;
-    animation: gold-shine-bg 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    box-shadow: 
-      0 6px 24px rgba(184, 134, 11, 0.3),
-      0 3px 12px rgba(184, 134, 11, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-      inset 0 0.5px 0 rgba(139, 69, 19, 0.3);
-    position: relative;
+    background:
+            var(--gold-noise),
+            linear-gradient(
+                    135deg,
+                    #9c7512 0%,
+                    #d4af37 25%,
+                    #fff4ce 50%,
+                    #d4af37 75%,
+                    #7a5901 100%
+            );
+    background-size: 200% 200%;
+    /* Blend mode integrates the noise beautifully into the background */
+    background-blend-mode: overlay, normal;
+    animation: gold-pulse-pan 8s ease-in-out infinite;
+    /* Improved 3D bevel shadows */
+    box-shadow:
+            0 8px 20px rgba(0, 0, 0, 0.4),
+            0 3px 6px rgba(184, 134, 11, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.6),
+            inset 0 -3px 6px rgba(92, 64, 0, 0.6),
+            inset 0 0 10px rgba(139, 105, 20, 0.5);
+    border-radius: 4px; /* Optional, helps edge highlights look natural */
   }
-  
+
+  /* 5. Highly Reflective Shiny Background */
+  .bg-gold-shiny {
+    position: relative;
+    overflow: hidden;
+    background:
+            var(--gold-noise),
+            linear-gradient(
+                    110deg,
+                    #a47a1e 0%,
+                    #dfb73e 30%,
+                    #ffffff 50%,
+                    #dfb73e 70%,
+                    #7a5901 100%
+            );
+    background-size: 250% auto;
+    background-blend-mode: multiply, normal;
+    animation: shimmer-sweep 5s linear infinite;
+    box-shadow:
+            0 5px 15px rgba(0, 0, 0, 0.3),
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Optional glare overlay for bg-gold-shiny */
+  .bg-gold-shiny::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: gold-glare 4s infinite;
+  }
+
+
+
+  /* --- Improved Keyframe Animations --- */
+
+  /* A continuous, smooth pan of the gradient */
+  @keyframes shimmer-sweep {
+    0% {
+      background-position: 200% center;
+    }
+    100% {
+      background-position: -200% center;
+    }
+  }
+
+  /* A breathing, pulsing movement that creates shifting highlights */
+  @keyframes gold-pulse-pan {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  /* A physical glare line sweeping across backgrounds */
+  @keyframes gold-glare {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; } /* Pauses the glare before restarting */
+  }
+
+  /* Hide ::before tags as requested in your original code */
+  .text-gold-shiny::before,
+  .text-gold-shimmer::before,
+  .text-gold-dark::before,
   .bg-gold-shimmer::before {
     display: none;
   }
-  
-  @keyframes gold-shine-text {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    25% {
-      background-position: 100% 25%;
-    }
-    50% {
-      background-position: 100% 75%;
-    }
-    75% {
-      background-position: 0% 100%;
-    }
-  }
-  
-  @keyframes gold-shine-bg {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    25% {
-      background-position: 100% 25%;
-    }
-    50% {
-      background-position: 100% 75%;
-    }
-    75% {
-      background-position: 0% 100%;
-    }
-  }
-  
-  @keyframes gold-shine-overlay {
-    0% {
-      left: -100%;
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    80% {
-      opacity: 1;
-    }
-    100% {
-      left: 100%;
-      opacity: 0;
-    }
-  }
-  
-  .bg-gold-shiny {
-    background: linear-gradient(135deg, 
-      #a47a1e 0%, 
-      #d3a84c 20%, 
-      #ffec94 40%, 
-      #e6be69 60%, 
-      #ffd87c 80%, 
-      #b58f3e 100%
-    );
-    background-size: 300% 300%;
-    animation: shimmer 16s ease-in-out infinite;
-    box-shadow: 
-      0 4px 15px rgba(255, 215, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  }
-  
-  @keyframes gold-shine {
-    0% {
-      left: -100%;
-    }
-    20% {
-      left: 100%;
-    }
-    100% {
-      left: 100%;
-    }
-  }
 }
+
+
+

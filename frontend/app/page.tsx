@@ -7,11 +7,9 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import StickyCart from "@/components/StickyCart"; // For sticky button functionality
 import {
 	getFeaturedProducts,
 	getSettings,
-	getStrapiImageUrl,
 } from "@/lib/strapi";
 import type { StrapiSettings, Producto } from "@/lib/strapi";
 import type { WhatsAppMessageConfig } from "@/lib/whatsapp";
@@ -58,7 +56,6 @@ export default function Home() {
 
 	const featuredProducts = products.slice(0, 6);
 
-	const heroTitle = "Atlantis Porfic Stile";
 	const heroSubtitle =
 		"Ropa de alta calidad con estilo único. Descubre nuestras colecciones exclusivas.";
 	const estadisticas = settings?.estadisticas;
@@ -121,11 +118,11 @@ export default function Home() {
 								{/* Brand Name */}
 								<div className="flex flex-col items-center justify-center mb-4">
 									<Image
-										src="/AtlantisDorado.svg"
+										src="/AtlantisTitle.svg"
 										alt="Atlantis logo"
 										width={300}
 										height={80}
-										className="object-contain transition-all duration-300 w-48 md:w-64 lg:w-80 h-auto mb-4"
+										className="object-contain w-48 md:w-64 lg:w-80 h-auto mb-4"
 									/>
 									<span className="text-1xl md:text-3xl lg:text-4xl text-gold-shimmer font-black font-inter uppercase tracking-widest">
 										PORFIC STILE
@@ -143,7 +140,7 @@ export default function Home() {
 								<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
 									<Link
 										href="/productos"
-										className="inline-flex items-center justify-center gap-3 bg-gold-shimmer text-accent-foreground px-8 py-4 font-black hover:bg-accent/90 transition-all duration-500 group shadow-2xl hover:-translate-y-1 uppercase tracking-widest text-sm hover:shadow-accent/25"
+										className="inline-flex items-center justify-center gap-3 bg-gold-premium-shimmer text-accent-foreground px-8 py-4 font-black hover:bg-accent/90 transition-all duration-500 group shadow-2xl hover:-translate-y-1 uppercase tracking-widest text-sm hover:shadow-accent/25"
 									>
 										Ver Catálogo
 										<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
