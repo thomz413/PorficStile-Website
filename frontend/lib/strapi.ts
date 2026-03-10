@@ -1,3 +1,5 @@
+"use cache";
+
 import { Category, CategoriesSchema } from "@/lib/strapi/types/category";
 import { SiteSettingsSchema, SiteSettings } from "@/lib/strapi/types/settings";
 import {
@@ -7,166 +9,114 @@ import {
 } from "./strapi/types/product";
 import qs from "qs";
 import { STRAPI_URL } from "@/lib/constants";
-
-/**
- * Build product query safely using qs.stringify.
- * This avoids malformed nested populate strings and 400 errors.
- */
-export function buildProductQuery() {
-	const queryObj = {
-		fields: [
-			"id",
-			"documentId",
-			"nombre",
-			"descripcion",
-			"precio",
-			"enOferta",
-			"precioOferta",
-			"tipoDescuento",
-			"valorDescuento",
-			"disponible",
-			"cantidadStock",
-			"slug",
-			"destacado",
-		],
-		populate: {
-			imagenPrincipal: { fields: ["url", "name", "alternativeText"] },
-			galeria: { fields: ["url", "name", "alternativeText"] },
-			categoria: { fields: ["id", "documentId", "nombre", "descripcion"] },
-			variantes: {
-				fields: [
-					"id",
-					"sku",
-					"talla",
-					"color",
-					"stock",
-					"disponible",
-					"precioSobreescribir",
-					"enOferta",
-					"precioOferta",
-					"tipoDescuento",
-					"valorDescuento",
-					"fechaInicioOferta",
-					"fechaFinOferta",
-				],
-			},
-		},
-	};
-
-	// encodeValuesOnly keeps bracket structure readable for Strapi
-	return qs.stringify(queryObj, { encodeValuesOnly: true });
-}
+import { buildProductQuery } from "@/lib/utils";
+import { cacheTag, cacheLife } from "next/cache";
 
 /** Get featured productos (destacado = true) */
 export async function getFeaturedProducts(): Promise<Producto[]> {
-	try {
-		const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
+	cacheTag("products", "featured-products");
+	cacheLife({
+		stale: 300, // Client cache for 5 mins
+		revalidate: 3600, // Background refresh after 1 hour
+		expire: 86400, // Expire completely after 1 day of no traffic
+	});
 
-		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
+	const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
+	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
-		console.log(`${STRAPI_URL}/api/productos?${qs}`);
+	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
-		if (!res.ok) {
-			throw new Error(`Strapi API error: ${res.status}`);
-		}
-
-		const json = await res.json();
-		const items = json.data ?? [];
-
-		return ProductosSchema.parse(items);
-	} catch (err) {
-		console.error("[Strapi] getFeaturedProducts error:", err);
-		return [];
-	}
+	const json = await res.json();
+	return ProductosSchema.parse(json.data ?? []);
 }
-
-/**
- * API functions (zodified)
- */
 
 /** Get all productos */
 export async function getProducts(): Promise<Producto[]> {
-	try {
-		const qs = buildProductQuery();
+	cacheTag("products");
+	cacheLife({
+		stale: 300,
+		revalidate: 3600,
+		expire: 86400,
+	});
 
-		console.log(`${STRAPI_URL}/api/productos?${qs}`);
+	const qs = buildProductQuery();
+	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
-		const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
+	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
-		if (!res.ok) {
-			throw new Error(`Strapi API error: ${res.status}`);
-		}
-
-		const json = await res.json();
-		const items = json.data ?? [];
-
-		return ProductosSchema.parse(items);
-	} catch (err) {
-		console.error("[Strapi] getProducts error:", err);
-		return [];
-	}
+	const json = await res.json();
+	return ProductosSchema.parse(json.data ?? []);
 }
 
 /** Get product by ID */
 export async function getProductById(id: string): Promise<Producto | null> {
-	try {
-		const qs = buildProductQuery();
+	cacheTag("products", `product-${id}`);
+	cacheLife({
+		stale: 300,
+		revalidate: 3600,
+		expire: 86400,
+	});
 
-		const res = await fetch(
-			`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
-		);
+	const qs = buildProductQuery();
+	const res = await fetch(
+		`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
+	);
 
-		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
+	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
-		const json = await res.json();
-		const item = json.data ?? null;
-		if (!item) return null;
+	const json = await res.json();
+	if (!json.data) return null;
 
-		return ProductoSchema.parse(item);
-	} catch (err) {
-		console.error("[Strapi] getProductById error:", err);
-		return null;
-	}
+	return ProductoSchema.parse(json.data);
 }
 
 /** Get all categories */
 export async function getCategories(): Promise<Category[]> {
-	try {
-		const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
-		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
-		const json = await res.json();
-		const items = json.data ?? [];
+	cacheTag("categories");
+	cacheLife({
+		stale: 3600, // Categories rarely change, client cache for 1 hour
+		revalidate: 86400, // Background refresh after 1 day
+		expire: 604800, // Expire after 1 week of no traffic
+	});
 
-		return CategoriesSchema.parse(items);
-	} catch (err) {
-		console.error("[Strapi] getCategories error:", err);
-		return [];
-	}
+	const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
+	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
+
+	const json = await res.json();
+	return CategoriesSchema.parse(json.data ?? []);
 }
 
-/** Get productos by category (expects `category` to be the category slug or name depending on your Strapi filters) */
+/** Get productos by category */
 export async function getProductsByCategory(
 	category: string,
 ): Promise<Producto[]> {
-	try {
-		const encoded = encodeURIComponent(category);
-		// NOTE: adjust filter key according to your Strapi field name (categoria vs category)
-		const res = await fetch(
-			`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`,
-		);
-		if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
-		const json = await res.json();
-		const items = json.data ?? [];
+	cacheTag("products", `category-${category}`);
+	cacheLife({
+		stale: 300,
+		revalidate: 3600,
+		expire: 86400,
+	});
 
-		return ProductosSchema.parse(items);
-	} catch (err) {
-		console.error("[Strapi] getProductsByCategory error:", err);
-		return [];
-	}
+	const encoded = encodeURIComponent(category);
+	const res = await fetch(
+		`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`,
+	);
+
+	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
+
+	const json = await res.json();
+	return ProductosSchema.parse(json.data ?? []);
 }
 
 /** Get site settings */
 export async function getSettings(): Promise<SiteSettings | null> {
+	cacheTag("settings");
+	cacheLife({
+		stale: 3600, // Settings rarely change, client cache for 1 hour
+		revalidate: 86400, // Background refresh after 1 day
+		expire: 604800, // Expire after 1 week
+	});
+
 	const query = qs.stringify(
 		{
 			fields: [
@@ -179,33 +129,19 @@ export async function getSettings(): Promise<SiteSettings | null> {
 				"textoCTA",
 			],
 			populate: {
-				imagenHero: {
-					fields: ["url", "name", "alternativeText"],
-				},
-				estadisticas: {
-					fields: ["id", "textoArriba", "textoAbajo"],
-				},
+				imagenHero: { fields: ["url", "name", "alternativeText"] },
+				estadisticas: { fields: ["id", "textoArriba", "textoAbajo"] },
 			},
 		},
 		{ encodeValuesOnly: true },
 	);
 
-	try {
-		const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
+	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
 
-		if (!res.ok) {
-			console.error(`[Strapi] Fetch failed: ${res.statusText}`);
-			return null;
-		}
+	if (!res.ok) throw new Error(`Strapi Fetch failed: ${res.statusText}`);
 
-		const { data } = await res.json();
+	const { data } = await res.json();
+	if (!data) return null;
 
-		if (!data) return null;
-
-		// Validation with Zod
-		return SiteSettingsSchema.parse(data);
-	} catch (err) {
-		console.error("[Strapi] Network error:", err);
-		return null;
-	}
+	return SiteSettingsSchema.parse(data);
 }

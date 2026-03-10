@@ -1,7 +1,8 @@
-import Header from "@/components/Header";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { getSettings } from "@/lib/strapi";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export const metadata = {
 	title: "Contacto - Atlantis Porfic Stile",
@@ -13,8 +14,7 @@ export default async function ContactoPage() {
 	const settings = await getSettings();
 	const whatsappNumber = settings?.numeroWhatsapp;
 	const direccion =
-		settings?.direccion ?? "Galería Santa Lucía — Piso 7, Tienda 709";
-	const horario = settings?.horario ?? "Lun–Sáb 9:00–19:00 (hora referencial)";
+		settings?.direccionTienda ?? "Galería Santa Lucía — Piso 7, Tienda 709";
 
 	// WhatsApp message configurations for different contact purposes
 	const configs: { label: string; config: WhatsAppMessageConfig }[] = [
@@ -139,16 +139,6 @@ export default async function ContactoPage() {
 
 								<div>
 									<dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-										Horario
-									</dt>
-									<dd className="font-medium text-foreground">{horario}</dd>
-									<dd className="text-xs text-muted-foreground">
-										Respuestas fuera de horario cuando estemos disponibles.
-									</dd>
-								</div>
-
-								<div>
-									<dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 										Atención
 									</dt>
 									<dd className="mt-1">
@@ -171,6 +161,9 @@ export default async function ContactoPage() {
 					</div>
 				</div>
 			</section>
+
+			{/* Footer */}
+			<Footer />
 
 			{/* Sticky WhatsApp Button */}
 			<WhatsAppCTA

@@ -52,7 +52,7 @@ export function canAddToCart(
 	variant: Variante | null,
 ): boolean {
 	// If product.disponible === true, item can be added regardless of cantidadStock
-	if (product.disponible === true) {
+	if (product.disponible) {
 		return true;
 	}
 

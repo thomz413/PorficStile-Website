@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { getProducts, getCategories, getSettings } from "@/lib/strapi";
 import ProductCard from "@/components/ProductCard";
 import StickyCart from "@/components/StickyCart";
-import { Producto, Category } from "@/lib/strapi";
 import { Filter, Grid, List } from "lucide-react";
-import Header from "@/components/Header";
 import { SiteSettings } from "@/lib/strapi/types/settings";
+import { Producto } from "@/lib/strapi/types/product";
+import { Category } from "@/lib/strapi/types/category";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function ProductsPage() {
 	const [products, setProducts] = useState<Producto[]>([]);
-	const [categories, setCategories] = useState<StrapiCategory[]>([]);
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -67,7 +69,7 @@ export default function ProductsPage() {
 			<Header whatsappNumber={settings?.numeroWhatsapp} />
 
 			{/* Header Section */}
-			<section className="py-12 px-4 sm:px-6 lg:px-8">
+			<section className="pt-20 pb-40 px-4 sm:px-6 lg:px-8">
 				<div className="max-w-7xl mx-auto">
 					<div className="text-center mb-12 animate-fade-in-up">
 						<h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -91,7 +93,7 @@ export default function ProductsPage() {
 						>
 							Todos
 						</button>
-						{categories.map((category, index) => (
+						{categories.map((category) => (
 							<button
 								key={category.id}
 								onClick={() => handleCategoryFilter(category.nombre)}
@@ -162,6 +164,9 @@ export default function ProductsPage() {
 				</div>
 			</section>
 
+			{/* Footer */}
+
+			<Footer />
 			{/* Sticky Cart - for sticky button functionality */}
 			<StickyCart whatsappNumber={settings?.numeroWhatsapp} />
 		</main>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart, MessageCircle } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
@@ -137,21 +137,16 @@ export default function ProductCard({
 			position: "bottom-center",
 		});
 	};
-
-	const handleWhatsAppCheckout = () => {
-		// Create WhatsApp URL directly
-		const message = `Hola! Estoy interesado en: ${product.nombre}${selectedVariant?.talla ? ` - Talla: ${selectedVariant.talla}` : ""}`;
-		const whatsappUrl = `https://wa.me/51999999999?text=${encodeURIComponent(message)}`;
-		window.open(whatsappUrl, "_blank");
-	};
-
 	// Get stock information
 	const getStockInfo = () => {
 		if (selectedVariant) {
-
 			let message = "Agotado";
 
-			if (selectedVariant.disponible && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
+			if (
+				selectedVariant.disponible &&
+				selectedVariant.stock !== undefined &&
+				selectedVariant.stock !== null
+			) {
 				message = `${selectedVariant.stock} disponibles`;
 			} else if (selectedVariant.disponible) {
 				message = `Disponible`;
@@ -166,13 +161,15 @@ export default function ProductCard({
 
 		let message = "Agotado";
 
-		if (product.disponible && product.cantidadStock !== undefined && product.cantidadStock !== null) {
+		if (
+			product.disponible &&
+			product.cantidadStock !== undefined &&
+			product.cantidadStock !== null
+		) {
 			message = `${product.cantidadStock} disponibles`;
 		} else if (product.disponible) {
 			message = `Disponible`;
-
 		}
-
 
 		return {
 			available: product?.disponible ?? false,
@@ -226,24 +223,6 @@ export default function ProductCard({
 						}`}
 					/>
 				</button>
-
-				{/* Quick Actions */}
-				<div className="absolute bottom-3 left-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-					<button
-						onClick={handleAddToCart}
-						className="flex-1 bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-black transition-colors duration-200"
-					>
-						<ShoppingCart className="h-3 w-3 inline mr-1" />
-						Agregar
-					</button>
-					<button
-						onClick={handleWhatsAppCheckout}
-						className="flex-1 bg-green-600/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors duration-200"
-					>
-						<MessageCircle className="h-3 w-3 inline mr-1" />
-						WhatsApp
-					</button>
-				</div>
 			</div>
 
 			{/* Product Info */}

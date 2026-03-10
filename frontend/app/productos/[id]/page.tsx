@@ -15,17 +15,14 @@ import {
 	Trash,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import {
-	getProductById,
-	getSettings,
-} from "@/lib/strapi";
+import { getProductById, getSettings } from "@/lib/strapi";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {Producto, Variante} from "@/lib/strapi/types/product";
+import { Producto, Variante } from "@/lib/strapi/types/product";
 
 type SelectedItem = {
 	key: string; // variant id or "default"
@@ -146,7 +143,8 @@ export default function ProductDetailPage() {
 		}
 		// No variant passed: only use product-level stock if product has NO variants
 		if (!productHasVariants()) {
-			if (typeof product?.cantidadStock === "number") return product!.cantidadStock;
+			if (typeof product?.cantidadStock === "number")
+				return product!.cantidadStock;
 			return undefined;
 		}
 		// product has variants and no variant selected -> no effective stock (must pick a variant)
@@ -189,7 +187,9 @@ export default function ProductDetailPage() {
 
 		// Product has no variants: product-level rules
 		const stock =
-			typeof product?.cantidadStock === "number" ? product?.cantidadStock : null;
+			typeof product?.cantidadStock === "number"
+				? product?.cantidadStock
+				: null;
 		if (stock !== null) {
 			const available = stock > 0;
 			return {
@@ -212,7 +212,8 @@ export default function ProductDetailPage() {
 		desiredQty: number,
 	) => {
 		const info = getLevelStockInfo(variant ?? null);
-		if (!info.available) return { ok: false, reason: info.message || "No disponible" };
+		if (!info.available)
+			return { ok: false, reason: info.message || "No disponible" };
 		if (typeof info.stock === "number") {
 			if (info.stock <= 0) return { ok: false, reason: "Agotado" };
 			if (desiredQty > info.stock) {
@@ -292,12 +293,12 @@ export default function ProductDetailPage() {
 			selectedItems.length > 0
 				? selectedItems
 				: [
-					{
-						key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
-						variant: selectedVariant ?? null,
-						quantity: workingQuantity,
-					},
-				];
+						{
+							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+							variant: selectedVariant ?? null,
+							quantity: workingQuantity,
+						},
+					];
 
 		// Validate all items
 		for (const it of itemsToAdd) {
@@ -328,15 +329,15 @@ export default function ProductDetailPage() {
 			// include tallas so CartItem matches expected shape
 			tallas: selectedVariant
 				? [
-					{
-						talla: selectedVariant.talla ?? "",
-						stock:
-							typeof selectedVariant.stock === "number"
-								? selectedVariant.stock
-								: 0,
-						disponible: selectedVariant.disponible,
-					},
-				]
+						{
+							talla: selectedVariant.talla ?? "",
+							stock:
+								typeof selectedVariant.stock === "number"
+									? selectedVariant.stock
+									: 0,
+							disponible: selectedVariant.disponible,
+						},
+					]
 				: [],
 		};
 
@@ -362,12 +363,12 @@ export default function ProductDetailPage() {
 			selectedItems.length > 0
 				? selectedItems
 				: [
-					{
-						key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
-						variant: selectedVariant ?? null,
-						quantity: workingQuantity,
-					},
-				];
+						{
+							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+							variant: selectedVariant ?? null,
+							quantity: workingQuantity,
+						},
+					];
 
 		const lines = itemsToSend.map((it) => {
 			const name =
@@ -524,7 +525,9 @@ export default function ProductDetailPage() {
 									onChange={(e) => {
 										let val = parseInt(e.target.value) || 1;
 										// enforce stock limits if present (only when effective stock exists)
-										const stockLevel = getEffectiveStockLevel(selectedVariant ?? null);
+										const stockLevel = getEffectiveStockLevel(
+											selectedVariant ?? null,
+										);
 										if (typeof stockLevel === "number") {
 											val = Math.max(1, Math.min(val, stockLevel));
 										} else {
@@ -539,7 +542,9 @@ export default function ProductDetailPage() {
 									size="sm"
 									onClick={() => {
 										// +1 respecting stock (only if effective stock available)
-										const stockLevel = getEffectiveStockLevel(selectedVariant ?? null);
+										const stockLevel = getEffectiveStockLevel(
+											selectedVariant ?? null,
+										);
 
 										if (typeof stockLevel === "number") {
 											// if stock exists, clamp
@@ -570,8 +575,9 @@ export default function ProductDetailPage() {
 								<h3 className="text-lg font-semibold">Tu selección</h3>
 								<div className="space-y-2 mt-2">
 									{selectedItems.map((it) => {
-										const stockLevel =
-											getEffectiveStockLevel(it.variant ?? null);
+										const stockLevel = getEffectiveStockLevel(
+											it.variant ?? null,
+										);
 										const itemPrice = computeFinalPriceForVariant(
 											it.variant ?? null,
 										);
@@ -720,10 +726,10 @@ export default function ProductDetailPage() {
 												: selectedVariant
 										)
 											? getLevelStockInfo(
-												(selectedItems.length > 0
-													? selectedItems[0].variant
-													: selectedVariant) ?? null,
-											).message
+													(selectedItems.length > 0
+														? selectedItems[0].variant
+														: selectedVariant) ?? null,
+												).message
 											: product.disponible
 												? "Disponible"
 												: "Agotado"}

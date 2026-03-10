@@ -1,8 +1,9 @@
-import Header from "@/components/Header";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import Image from "next/image";
 import { getSettings } from "@/lib/strapi";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export const metadata = {
 	title: "Nosotros - Atlantis Porfic Stile",
@@ -261,6 +262,8 @@ export default async function NosotrosPage() {
 					</div>
 				</div>
 			</section>
+			{/* Footer */}
+			<Footer />
 		</main>
 	);
 }
