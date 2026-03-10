@@ -3,6 +3,7 @@ import { MapPin, Mail } from "lucide-react";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { FaFacebook, FaInstagram, FaTiktok } from "react-icons/fa";
 import CopyrightYear from "@/components/CopyRightYear";
+import Image from "next/image";
 
 export default function Footer({
 	whatsappNumber,
@@ -18,36 +19,48 @@ export default function Footer({
 			<div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
 					{/* Brand Column */}
-					<div className="lg:col-span-4 space-y-6">
-						<div>
-							<h3 className="text-2xl font-black text-white tracking-tighter flex flex-col">
-								ATLANTIS
-								<span className="text-sm font-inter uppercase tracking-[0.3em] text-gold-shimmer mt-1">
-									PORFIC STILE
-								</span>
-							</h3>
+					<div className="lg:col-span-4 space-y-8 flex flex-col items-start">
+						<div className="flex flex-col items-start">
+							<h3 className="sr-only">ATLANTIS PORFIC STILE</h3>
+
+							{/* Logo: Fixed height prevents layout jumps */}
+							<div className="relative h-12 w-48 mb-3">
+								<Image
+									src="/AtlantisTitle.svg"
+									alt="ATLANTIS"
+									fill
+									className="object-contain object-left"
+									priority
+								/>
+							</div>
+
+							{/* Tagline: Refined for luxury feel */}
+							<span className="text-sm text-gold-shimmer font-bold uppercase tracking-[0.5em] leading-none ml-1">
+								PORFIC STILE
+							</span>
 						</div>
-						<p className="text-slate-400 leading-relaxed text-balance">
+
+						<p className="text-slate-400 leading-relaxed text-sm max-w-[320px]">
 							Elevando la moda premium peruana. Fusionamos técnicas ancestrales
 							con cortes contemporáneos para la mujer que lidera su propia
 							historia.
 						</p>
 
-						{/* New Socials Section */}
-						<div className="flex items-center gap-4">
+						{/* Socials: More subtle approach */}
+						<div className="flex items-center gap-4 pt-2">
 							<SocialLink
-								href="https://instagram.com"
-								icon={<FaInstagram size={20} />}
+								href="#"
+								icon={<FaInstagram size={18} />}
 								label="Instagram"
 							/>
 							<SocialLink
-								href="https://tiktok.com"
-								icon={<FaTiktok size={20} />}
+								href="#"
+								icon={<FaTiktok size={18} />}
 								label="TikTok"
 							/>
 							<SocialLink
-								href="https://facebook.com"
-								icon={<FaFacebook size={20} />}
+								href="#"
+								icon={<FaFacebook size={18} />}
 								label="Facebook"
 							/>
 						</div>

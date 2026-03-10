@@ -405,22 +405,31 @@ html, body {
             var(--gold-noise),
             linear-gradient(
                     135deg,
-                    #4a3500 0%,
-                    #8b6914 25%,
-                    #c49a37 45%,
-                    #ffe18a 55%,
-                    #8b6914 75%,
-                    #362600 100%
+                    #5c4300 0%,   /* Deeper bronze start */
+                    #8b6d15 20%,  /* Rich Ochre */
+                    #b8860b 40%,  /* Dark Goldenrod */
+                    #d4af37 50%,  /* Classic Gold highlight (avoided pale yellow) */
+                    #a67c00 70%,  /* Deep Gold */
+                    #7b5900 100%  /* Bronze finish */
             );
     background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: gold-pulse-pan 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    /* Darker drop shadow for depth, slight yellow glow */
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 15px rgba(139, 105, 20, 0.4));
+
+    /* The Secret Sauce for White Backgrounds: */
+    /* 1. Subtle dark stroke to define the edges */
+    -webkit-text-stroke: 0.5px rgba(92, 67, 0, 0.2);
+
+    /* 2. Layered drop shadows for "Pop" without looking "dirty" */
+    filter:
+            drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15))
+            drop-shadow(0 0 1px rgba(92, 67, 0, 0.4));
+
+    animation: gold-pulse-pan 8s ease-in-out infinite;
   }
+
 
   /* 7. Refined Satin Gold - No White Fog */
   .bg-gold-premium-shimmer {
@@ -537,16 +546,11 @@ html, body {
   }
 
   /* A breathing, pulsing movement that creates shifting highlights */
+
   @keyframes gold-pulse-pan {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    100% {
-      background-position: 0% 0%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   /* A physical glare line sweeping across backgrounds */

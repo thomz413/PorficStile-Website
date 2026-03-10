@@ -41,7 +41,7 @@ export default async function ContactoPage() {
 	];
 
 	return (
-		<main className="min-h-screen bg-background text-foreground">
+		<main className="min-h-screen bg-background text-foreground pt-16">
 			<Header />
 
 			{/* Hero */}

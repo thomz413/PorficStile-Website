@@ -55,7 +55,7 @@ export default function ProductsPage() {
 
 	if (loading) {
 		return (
-			<main className="min-h-screen bg-background">
+			<main className="min-h-screen bg-background  pt-16">
 				<Header whatsappNumber={settings?.numeroWhatsapp} />
 				<div className="flex items-center justify-center h-96">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -65,7 +65,7 @@ export default function ProductsPage() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background">
+		<main className="min-h-screen bg-background pt-16">
 			<Header whatsappNumber={settings?.numeroWhatsapp} />
 
 			{/* Header Section */}

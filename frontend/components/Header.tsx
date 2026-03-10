@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import CurrencySelector from "./CurrencySelector";
 import StickyCart from "./StickyCart";
 import { useCart } from "@/contexts/CartContext";
@@ -10,8 +10,10 @@ import Image from "next/image";
 
 export default function Header({
 	whatsappNumber,
+	showLogo,
 }: {
 	whatsappNumber?: string | null;
+	showLogo?: boolean;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
@@ -20,27 +22,40 @@ export default function Header({
 	return (
 		<>
 			<header
-				className={`fixed top-0 z-50 w-full transition-all duration-500 bg-background/90 backdrop-blur-lg border-b border-border shadow-md py-0`}
+				className={`fixed top-0 z-50 w-full transition-all duration-500 bg-background/90 backdrop-blur-lg border-b border-border shadow-lg py-0`}
 			>
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					{/* Desktop View */}
 					<div className="hidden lg:flex items-center justify-between h-20">
-						<div className="flex items-center gap-3">
-							<Link href="/" className="flex items-center gap-3 group">
-								<Image
-									src="/Atlantis.svg"
-									alt="Logo"
-									width={40}
-									height={40}
-									className={`object-contain transition-all duration-300 group-hover:scale-110 w-12 h-10 drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]`}
-								/>
+						<Link
+							href="/"
+							className="flex items-center gap-3 group"
+							aria-label="Ir a la página principal"
+						>
+							<div className="flex flex-col items-center justify-center">
+								<div
+									className={`rounded-full p-1 transition-shadow duration-300 group-hover:scale-105 transform ${"bg-linear-to-br from-yellow-300/10 via-amber-200/10 to-red-200/5 ring-1 ring-amber-200/10"}`}
+									aria-hidden
+								>
+									<Image
+										src="/Atlantis.svg"
+										alt="Atlantis logo"
+										width={120}
+										height={120}
+										priority
+										className={`object-contain transition-all duration-300 group-hover:scale-105 ${"drop-shadow-[0_6px_18px_rgba(0,0,0,0.25)]"}`}
+									/>
+								</div>
+
+								{/* Brand label below logo, smaller */}
 								<span
-									className={`text-lg font-black font-inter uppercase tracking-[0.2em] transition-colors duration-300 text-primary`}
+									className={`mt-1 text-xs leading-4 font-black font-inter uppercase tracking-[0.22em] transition-colors duration-300 ${"text-gold-dark"}`}
+									aria-hidden
 								>
 									PORFIC STILE
 								</span>
-							</Link>
-						</div>
+							</div>
+						</Link>
 
 						<nav className="flex items-center gap-2">
 							{["Tienda", "Nosotros", "Contacto"].map((item) => (
@@ -88,8 +103,8 @@ export default function Header({
 							<Image
 								src="/Atlantis.svg"
 								alt="Logo"
-								width={35}
-								height={35}
+								width={120}
+								height={120}
 								className={`transition-all duration-300`}
 							/>
 						</Link>

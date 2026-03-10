@@ -393,7 +393,7 @@ export default function ProductDetailPage() {
 
 	if (loading) {
 		return (
-			<main className="min-h-screen bg-gray-50">
+			<main className="min-h-screen bg-gray-50  pt-16">
 				<Header />
 				<div className="flex items-center justify-center h-96">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -404,7 +404,7 @@ export default function ProductDetailPage() {
 
 	if (!product) {
 		return (
-			<main className="min-h-screen bg-gray-50">
+			<main className="min-h-screen bg-gray-50 pt-16">
 				<Header />
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
 					<div className="text-center">

@@ -65,25 +65,47 @@ export default function HeaderTransition({
 					{/* Desktop View */}
 					<div className="hidden lg:flex items-center justify-between h-20">
 						<div className="flex items-center gap-3">
-							<Link href="/" className="flex items-center gap-3 group">
-								<Image
-									src="/Atlantis.svg"
-									alt="Logo"
-									width={40}
-									height={40}
-									className={`object-contain transition-all duration-300 group-hover:scale-110 w-12 h-10 ${
-										!isTransparent
-											? "drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]"
-											: "brightness-0 invert"
-									}`}
-								/>
-								<span
-									className={`text-lg font-black font-inter uppercase tracking-[0.2em] transition-colors duration-300 ${
-										isTransparent ? "text-white drop-shadow-md" : "text-primary"
-									}`}
-								>
-									PORFIC STILE
-								</span>
+							<Link
+								href="/"
+								className="flex items-center gap-3 group"
+								aria-label="Ir a la página principal"
+							>
+								{/* Logo + small stacked label */}
+								<div className="flex flex-col items-center justify-center">
+									<div
+										className={`rounded-full p-1 transition-shadow duration-300 group-hover:scale-105 transform ${
+											isTransparent
+												? "bg-white/5 ring-0"
+												: "bg-linear-to-br from-yellow-300/10 via-amber-200/10 to-red-200/5 ring-1 ring-amber-200/10"
+										}`}
+										aria-hidden
+									>
+										<Image
+											src="/Atlantis.svg"
+											alt="Atlantis logo"
+											width={120}
+											height={120}
+											priority
+											className={`object-contain transition-all duration-300 group-hover:scale-105 ${
+												isTransparent
+													? "brightness-0 invert"
+													: "drop-shadow-[0_6px_18px_rgba(0,0,0,0.25)]"
+											}`}
+										/>
+									</div>
+
+									{/* Brand label below logo, smaller */}
+									<span
+										className={`mt-1 text-xs leading-4 font-black font-inter uppercase tracking-[0.22em] transition-colors duration-300 ${
+											isTransparent
+												? "text-gold-shimmer drop-shadow-md"
+												: "text-gold-dark"
+										}`}
+										aria-hidden
+									>
+										PORFIC STILE
+									</span>
+								</div>
 							</Link>
 						</div>
 
@@ -137,13 +159,24 @@ export default function HeaderTransition({
 							{isOpen ? <X size={28} /> : <Menu size={28} />}
 						</button>
 
-						<Link href="/" className="absolute left-1/2 -translate-x-1/2">
+						{/* Centered stacked logo + small label for mobile (hidden while header is transparent) */}
+						<Link
+							href="/"
+							className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center transition-all duration-300 ${
+								isTransparent
+									? "opacity-0 pointer-events-none -translate-y-2"
+									: "opacity-100 pointer-events-auto translate-y-0"
+							}`}
+							aria-label="Ir a la página principal"
+							aria-hidden={isTransparent}
+						>
 							<Image
 								src="/Atlantis.svg"
-								alt="Logo"
-								width={35}
-								height={35}
+								alt="Atlantis logo"
+								width={120}
+								height={120}
 								className={`transition-all duration-300 ${isTransparent ? "brightness-0 invert" : ""}`}
+								priority
 							/>
 						</Link>
 
@@ -163,7 +196,11 @@ export default function HeaderTransition({
 
 				{/* Mobile Menu Overlay */}
 				<div
-					className={`lg:hidden absolute top-full left-0 w-full bg-background/98 backdrop-blur-xl border-b border-border transition-all duration-300 ease-in-out ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}
+					className={`lg:hidden absolute top-full left-0 w-full bg-background/98 backdrop-blur-xl border-b border-border transition-all duration-300 ease-in-out ${
+						isOpen
+							? "opacity-100 translate-y-0"
+							: "opacity-0 -translate-y-4 pointer-events-none"
+					}`}
 				>
 					<nav className="flex flex-col p-6 gap-4 text-foreground">
 						<Link
