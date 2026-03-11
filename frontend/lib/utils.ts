@@ -54,3 +54,20 @@ export function buildProductQuery() {
 	// encodeValuesOnly keeps bracket structure readable for Strapi
 	return qs.stringify(queryObj, { encodeValuesOnly: true });
 }
+
+export function placeholderImage({
+	text = "No Imagen",
+	width = 600,
+	height = 800,
+	bg = "f3f4f6",
+	color = "6b7280",
+}: {
+	text?: string;
+	width?: number;
+	height?: number;
+	bg?: string;
+	color?: string;
+} = {}) {
+	const encoded = encodeURIComponent(text);
+	return `https://placehold.co/${width}x${height}/${bg}/${color}?text=${encoded}`;
+}

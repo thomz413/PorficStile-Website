@@ -8,6 +8,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Producto, Variante } from "@/lib/strapi/types/product";
+import {placeholderImage} from "@/lib/utils";
 
 interface ProductCardProps {
 	product: Producto;
@@ -26,14 +27,19 @@ export default function ProductCard({
 
 	// Get the appropriate image with fallback logic
 	const getProductImage = () => {
-		// Priority: imagenPrincipal > galeria[0] > placeholder
 		if (product.imagenPrincipal?.url) {
 			return product.imagenPrincipal.url;
 		}
+		// First in order in the galery
 		if (product.galeria && product.galeria.length > 0) {
 			return product.galeria[0].url;
 		}
-		return "https://placehold.co/400x400?text=No+Imagen";
+
+		if (product.imagenPrincipal?.alternativeText) {
+			return placeholderImage({ text: product.imagenPrincipal?.alternativeText });
+		}
+
+		return placeholderImage();
 	};
 
 	// Price calculation with variant override and discount logic

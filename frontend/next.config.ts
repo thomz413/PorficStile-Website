@@ -2,8 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	cacheComponents: true,
+	cacheLife: {
+		products: {
+			stale: 300,
+			revalidate: 3600,
+			expire: 86400,
+		},
+	},
 	images: {
-		domains: ["placehold.co", "localhost"],
 		remotePatterns: [
 			{
 				protocol: "http",
@@ -11,8 +17,12 @@ const nextConfig: NextConfig = {
 				port: "1337",
 				pathname: "/uploads/**",
 			},
+			{
+				protocol: "https",
+				hostname: "placehold.co",
+				pathname: "/**",
+			},
 		],
-		dangerouslyAllowLocalIP: true,
 	},
 };
 

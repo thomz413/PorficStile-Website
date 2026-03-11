@@ -10,16 +10,13 @@ import {
 import qs from "qs";
 import { STRAPI_URL } from "@/lib/constants";
 import { buildProductQuery } from "@/lib/utils";
-import { cacheTag, cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 /** Get featured productos (destacado = true) */
 export async function getFeaturedProducts(): Promise<Producto[]> {
+	"use cache";
 	cacheTag("products", "featured-products");
-	cacheLife({
-		stale: 300, // Client cache for 5 mins
-		revalidate: 3600, // Background refresh after 1 hour
-		expire: 86400, // Expire completely after 1 day of no traffic
-	});
+	cacheLife("products");
 
 	const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
 	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
@@ -32,12 +29,9 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 
 /** Get all productos */
 export async function getProducts(): Promise<Producto[]> {
+	"use cache";
 	cacheTag("products");
-	cacheLife({
-		stale: 300,
-		revalidate: 3600,
-		expire: 86400,
-	});
+	cacheLife("products");
 
 	const qs = buildProductQuery();
 	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
@@ -50,12 +44,9 @@ export async function getProducts(): Promise<Producto[]> {
 
 /** Get product by ID */
 export async function getProductById(id: string): Promise<Producto | null> {
+	"use cache";
 	cacheTag("products", `product-${id}`);
-	cacheLife({
-		stale: 300,
-		revalidate: 3600,
-		expire: 86400,
-	});
+	cacheLife("products");
 
 	const qs = buildProductQuery();
 	const res = await fetch(
@@ -72,12 +63,9 @@ export async function getProductById(id: string): Promise<Producto | null> {
 
 /** Get all categories */
 export async function getCategories(): Promise<Category[]> {
+	"use cache";
 	cacheTag("categories");
-	cacheLife({
-		stale: 3600, // Categories rarely change, client cache for 1 hour
-		revalidate: 86400, // Background refresh after 1 day
-		expire: 604800, // Expire after 1 week of no traffic
-	});
+	cacheLife("products");
 
 	const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
@@ -90,12 +78,9 @@ export async function getCategories(): Promise<Category[]> {
 export async function getProductsByCategory(
 	category: string,
 ): Promise<Producto[]> {
+	"use cache";
 	cacheTag("products", `category-${category}`);
-	cacheLife({
-		stale: 300,
-		revalidate: 3600,
-		expire: 86400,
-	});
+	cacheLife("products");
 
 	const encoded = encodeURIComponent(category);
 	const res = await fetch(
@@ -110,12 +95,9 @@ export async function getProductsByCategory(
 
 /** Get site settings */
 export async function getSettings(): Promise<SiteSettings | null> {
+	"use cache";
 	cacheTag("settings");
-	cacheLife({
-		stale: 3600, // Settings rarely change, client cache for 1 hour
-		revalidate: 86400, // Background refresh after 1 day
-		expire: 604800, // Expire after 1 week
-	});
+	cacheLife("products");
 
 	const query = qs.stringify(
 		{

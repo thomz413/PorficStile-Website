@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
+import {placeholderImage} from "@/lib/utils";
 
 interface GalleryImage {
 	url: string;
@@ -66,7 +67,7 @@ export default function ProductGallery({
 		// final fallback placeholder
 		if (imgs.length === 0) {
 			imgs.push({
-				url: "https://placehold.co/800x800?text=No+Imagen",
+				url: placeholderImage(),
 				name: "No Image",
 				alt: product.nombre ?? "Sin imagen",
 				source: "product",
