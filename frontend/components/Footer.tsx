@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MapPin, Mail } from "lucide-react";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import { FaFacebook, FaInstagram, FaTiktok } from "react-icons/fa";
+import { FaFacebook, FaTiktok } from "react-icons/fa";
 import CopyrightYear from "@/components/CopyRightYear";
 import Image from "next/image";
 
@@ -48,11 +48,6 @@ export default function Footer({
 
 						{/* Socials: More subtle approach */}
 						<div className="flex items-center gap-4 pt-2">
-							<SocialLink
-								href="#"
-								icon={<FaInstagram size={18} />}
-								label="Instagram"
-							/>
 							<SocialLink
 								href="#"
 								icon={<FaTiktok size={18} />}
