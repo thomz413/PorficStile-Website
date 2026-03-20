@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
-import {placeholderImage} from "@/lib/utils";
+import { placeholderImage } from "@/lib/utils";
 
 interface GalleryImage {
 	url: string;

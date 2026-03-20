@@ -12,12 +12,21 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
 export default function ProductsPage() {
+
 	const [products, setProducts] = useState<Producto[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+	// TODO tallas y rango de precio
+
+	
+
 	const [loading, setLoading] = useState(true);
 	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 	const [settings, setSettings] = useState<SiteSettings | null>(null);
+
+
+
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -97,7 +106,7 @@ export default function ProductsPage() {
 							<button
 								key={category.id}
 								onClick={() => handleCategoryFilter(category.nombre)}
-								className={`animate-fade-in-up px-4 py-2 rounded-full text-sm font-medium hover-scale`}
+								className={`animate-fade-in-up px-4 py-2 rounded-full text-sm font-medium hover-scale ${ selectedCategory === category.nombre ? 'bg-primary text-primary-foreground': ''}`}
 							>
 								{category.nombre}
 							</button>

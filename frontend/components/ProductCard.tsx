@@ -8,7 +8,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Producto, Variante } from "@/lib/strapi/types/product";
-import {placeholderImage} from "@/lib/utils";
+import { placeholderImage } from "@/lib/utils";
 
 interface ProductCardProps {
 	product: Producto;
@@ -36,7 +36,9 @@ export default function ProductCard({
 		}
 
 		if (product.imagenPrincipal?.alternativeText) {
-			return placeholderImage({ text: product.imagenPrincipal?.alternativeText });
+			return placeholderImage({
+				text: product.imagenPrincipal?.alternativeText,
+			});
 		}
 
 		return placeholderImage();

@@ -119,25 +119,3 @@ export function generateWhatsAppMessage(cart: CartItem[]): string {
 
 	return message;
 }
-
-// Create WhatsApp checkout URL
-export function createWhatsAppCheckoutURL(
-	cart: CartItem[],
-	phoneNumber?: string,
-): string {
-	const message = generateWhatsAppMessage(cart);
-	const encodedMessage = encodeURIComponent(message);
-	const cleanPhoneNumber = (
-		phoneNumber ||
-		process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
-		"51XXXXXXXXXX"
-	).replace(/\D/g, "");
-
-	return `https://wa.me/${cleanPhoneNumber}?text=${encodedMessage}`;
-}
-
-// Open WhatsApp checkout
-export function openWhatsAppCheckout(cart: CartItem[], phoneNumber?: string) {
-	const url = createWhatsAppCheckoutURL(cart, phoneNumber);
-	window.open(url, "_blank");
-}

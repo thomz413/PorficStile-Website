@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingCart, X, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { createWhatsAppCheckoutURL } from "@/lib/cart";
 import { toast } from "sonner";
 
 interface StickyCartProps {

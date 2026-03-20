@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import { generateWhatsAppMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
+import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import { X, ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 
 interface CartProps {
