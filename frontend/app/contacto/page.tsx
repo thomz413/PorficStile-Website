@@ -1,22 +1,46 @@
+"use client"; // Required for Framer Motion
+
+import {motion, Variants} from "framer-motion";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
-import { getSettings } from "@/lib/strapi";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
-export const metadata = {
-	title: "Contacto - Atlantis Porfic Stile",
-	description:
-		"Visítanos en Galería Santa Lucía Piso 7 Tienda 709. Contáctanos para pedidos y consultas. Atención directa por WhatsApp.",
+// Animation Presets
+const containerVariants: Variants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.1,
+			delayChildren: 0.2,
+		},
+	},
 };
 
-export default async function ContactoPage() {
-	const settings = await getSettings();
+const fadeInUp: Variants = {
+	hidden: { opacity: 0, y: 20 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.5, ease: "easeOut" },
+	},
+};
+
+const slideInRight: Variants = {
+	hidden: { opacity: 0, x: 30 },
+	visible: {
+		opacity: 1,
+		x: 0,
+		transition: { duration: 0.6, ease: "easeOut" },
+	},
+};
+
+export default function ContactoPage({ settings }: { settings: any }) {
 	const whatsappNumber = settings?.numeroWhatsapp;
 	const direccion =
 		settings?.direccionTienda ?? "Galería Santa Lucía — Piso 7, Tienda 709";
 
-	// WhatsApp message configurations for different contact purposes
 	const configs: { label: string; config: WhatsAppMessageConfig }[] = [
 		{ label: "Ver productos", config: { type: "general_question" } },
 		{
@@ -25,17 +49,11 @@ export default async function ContactoPage() {
 		},
 		{
 			label: "Precios al por mayor",
-			config: {
-				type: "custom_order",
-				customNote: "Solicito precios al por mayor",
-			},
+			config: { type: "custom_order", customNote: "Solicito precios al por mayor" },
 		},
 		{
 			label: "Diseños personalizados",
-			config: {
-				type: "custom_order",
-				customNote: "Necesito un diseño a medida",
-			},
+			config: { type: "custom_order", customNote: "Necesito un diseño a medida" },
 		},
 		{ label: "Otras consultas", config: { type: "general_question" } },
 	];
@@ -44,133 +62,160 @@ export default async function ContactoPage() {
 		<main className="min-h-screen bg-background text-foreground pt-16">
 			<Header />
 
-			{/* Hero */}
-			<section
-				className="border-b border-border py-16 md:py-24"
-				aria-labelledby="contacto-title"
-			>
+			{/* Hero Section */}
+			<section className="border-b border-border py-16 md:py-24">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-					<div className="max-w-2xl space-y-4">
-						<p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">
+					<motion.div
+						initial="hidden"
+						animate="visible"
+						variants={containerVariants}
+						className="max-w-2xl space-y-4"
+					>
+						<motion.p variants={fadeInUp} className="text-xs font-medium text-primary uppercase tracking-[0.2em]">
 							Contacto
-						</p>
+						</motion.p>
 
-						<h1
-							id="contacto-title"
+						<motion.h1
+							variants={fadeInUp}
 							className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight"
 						>
-							Contáctanos por <span className="text-primary">WhatsApp</span>
-						</h1>
+							Contáctanos por <span className="text-primary italic">WhatsApp</span>
+						</motion.h1>
 
-						<p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+						<motion.p variants={fadeInUp} className="text-base md:text-lg text-muted-foreground leading-relaxed">
 							Pedidos, cotizaciones y consultas. Respuesta rápida y atención
 							clara. Envíos a todo el Perú.
-						</p>
-					</div>
+						</motion.p>
+					</motion.div>
 				</div>
 			</section>
 
-			{/* Contact options */}
-			<section
-				className="py-16 md:py-20 bg-muted/40"
-				aria-labelledby="contact-options"
-			>
+			{/* Contact Options */}
+			<section className="py-16 md:py-20 bg-muted/40">
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					<div className="space-y-12 lg:grid lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] lg:gap-12 lg:space-y-0">
-						{/* Left column: options */}
-						<div>
+
+						{/* Left column: Options */}
+						<motion.div
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-100px" }}
+							variants={containerVariants}
+						>
 							<div className="space-y-3 mb-6">
-								<h2
-									id="contact-options"
-									className="text-2xl md:text-3xl font-semibold"
-								>
+								<motion.h2 variants={fadeInUp} className="text-2xl md:text-3xl font-semibold">
 									¿En qué podemos ayudarte?
-								</h2>
-								<p className="text-sm md:text-base text-muted-foreground max-w-xl">
-									Selecciona la opción que describa tu consulta para escribirnos
-									por WhatsApp con contexto prellenado.
-								</p>
+								</motion.h2>
+								<motion.p variants={fadeInUp} className="text-sm md:text-base text-muted-foreground max-w-xl">
+									Selecciona la opción que describa tu consulta.
+								</motion.p>
 							</div>
 
 							<div className="grid gap-4 md:gap-6">
-								<div className="rounded-lg p-4 bg-card border border-border">
-									<h3 className="font-semibold text-foreground">
-										Envíos y plazos
-									</h3>
+								<motion.div
+									variants={fadeInUp}
+									whileHover={{ scale: 1.01 }}
+									className="rounded-lg p-4 bg-card border border-border shadow-sm"
+								>
+									<h3 className="font-semibold text-foreground">Envíos y plazos</h3>
 									<p className="text-sm text-muted-foreground">
-										Envíos a todo el país. Entregas habituales en 24–72 horas
-										según destino.
+										Envíos a todo el país. Entregas habituales en 24–72 horas.
 									</p>
-								</div>
+								</motion.div>
 
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<motion.div
+									variants={containerVariants}
+									className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+								>
 									{configs.map((item, index) => (
-										<WhatsAppCTA
-											key={index}
-											whatsappNumber={whatsappNumber}
-											variant="card"
-											label={item.label}
-											messageConfig={item.config}
-										/>
+										<motion.div key={index} variants={fadeInUp} whileHover={{ y: -4 }}>
+											<WhatsAppCTA
+												whatsappNumber={whatsappNumber}
+												variant="card"
+												label={item.label}
+												messageConfig={item.config}
+											/>
+										</motion.div>
 									))}
-								</div>
+								</motion.div>
 							</div>
-						</div>
+						</motion.div>
 
-						{/* Right column: details */}
-						<aside className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-lg">
-							<div>
+						{/* Right column: Details Sidebar */}
+						<motion.aside
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true }}
+							variants={slideInRight}
+							className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-xl relative overflow-hidden"
+						>
+							{/* Subtle background glow */}
+							<div className="absolute -top-24 -right-24 h-48 w-48 bg-primary/5 blur-3xl rounded-full" />
+
+							<div className="relative">
 								<h3 className="text-lg md:text-xl font-semibold text-foreground">
-									Datos
+									Información
 								</h3>
 								<p className="text-sm text-muted-foreground">
-									Confirma siempre por WhatsApp antes de cualquier envío o
-									coordinación.
+									Confirma siempre por WhatsApp antes de cualquier coordinación.
 								</p>
 							</div>
 
-							<dl className="space-y-4 text-sm">
+							<dl className="space-y-4 text-sm relative">
 								<div>
-									<dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+									<dt className="text-xs font-semibold uppercase tracking-wide text-primary">
 										Ubicación
 									</dt>
-									<dd className="font-medium text-foreground">{direccion}</dd>
+									<dd className="font-medium text-foreground mt-1">{direccion}</dd>
 								</div>
 
 								<div>
-									<dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-										Atención
+									<dt className="text-xs font-semibold uppercase tracking-wide text-primary">
+										Nuestra atención
 									</dt>
 									<dd className="mt-1">
-										<ul className="list-inside list-disc text-foreground">
-											<li>WhatsApp: respuesta directa</li>
-											<li>Envíos nacionales</li>
-											<li>Pedidos a medida</li>
+										<ul className="space-y-2 text-foreground">
+											<li className="flex items-center gap-2">
+												<span className="h-1.5 w-1.5 rounded-full bg-primary" />
+												WhatsApp: respuesta directa
+											</li>
+											<li className="flex items-center gap-2">
+												<span className="h-1.5 w-1.5 rounded-full bg-primary" />
+												Envíos nacionales
+											</li>
+											<li className="flex items-center gap-2">
+												<span className="h-1.5 w-1.5 rounded-full bg-primary" />
+												Pedidos a medida
+											</li>
 										</ul>
 									</dd>
 								</div>
 							</dl>
 
-							<div className="pt-4 border-t border-border/60">
-								<p className="text-xs text-muted-foreground">
-									Cambios y devoluciones: escríbenos por WhatsApp con fotos y
-									detalles para evaluar el caso.
+							<div className="pt-4 border-t border-border/60 relative">
+								<p className="text-xs text-muted-foreground italic">
+									Cambios y devoluciones: escríbenos por WhatsApp con fotos para evaluar el caso.
 								</p>
 							</div>
-						</aside>
+						</motion.aside>
 					</div>
 				</div>
 			</section>
 
-			{/* Footer */}
 			<Footer />
 
-			{/* Sticky WhatsApp Button */}
-			<WhatsAppCTA
-				whatsappNumber={whatsappNumber}
-				variant="sticky"
-				messageConfig={{ type: "general_question" }}
-			/>
+			{/* Sticky WhatsApp Button with pulse animation */}
+			<motion.div
+				initial={{ scale: 0, opacity: 0 }}
+				animate={{ scale: 1, opacity: 1 }}
+				transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
+			>
+				<WhatsAppCTA
+					whatsappNumber={whatsappNumber}
+					variant="sticky"
+					messageConfig={{ type: "general_question" }}
+				/>
+			</motion.div>
 		</main>
 	);
 }
