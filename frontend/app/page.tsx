@@ -7,7 +7,12 @@ import { getFeaturedProducts, getSettings } from "@/lib/strapi";
 import Footer from "@/components/Footer";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import HeaderTransition from "@/components/HeaderTransition";
-import {FadeIn, StaggerContainer, StaggerItem, TextReveal} from "@/components/Animations";
+import {
+	FadeIn,
+	StaggerContainer,
+	StaggerItem,
+	TextReveal,
+} from "@/components/Animations";
 
 export default async function Home() {
 	// 1. Fetch data directly on the server
@@ -52,7 +57,10 @@ export default async function Home() {
 
 				<div className="relative z-20 mx-auto max-w-7xl px-4 text-center space-y-8">
 					{/* Staggered Hero Elements */}
-					<FadeIn delay={0.2} className="flex flex-col items-center justify-center mb-4">
+					<FadeIn
+						delay={0.2}
+						className="flex flex-col items-center justify-center mb-4"
+					>
 						<Image
 							src="/AtlantisTitle.svg"
 							alt="Atlantis logo"
@@ -61,8 +69,8 @@ export default async function Home() {
 							className="w-48 md:w-80 h-auto mb-4"
 						/>
 						<span className="text-1xl md:text-4xl text-gold-shimmer font-black uppercase tracking-widest">
-                      PORFIC STILE
-                   </span>
+							PORFIC STILE
+						</span>
 					</FadeIn>
 
 					<FadeIn delay={0.4}>
@@ -72,7 +80,10 @@ export default async function Home() {
 						</p>
 					</FadeIn>
 
-					<FadeIn delay={0.6} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+					<FadeIn
+						delay={0.6}
+						className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+					>
 						<Link
 							href="/productos"
 							className="bg-gold-premium-shimmer text-accent-foreground px-8 py-4 font-black hover:-translate-y-1 transition-all uppercase tracking-widest text-sm shadow-2xl"
@@ -137,22 +148,34 @@ export default async function Home() {
 								<div className="w-20 h-20 mx-auto bg-accent/10 rounded-full flex items-center justify-center">
 									<Star className="h-8 w-8 text-accent" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Diseño Único</h3>
-								<p className="text-muted-foreground">Piezas originales creadas con atención al detalle</p>
+								<h3 className="text-xl font-black text-foreground">
+									Diseño Único
+								</h3>
+								<p className="text-muted-foreground">
+									Piezas originales creadas con atención al detalle
+								</p>
 							</StaggerItem>
 							<StaggerItem className="text-center space-y-4">
 								<div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
 									<Award className="h-8 w-8 text-primary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Alta Calidad</h3>
-								<p className="text-muted-foreground">Materiales seleccionados y acabados duraderos</p>
+								<h3 className="text-xl font-black text-foreground">
+									Alta Calidad
+								</h3>
+								<p className="text-muted-foreground">
+									Materiales seleccionados y acabados duraderos
+								</p>
 							</StaggerItem>
 							<StaggerItem className="text-center space-y-4">
 								<div className="w-20 h-20 mx-auto bg-secondary/10 rounded-full flex items-center justify-center">
 									<Heart className="h-8 w-8 text-secondary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">Estilo Peruano</h3>
-								<p className="text-muted-foreground">Diseños que reflejan nuestra cultura</p>
+								<h3 className="text-xl font-black text-foreground">
+									Estilo Peruano
+								</h3>
+								<p className="text-muted-foreground">
+									Diseños que reflejan nuestra cultura
+								</p>
 							</StaggerItem>
 						</StaggerContainer>
 					</div>
@@ -165,7 +188,10 @@ export default async function Home() {
 				<div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
 				<div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
 
-				<FadeIn className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center" direction="none">
+				<FadeIn
+					className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center"
+					direction="none"
+				>
 					<div className="space-y-8">
 						<h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight">
 							Encuentra tu Estilo

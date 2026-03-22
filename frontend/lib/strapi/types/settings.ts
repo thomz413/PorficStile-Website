@@ -7,6 +7,8 @@ export const StatisticSchema = z.object({
 	textoAbajo: z.string().optional().default(""),
 });
 
+export type Statistic = z.infer<typeof StatisticSchema>;
+
 export const SiteSettingsSchema = z.object({
 	id: z.number().int(),
 	documentId: z.string().optional().default(""),

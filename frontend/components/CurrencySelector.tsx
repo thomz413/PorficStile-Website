@@ -7,28 +7,27 @@ import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 export default function CurrencySelector() {
 	const { currency, setCurrency } = useCurrency();
 	const [isOpen, setIsOpen] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
 	const listRef = useRef<HTMLUListElement | null>(null);
+
+	// 1. Initialize state with a function to check the window immediately
+	const [isMobile, setIsMobile] = useState(() => {
+		if (typeof window === "undefined") return false;
+		return window.matchMedia("(max-width: 768px)").matches;
+	});
 
 	const currentCurrency =
 		SUPPORTED_CURRENCIES.find((c) => c.code === currency) ||
 		SUPPORTED_CURRENCIES[0];
 
 	useEffect(() => {
-		if (typeof window === "undefined") return;
+		// 2. Remove the "setIsMobile(mq.matches)" from here
 		const mq = window.matchMedia("(max-width: 768px)");
-		const onChange = (e: MediaQueryListEvent | MediaQueryList) =>
-			setIsMobile(e.matches);
-		// initial
-		setIsMobile(mq.matches);
-		// add listener (addEventListener for modern browsers)
-		if ("addEventListener" in mq)
-			mq.addEventListener("change", onChange as any);
-		else mq.addListener(onChange as any);
+
+		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+
+		mq.addEventListener("change", onChange);
 		return () => {
-			if ("removeEventListener" in mq)
-				mq.removeEventListener("change", onChange as any);
-			else mq.removeListener(onChange as any);
+			mq.removeEventListener("change", onChange);
 		};
 	}, []);
 

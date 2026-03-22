@@ -23,6 +23,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Producto, Variante } from "@/lib/strapi/types/product";
+import { motion } from "framer-motion";
+import { animations } from "@/lib/animations";
+
+// Animation Variants
+const fadeInUp = animations.fadeInUp;
+const fadeInRight = animations.fadeInRight;
 
 type SelectedItem = {
 	key: string; // variant id or "default"
@@ -393,10 +399,14 @@ export default function ProductDetailPage() {
 
 	if (loading) {
 		return (
-			<main className="min-h-screen bg-gray-50  pt-16">
+			<main className="min-h-screen bg-gray-50 pt-16">
 				<Header />
 				<div className="flex items-center justify-center h-96">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+					<motion.div
+						animate={{ rotate: 360 }}
+						transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+						className="rounded-full h-12 w-12 border-b-2 border-blue-600"
+					/>
 				</div>
 			</main>
 		);
@@ -404,7 +414,7 @@ export default function ProductDetailPage() {
 
 	if (!product) {
 		return (
-			<main className="min-h-screen bg-gray-50 pt-16">
+			<main className="min-h-screen bg-gray-50 pt-30">
 				<Header />
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
 					<div className="text-center">
@@ -432,92 +442,133 @@ export default function ProductDetailPage() {
 			<Header />
 
 			{/* Breadcrumb */}
-			<div
-				{...anim(0)}
-				className={`bg-white border-b ${anim(0).className}`}
-				style={anim(0).style}
+			<motion.div
+				initial="hidden"
+				animate="visible"
+				variants={fadeInUp}
+				className="bg-white border-b"
 			>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-					<Link
-						href="/productos"
-						className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-					>
-						<ArrowLeft className="h-4 w-4" />
-						Volver a Productos
-					</Link>
+					<motion.div variants={fadeInUp}>
+						<Link
+							href="/productos"
+							className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+						>
+							<motion.div whileHover={{ x: -3 }} transition={{ duration: 0.2 }}>
+								<ArrowLeft className="h-4 w-4" />
+							</motion.div>
+							Volver a Productos
+						</Link>
+					</motion.div>
 				</div>
-			</div>
+			</motion.div>
 
 			{/* Product Detail */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 					{/* Product Gallery */}
-					<div
-						{...anim(80)}
-						className={`animate-section ${anim(80).className}`}
-						style={anim(80).style}
+					<motion.div
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: "-50px" }}
+						variants={fadeInUp}
+						className="animate-section"
 					>
 						<ProductGallery
 							product={product}
 							selectedVariant={selectedVariant}
 						/>
-					</div>
+					</motion.div>
 
 					{/* Product Info */}
-					<div
-						{...anim(140)}
-						className={`space-y-6 ${anim(140).className}`}
-						style={anim(140).style}
+					<motion.div
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: "-50px" }}
+						variants={fadeInRight}
+						className="space-y-6"
 					>
 						{/* Category Badge */}
 						{product.categoria && (
-							<Badge variant="secondary" className="inline-block">
-								{product.categoria.nombre}
-							</Badge>
+							<motion.div
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								transition={{ delay: 0.3, duration: 0.3 }}
+							>
+								<Badge variant="secondary" className="inline-block">
+									{product.categoria.nombre}
+								</Badge>
+							</motion.div>
 						)}
 
 						{/* Title */}
-						<h1 className="text-3xl font-bold text-gray-900">
+						<motion.h1
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.4, duration: 0.5 }}
+							className="text-3xl font-bold text-gray-900"
+						>
 							{product.nombre}
-						</h1>
+						</motion.h1>
 
 						{/* Price (for the working selection) */}
-						<div className="space-y-2">
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.5, duration: 0.5 }}
+							className="space-y-2"
+						>
 							<div className="text-3xl font-bold text-gray-900">
 								{convertAndFormatPrice(
 									computeFinalPriceForVariant(selectedVariant ?? null),
 								)}
 							</div>
-						</div>
+						</motion.div>
 
 						{/* Variant Selector (keeps existing contract) */}
 						{product.variantes && product.variantes.length > 0 && (
-							<div {...anim(220)} style={anim(220).style}>
+							<motion.div
+								initial="hidden"
+								whileInView="visible"
+								viewport={{ once: true, margin: "-50px" }}
+								variants={fadeInUp}
+							>
 								<VariantSelector
 									product={product}
 									selectedVariant={selectedVariant}
 									onVariantSelect={setSelectedVariant}
 								/>
-							</div>
+							</motion.div>
 						)}
 
 						{/* Quantity + Add-to-selection */}
-						<div {...anim(280)} style={anim(280).style}>
+						<motion.div
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-50px" }}
+							variants={fadeInUp}
+						>
 							<label className="text-sm font-medium text-gray-700">
 								Cantidad
 							</label>
 							<div className="flex items-center gap-3">
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() =>
-										setWorkingQuantity(Math.max(1, workingQuantity - 1))
-									}
-									disabled={workingQuantity <= 1}
-									className="transition-all duration-200 hover-scale"
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									<Minus className="h-4 w-4" />
-								</Button>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() =>
+											setWorkingQuantity(Math.max(1, workingQuantity - 1))
+										}
+										disabled={workingQuantity <= 1}
+										className="transition-all duration-200 hover-scale"
+									>
+										<Minus className="h-4 w-4" />
+									</Button>
+								</motion.div>
+
 								<Input
 									type="number"
 									min={1}
@@ -537,128 +588,156 @@ export default function ProductDetailPage() {
 									}}
 									className="w-20 text-center"
 								/>
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => {
-										// +1 respecting stock (only if effective stock available)
-										const stockLevel = getEffectiveStockLevel(
-											selectedVariant ?? null,
-										);
 
-										if (typeof stockLevel === "number") {
-											// if stock exists, clamp
-											setWorkingQuantity((q) => Math.min(q + 1, stockLevel));
-										} else {
-											setWorkingQuantity((q) => q + 1);
-										}
-									}}
-									className="transition-all duration-200 hover-scale"
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									<Plus className="h-4 w-4" />
-								</Button>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => {
+											// +1 respecting stock (only if effective stock available)
+											const stockLevel = getEffectiveStockLevel(
+												selectedVariant ?? null,
+											);
 
-								<Button onClick={addSelection} className="ml-4" size="sm">
-									Añadir a la selección
-								</Button>
+											if (typeof stockLevel === "number") {
+												// if stock exists, clamp
+												setWorkingQuantity((q) => Math.min(q + 1, stockLevel));
+											} else {
+												setWorkingQuantity((q) => q + 1);
+											}
+										}}
+										className="transition-all duration-200 hover-scale"
+									>
+										<Plus className="h-4 w-4" />
+									</Button>
+								</motion.div>
+
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
+									className="ml-4"
+								>
+									<Button size="sm" onClick={addSelection}>
+										Añadir a la selección
+									</Button>
+								</motion.div>
 							</div>
 
 							{/* Stock helper */}
-							<p className="text-sm text-gray-600 mt-2">
+							<motion.p
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.6, duration: 0.3 }}
+								className="text-sm text-gray-600 mt-2"
+							>
 								{stockInfoForWorking.message}
-							</p>
-						</div>
+							</motion.p>
+						</motion.div>
 
 						{/* Selection list (multiple items) */}
 						{selectedItems.length > 0 && (
-							<div {...anim(360)} style={anim(360).style}>
-								<h3 className="text-lg font-semibold">Tu selección</h3>
-								<div className="space-y-2 mt-2">
-									{selectedItems.map((it) => {
-										const stockLevel = getEffectiveStockLevel(
-											it.variant ?? null,
-										);
-										const itemPrice = computeFinalPriceForVariant(
-											it.variant ?? null,
-										);
-										return (
-											<div
-												key={it.key}
-												className="flex items-center justify-between gap-4 bg-white p-3 rounded shadow-sm"
-											>
-												<div className="flex items-center gap-3">
-													{product.imagenPrincipal?.url && (
-														<Image
-															src={product.imagenPrincipal.url}
-															alt={product.nombre}
-															width={56}
-															height={56}
-															className="rounded"
-														/>
-													)}
-													<div>
-														<div className="font-medium">
-															{product.nombre}
-															{it.variant?.talla
-																? ` — ${it.variant.talla}`
-																: ""}
-														</div>
-														<div className="text-sm text-gray-600">
-															{convertAndFormatPrice(itemPrice)}
-														</div>
+							<motion.div
+								initial="hidden"
+								whileInView="visible"
+								viewport={{ once: true, margin: "-50px" }}
+								variants={fadeInUp}
+								className="space-y-2 mt-2"
+							>
+								<motion.h3
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: 0.1, duration: 0.3 }}
+									className="text-lg font-semibold"
+								>
+									Tu selección
+								</motion.h3>
+
+								{selectedItems.map((it) => {
+									const stockLevel = getEffectiveStockLevel(it.variant ?? null);
+									const itemPrice = computeFinalPriceForVariant(
+										it.variant ?? null,
+									);
+									return (
+										<motion.div
+											key={it.key}
+											className="flex items-center justify-between gap-4 bg-white p-3 rounded shadow-sm"
+										>
+											<div className="flex items-center gap-3">
+												{product?.imagenPrincipal?.url && (
+													<Image
+														src={product.imagenPrincipal.url}
+														alt={product.nombre}
+														width={56}
+														height={56}
+														className="rounded"
+													/>
+												)}
+												<div>
+													<div className="font-medium">
+														{product?.nombre}
+														{it.variant?.talla ? ` — ${it.variant.talla}` : ""}
+													</div>
+													<div className="text-sm text-gray-600">
+														{convertAndFormatPrice(itemPrice)}
 													</div>
 												</div>
-
-												<div className="flex items-center gap-2">
-													<Button
-														size="sm"
-														variant="outline"
-														onClick={() =>
-															updateSelectionQuantity(
-																it.key,
-																Math.max(1, it.quantity - 1),
-															)
-														}
-														disabled={it.quantity <= 1}
-													>
-														<Minus className="h-4 w-4" />
-													</Button>
-													<Input
-														type="number"
-														value={it.quantity}
-														onChange={(e) => {
-															const val = parseInt(e.target.value) || 1;
-															updateSelectionQuantity(it.key, val);
-														}}
-														className="w-16 text-center"
-													/>
-													<Button
-														size="sm"
-														variant="outline"
-														onClick={() =>
-															updateSelectionQuantity(it.key, it.quantity + 1)
-														}
-														disabled={
-															typeof stockLevel === "number" &&
-															it.quantity >= stockLevel
-														}
-													>
-														<Plus className="h-4 w-4" />
-													</Button>
-													<Button
-														size="sm"
-														variant="ghost"
-														onClick={() => removeSelection(it.key)}
-														title="Eliminar"
-													>
-														<Trash className="h-4 w-4" />
-													</Button>
-												</div>
 											</div>
-										);
-									})}
-								</div>
-							</div>
+
+											<div className="flex items-center gap-2">
+												<Button
+													size="sm"
+													variant="outline"
+													onClick={() =>
+														updateSelectionQuantity(
+															it.key,
+															Math.max(1, it.quantity - 1),
+														)
+													}
+													disabled={it.quantity <= 1}
+												>
+													<Minus className="h-4 w-4" />
+												</Button>
+
+												<Input
+													type="number"
+													value={it.quantity}
+													onChange={(e) => {
+														const val = parseInt(e.target.value) || 1;
+														updateSelectionQuantity(it.key, val);
+													}}
+													className="w-16 text-center"
+												/>
+
+												<Button
+													size="sm"
+													variant="outline"
+													onClick={() =>
+														updateSelectionQuantity(it.key, it.quantity + 1)
+													}
+													disabled={
+														typeof stockLevel === "number" &&
+														it.quantity >= stockLevel
+													}
+												>
+													<Plus className="h-4 w-4" />
+												</Button>
+
+												<Button
+													size="sm"
+													variant="ghost"
+													onClick={() => removeSelection(it.key)}
+													title="Eliminar"
+												>
+													<Trash className="h-4 w-4" />
+												</Button>
+											</div>
+										</motion.div>
+									);
+								})}
+							</motion.div>
 						)}
 
 						{/* Actions */}
@@ -698,7 +777,7 @@ export default function ProductDetailPage() {
 								</Button>
 							</div>
 						</div>
-					</div>
+					</motion.div>
 				</div>
 
 				{/* Additional Info */}

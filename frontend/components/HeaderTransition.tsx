@@ -7,12 +7,12 @@ import CurrencySelector from "./CurrencySelector";
 import StickyCart from "./StickyCart";
 import { useCart } from "@/contexts/CartContext";
 import Image from "next/image";
-import {motion, AnimatePresence, Variants} from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function HeaderTransition({
-											 whatsappNumber,
-											 heroSelector = "#hero",
-										 }: {
+	whatsappNumber,
+	heroSelector = "#hero",
+}: {
 	whatsappNumber?: string | null;
 	heroSelector?: string;
 }) {
@@ -60,14 +60,18 @@ export default function HeaderTransition({
 				duration: 0.8,
 				ease: [0.21, 0.47, 0.32, 0.98], // Premium custom easing
 				when: "beforeChildren",
-				staggerChildren: 0.1
-			}
-		}
+				staggerChildren: 0.1,
+			},
+		},
 	};
 
 	const itemVariants: Variants = {
 		hidden: { opacity: 0, y: -20 },
-		visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: { duration: 0.5, ease: "easeOut" },
+		},
 	};
 
 	return (
@@ -85,7 +89,10 @@ export default function HeaderTransition({
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 					{/* Desktop View */}
 					<div className="hidden lg:flex items-center justify-between h-20">
-						<motion.div variants={itemVariants} className="flex items-center gap-3">
+						<motion.div
+							variants={itemVariants}
+							className="flex items-center gap-3"
+						>
 							<Link
 								href="/"
 								className="flex items-center gap-3 group"
@@ -122,8 +129,8 @@ export default function HeaderTransition({
 										}`}
 										aria-hidden
 									>
-                               PORFIC STILE
-                            </span>
+										PORFIC STILE
+									</span>
 								</div>
 							</Link>
 						</motion.div>
@@ -146,7 +153,10 @@ export default function HeaderTransition({
 							))}
 						</nav>
 
-						<motion.div variants={itemVariants} className="flex items-center gap-4">
+						<motion.div
+							variants={itemVariants}
+							className="flex items-center gap-4"
+						>
 							<div className={isTransparent ? "text-white" : "text-foreground"}>
 								<CurrencySelector />
 							</div>
@@ -163,8 +173,8 @@ export default function HeaderTransition({
 								<ShoppingCart className="h-6 w-6 transition-colors duration-300" />
 								{mounted && getTotalItems() > 0 && (
 									<span className="absolute top-0 right-0 bg-primary text-primary-foreground rounded-full h-5 w-5 text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
-                               {getTotalItems()}
-                            </span>
+										{getTotalItems()}
+									</span>
 								)}
 							</button>
 						</motion.div>
@@ -210,8 +220,8 @@ export default function HeaderTransition({
 							<ShoppingCart size={26} />
 							{mounted && getTotalItems() > 0 && (
 								<span className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full h-4 w-4 text-[9px] font-bold flex items-center justify-center">
-                            {getTotalItems()}
-                         </span>
+									{getTotalItems()}
+								</span>
 							)}
 						</motion.button>
 					</div>
