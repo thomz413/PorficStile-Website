@@ -4,7 +4,7 @@ import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { getFeaturedProducts, getSettings } from "@/lib/strapi";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/footer/Footer";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import HeaderTransition from "@/components/HeaderTransition";
 import {
@@ -17,15 +17,10 @@ import {
 export default async function Home() {
 	// 1. Fetch data directly on the server
 	// This happens during build time or request time, not in the browser!
-	const [products, settings] = await Promise.all([
+	const [featuredProducts, settings] = await Promise.all([
 		getFeaturedProducts(),
 		getSettings(),
 	]);
-
-	// 2. Pre-filter your data
-	const featuredProducts = products
-		.filter((p) => p.disponible || (p.cantidadStock && p.cantidadStock > 0))
-		.slice(0, 12);
 
 	const whatsappNumber = settings?.numeroWhatsapp;
 	const heroImageUrl = settings?.imagenHero?.url;
@@ -221,7 +216,7 @@ export default async function Home() {
 				</FadeIn>
 			</section>
 
-			<Footer />
+			<FooterWrapper />
 
 			{whatsappNumber && (
 				<WhatsAppCTA

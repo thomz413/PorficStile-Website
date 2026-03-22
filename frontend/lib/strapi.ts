@@ -49,6 +49,7 @@ export async function getProductById(id: string): Promise<Producto | null> {
 	cacheLife("products");
 
 	const qs = buildProductQuery();
+	console.log(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
 	const res = await fetch(
 		`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
 	);
@@ -126,4 +127,15 @@ export async function getSettings(): Promise<SiteSettings | null> {
 	if (!data) return null;
 
 	return SiteSettingsSchema.parse(data);
+}
+
+export async function getWhatsAppNumber(): Promise<string | undefined> {
+	"use cache";
+	cacheTag("settings");
+
+	const query = qs.stringify({ fields: ["numeroWhatsapp"] });
+	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
+
+	const { data } = await res.json();
+	return data?.numeroWhatsapp ?? undefined;
 }

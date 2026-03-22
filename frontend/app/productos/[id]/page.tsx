@@ -128,9 +128,9 @@ export default function ProductDetailPage() {
 			finalPrice = variant.precioSobreescribir;
 		}
 
-		if (variant?.enOferta && variant.precioOferta) {
-			finalPrice = variant.precioOferta;
-		} else if (product.enOferta && product.precioOferta) {
+		if (variant?.precioOferta) {
+			finalPrice = variant?.precioOferta;
+		} else if (product.precioOferta) {
 			finalPrice = product.precioOferta;
 		}
 		return finalPrice;
@@ -327,7 +327,6 @@ export default function ProductDetailPage() {
 			nombre: product.nombre,
 			precio: computeFinalPriceForVariant(null),
 			precioDescuento: undefined,
-			enOferta: product.enOferta,
 			categoria: product.categoria,
 			imagen: product.imagenPrincipal
 				? { url: product.imagenPrincipal.url }
@@ -399,7 +398,7 @@ export default function ProductDetailPage() {
 
 	if (loading) {
 		return (
-			<main className="min-h-screen bg-gray-50 pt-16">
+			<main className="min-h-screen bg-gray-50 pt-21">
 				<Header />
 				<div className="flex items-center justify-center h-96">
 					<motion.div
@@ -414,7 +413,7 @@ export default function ProductDetailPage() {
 
 	if (!product) {
 		return (
-			<main className="min-h-screen bg-gray-50 pt-30">
+			<main className="min-h-screen bg-gray-50 pt-21">
 				<Header />
 				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
 					<div className="text-center">
@@ -438,7 +437,7 @@ export default function ProductDetailPage() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background">
+		<main className="min-h-screen bg-background pt-21">
 			<Header />
 
 			{/* Breadcrumb */}
@@ -620,7 +619,7 @@ export default function ProductDetailPage() {
 									whileTap={{ scale: 0.95 }}
 									className="ml-4"
 								>
-									<Button size="sm" onClick={addSelection}>
+									<Button className="text-white"  size="sm" onClick={addSelection}>
 										Añadir a la selección
 									</Button>
 								</motion.div>
@@ -745,7 +744,7 @@ export default function ProductDetailPage() {
 							<div className="space-y-4 pt-6">
 								<Button
 									onClick={handleAddToCart}
-									className="w-full hover-lift"
+									className="w-full hover-lift text-white"
 									size="lg"
 								>
 									<ShoppingCart className="h-5 w-5 mr-2" />

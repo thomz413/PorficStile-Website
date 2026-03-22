@@ -10,19 +10,6 @@ interface VariantSelectorProps {
 	className?: string;
 }
 
-/**
- * VariantSelector
- *
- * Improvements:
- * - Allows selecting talla and color independently, but resolves to the best matching variant
- *   (prefers a variant with disponible=true, otherwise any variant that matches).
- * - Disables size/color options that have no available variant for that combination
- *   (availability = variant.disponible === true OR variant.stock > 0).
- * - Falls back to product.cantidadStock when variant.stock is undefined for informational messages.
- * - Syncs internal talla/color UI state with `selectedVariant` prop (so clicking in the product page
- *   or programmatic changes reflect in the selector).
- * - Better accessibility (aria-pressed, aria-disabled) and small UX polish (show stock counts).
- */
 export default function VariantSelector({
 	product,
 	selectedVariant,

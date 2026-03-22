@@ -9,7 +9,7 @@ import { Filter } from "lucide-react";
 import { SiteSettings } from "@/lib/strapi/types/settings";
 import { Producto } from "@/lib/strapi/types/product";
 import { Category } from "@/lib/strapi/types/category";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/footer/Footer";
 import Header from "@/components/Header";
 import { animations, transitions } from "@/lib/animations";
 
@@ -199,7 +199,7 @@ export default function ProductsPage() {
 
 			{/* Footer */}
 
-			<Footer />
+			<FooterWrapper />
 			{/* Sticky Cart - for sticky button functionality */}
 			<StickyCart whatsappNumber={settings?.numeroWhatsapp} />
 		</main>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import Image from "next/image";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/footer/Footer";
 import Header from "@/components/Header";
 import { animations, transitions } from "@/lib/animations";
 import { SiteSettings, Statistic } from "@/lib/strapi/types/settings";
@@ -269,7 +269,7 @@ export default function NosotrosClient({
 				</div>
 			</motion.section>
 
-			<Footer />
+			<FooterWrapper />
 		</main>
 	);
 }

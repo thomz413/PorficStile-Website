@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/footer/Footer";
 import Header from "@/components/Header";
 import { animations, transitions } from "@/lib/animations";
 import { SiteSettings } from "@/lib/strapi/types/settings";
@@ -228,7 +228,7 @@ export default function ContactoCliente({
 				</div>
 			</section>
 
-			<Footer />
+			<FooterWrapper />
 
 			<WhatsAppCTA
 				whatsappNumber={whatsappNumber}

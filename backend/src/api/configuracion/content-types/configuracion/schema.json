@@ -1,0 +1,54 @@
+{
+  "kind": "singleType",
+  "collectionName": "configuracions",
+  "info": {
+    "singularName": "configuracion",
+    "pluralName": "configuracions",
+    "displayName": "Configuración"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "tituloHero": {
+      "type": "string",
+      "default": "Excelente Calidad, Precios Imbatibles",
+      "required": true
+    },
+    "subtituloHero": {
+      "type": "text",
+      "default": "Tu tienda de confianza en Gamarra para hermosos textiles y ropa peruana. Explora nuestra colección o chatéa con nosotros por WhatsApp para ayuda personalizada.",
+      "required": true
+    },
+    "descripcionTienda": {
+      "type": "text"
+    },
+    "numeroWhatsapp": {
+      "type": "string",
+      "default": "51999999999",
+      "required": true
+    },
+    "textoCTA": {
+      "type": "string"
+    },
+    "imagenHero": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "files",
+        "images",
+        "videos"
+      ]
+    },
+    "estadisticas": {
+      "type": "component",
+      "component": "hero.estadistica",
+      "repeatable": true,
+      "max": 6
+    },
+    "direccionTienda": {
+      "type": "string"
+    }
+  }
+}

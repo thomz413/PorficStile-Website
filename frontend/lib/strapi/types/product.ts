@@ -24,9 +24,8 @@ export const VarianteSchema = z.object({
 	disponible: z.boolean().default(true),
 
 	precioSobreescribir: z.number().nullish(),
-	// keep your spanish name if preferred
 
-	enOferta: z.boolean().nullish(),
+	// Oferta
 	precioOferta: z.number().nullish(),
 	tipoDescuento: TipoDescuentoEnum.nullish(),
 	valorDescuento: z.number().nullish(),
@@ -45,13 +44,15 @@ export const ProductoSchema = z.object({
 	descripcion: z.string().nullish().nullable().default(""),
 	precio: z.number().default(0),
 
-	enOferta: z.boolean().default(false),
+	// Oferta
 	precioOferta: z.number().nullish(),
+
 	tipoDescuento: TipoDescuentoEnum.nullish(),
 	valorDescuento: z.number().nullish(),
+
 	fechaInicioOferta: z.string().nullish(),
 	fechaFinOferta: z.string().nullish(),
-	mostrarPrecioOferta: z.boolean().default(true),
+
 	textoBadgeOferta: z.string().nullish().default(""),
 
 	disponible: z.boolean().default(true),

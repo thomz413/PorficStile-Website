@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useCart } from "@/contexts/CartContext";
-import { toast } from "sonner";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 import { placeholderImage } from "@/lib/utils";
 
@@ -22,278 +21,136 @@ export default function ProductCard({
 	className = "",
 }: ProductCardProps) {
 	const { convertAndFormatPrice } = useCurrency();
-	const { addToCart: addToCartContext } = useCart();
 	const [isFavorite, setIsFavorite] = useState(false);
+	const [isHovered, setIsHovered] = useState(false);
 
-	// Get the appropriate image with fallback logic
-	const getProductImage = () => {
-		if (product.imagenPrincipal?.url) {
-			return product.imagenPrincipal.url;
-		}
-		// First in order in the galery
-		if (product.galeria && product.galeria.length > 0) {
-			return product.galeria[0].url;
-		}
+	const productUrl = `/productos/${product.documentId || product.id}`;
 
-		if (product.imagenPrincipal?.alternativeText) {
-			return placeholderImage({
-				text: product.imagenPrincipal?.alternativeText,
-			});
-		}
+	// Image Logic: Show gallery[0] on hover if it exists
+	const images = useMemo(() => {
+		const main = product.imagenPrincipal?.url || placeholderImage();
+		const hover = product.galeria?.[0]?.url || main;
+		return { main, hover };
+	}, [product]);
 
-		return placeholderImage();
-	};
-
-	// Price calculation with variant override and discount logic
-	const getPriceInfo = () => {
+	const priceInfo = useMemo(() => {
 		let basePrice = product.precio;
-		let finalPrice = product.precio;
-		let discountPercentage: number | null = null;
-		let discountAmount: number | null = null;
-		let showDiscount = false;
+		const activeOferta = selectedVariant?.precioOferta || product.precioOferta;
 
-		// Variant override logic
 		if (selectedVariant?.precioSobreescribir) {
 			basePrice = selectedVariant.precioSobreescribir;
-			finalPrice = selectedVariant.precioSobreescribir;
 		}
 
-		// Discount priority: 1. Variant discount, 2. Product discount
-		if (selectedVariant?.enOferta && selectedVariant.precioOferta) {
-			finalPrice = selectedVariant.precioOferta;
-			showDiscount = true;
-			discountAmount = basePrice - finalPrice;
-			discountPercentage = Math.round((discountAmount / basePrice) * 100);
-		} else if (product.enOferta && product.precioOferta) {
-			finalPrice = product.precioOferta;
-			showDiscount = true;
-			discountAmount = basePrice - finalPrice;
-			discountPercentage = Math.round((discountAmount / basePrice) * 100);
-		}
+		const showDiscount = !!(activeOferta && activeOferta < basePrice);
+		const finalPrice = showDiscount ? activeOferta : basePrice;
+		const discountPercentage = showDiscount
+			? Math.round(((basePrice - (activeOferta ?? 0)) / basePrice) * 100)
+			: 0;
 
-		return {
-			basePrice,
-			finalPrice,
-			showDiscount,
-			discountPercentage,
-			discountAmount,
-		};
-	};
-
-	const priceInfo = getPriceInfo();
-	const productImage = getProductImage();
-
-	const toggleFavorite = () => {
-		setIsFavorite(!isFavorite);
-		// Here you could add localStorage logic for favorites
-	};
-
-	const handleAddToCart = () => {
-		// Check if product is available
-		const isAvailable = selectedVariant
-			? selectedVariant.disponible
-			: product.disponible;
-		if (!isAvailable) {
-			toast.error("Este producto no está disponible", {
-				position: "bottom-center",
-			});
-			return;
-		}
-
-		// Add to cart using context
-		const productData = {
-			id: product.id.toString(),
-			nombre: product.nombre,
-			precio: priceInfo.finalPrice,
-			precioDescuento: priceInfo.showDiscount
-				? priceInfo.finalPrice
-				: undefined,
-			enOferta: priceInfo.showDiscount,
-			categoria: product.categoria,
-			imagen: product.imagenPrincipal
-				? { url: product.imagenPrincipal.url }
-				: undefined,
-			tallas: selectedVariant
-				? [
-						{
-							talla: selectedVariant.talla || "",
-							stock: selectedVariant.stock || 0,
-							disponible: selectedVariant.disponible,
-						},
-					]
-				: [],
-		};
-
-		const selectedItems = selectedVariant
-			? [
-					{
-						talla: selectedVariant.talla || "",
-						cantidad: 1,
-						precioUnitario: priceInfo.finalPrice,
-					},
-				]
-			: [
-					{
-						talla: "Default",
-						cantidad: 1,
-						precioUnitario: priceInfo.finalPrice,
-					},
-				];
-
-		addToCartContext(productData, selectedItems);
-		toast.success(`${product.nombre} agregado al carrito`, {
-			position: "bottom-center",
-		});
-	};
-	// Get stock information
-	const getStockInfo = () => {
-		if (selectedVariant) {
-			let message = "Agotado";
-
-			if (
-				selectedVariant.disponible &&
-				selectedVariant.stock !== undefined &&
-				selectedVariant.stock !== null
-			) {
-				message = `${selectedVariant.stock} disponibles`;
-			} else if (selectedVariant.disponible) {
-				message = `Disponible`;
-			}
-
-			return {
-				available: selectedVariant.disponible,
-				stock: selectedVariant.stock ?? 0,
-				message: message,
-			};
-		}
-
-		let message = "Agotado";
-
-		if (
-			product.disponible &&
-			product.cantidadStock !== undefined &&
-			product.cantidadStock !== null
-		) {
-			message = `${product.cantidadStock} disponibles`;
-		} else if (product.disponible) {
-			message = `Disponible`;
-		}
-
-		return {
-			available: product?.disponible ?? false,
-			stock: product?.cantidadStock ?? 0,
-			message: message,
-		};
-	};
-
-	const stockInfo = getStockInfo();
+		return { basePrice, finalPrice, showDiscount, discountPercentage };
+	}, [product, selectedVariant]);
 
 	return (
-		<div
-			className={`bg-white border border-gray-200 rounded-lg overflow-hidden hover-lift group ${className}`}
+		<motion.div
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+			className={`group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 ${className}`}
 		>
-			{/* Product Image */}
-			<div className="relative aspect-square overflow-hidden">
-				<Link href={`/productos/${product.documentId}`}>
-					<div className="relative w-full h-full transition-hover duration-300">
-						<Image
-							src={productImage}
-							alt={product.imagenPrincipal?.name || product.nombre}
-							fill
-							className="object-cover group-hover:scale-105 transition-transform duration-500"
-							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-						/>
-					</div>
+			{/* Image Section */}
+			<div className="relative aspect-4/5 w-full overflow-hidden bg-[#F9F9F9]">
+				<Link href={productUrl} className="block w-full h-full">
+					{/* Primary Image */}
+					<Image
+						src={images.main}
+						alt={product.nombre}
+						fill
+						className={`object-cover transition-all duration-700 ease-out-expo ${
+							isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
+						}`}
+						sizes="(max-width: 768px) 100vw, 33vw"
+					/>
+					{/* Hover Image (Secondary) */}
+					<Image
+						src={images.hover}
+						alt={product.nombre}
+						fill
+						className={`object-cover transition-all duration-700 ease-out-expo ${
+							isHovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
+						}`}
+						sizes="(max-width: 768px) 100vw, 33vw"
+					/>
 				</Link>
 
-				{/* Discount Badge */}
-				{priceInfo.showDiscount && (
-					<div className="absolute top-3 left-3 animate-fade-in">
-						<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
-							{priceInfo.discountPercentage
-								? `-${priceInfo.discountPercentage}%`
-								: `-${convertAndFormatPrice(priceInfo.discountAmount || 0)}`}
-						</span>
-					</div>
-				)}
+				{/* Floating Badges */}
+				<div className="absolute top-4 left-4 flex flex-col gap-2">
+					<AnimatePresence>
+						{priceInfo.showDiscount && (
+							<motion.span
+								initial={{ opacity: 0, x: -10 }}
+								animate={{ opacity: 1, x: 0 }}
+								className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md"
+							>
+								-{priceInfo.discountPercentage}%
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</div>
 
-				{/* Favorite Button */}
-				<button
-					onClick={toggleFavorite}
-					className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white"
-					aria-label="Agregar a favoritos"
-				>
-					<Heart
-						className={`h-4 w-4 transition-colors duration-200 ${
+				{/* Actions Overlay */}
+				<div className="absolute top-4 right-4 flex flex-col gap-2 transform translate-x-18 group-hover:translate-x-0 transition-transform duration-500">
+					<button
+						onClick={(e) => {
+							e.preventDefault();
+							setIsFavorite(!isFavorite);
+						}}
+						className={`p-3 rounded-full shadow-xl transition-all duration-300 ${
 							isFavorite
-								? "fill-red-500 text-red-500"
-								: "text-gray-600 hover:text-red-500"
+								? "bg-red-500 text-white"
+								: "bg-white text-gray-900 hover:bg-gray-50"
 						}`}
-					/>
-				</button>
+					>
+						<Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+					</button>
+				</div>
+
+				{/* Quick View Button (Slide up from bottom) */}
+				<div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+					<Link
+						href={productUrl}
+						className="w-full bg-white/90 backdrop-blur-md py-3 rounded-xl text-sm font-semibold text-gray-900 flex items-center justify-center gap-2 hover:bg-white transition-colors"
+					>
+						Ver detalles
+						<ArrowRight className="h-4 w-4" />
+					</Link>
+				</div>
 			</div>
 
-			{/* Product Info */}
-			<div className="p-4 space-y-3">
-				{/* Category */}
-				{product.categoria?.nombre && (
-					<p className="text-xs text-gray-500 uppercase tracking-wide animate-fade-in">
-						{product.categoria.nombre}
-					</p>
-				)}
-
-				{/* Product Name */}
-				<Link href={`/productos/${product.slug || product.id}`}>
-					<h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-200">
-						{product.nombre}
-					</h3>
-				</Link>
-
-				{/* Price Display */}
+			{/* Content Section */}
+			<div className="p-5 flex flex-col gap-2">
 				<div className="space-y-1">
-					{priceInfo.showDiscount ? (
-						<>
-							<div className="flex items-center gap-2 animate-fade-in">
-								<span className="text-sm text-gray-500 line-through">
-									{convertAndFormatPrice(priceInfo.basePrice)}
-								</span>
-								<span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
-									-
-									{Math.round(
-										((priceInfo.basePrice - priceInfo.finalPrice) /
-											priceInfo.basePrice) *
-											100,
-									)}
-									%
-								</span>
-							</div>
-							<div className="text-xl font-bold text-primary">
-								{convertAndFormatPrice(priceInfo.finalPrice)}
-							</div>
-						</>
-					) : (
-						<div className="text-xl font-bold text-gray-900">
-							{convertAndFormatPrice(priceInfo.finalPrice)}
-						</div>
+					{product.categoria?.nombre && (
+						<span className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest opacity-80">
+							{product.categoria.nombre}
+						</span>
+					)}
+					<Link href={productUrl}>
+						<h3 className="text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+							{product.nombre}
+						</h3>
+					</Link>
+				</div>
+
+				<div className="flex items-center gap-3 pt-1">
+					<span className="text-xl font-bold text-gray-900">
+						{convertAndFormatPrice(priceInfo.finalPrice)}
+					</span>
+					{priceInfo.showDiscount && (
+						<span className="text-sm font-medium text-gray-400 line-through">
+							{convertAndFormatPrice(priceInfo.basePrice)}
+						</span>
 					)}
 				</div>
-
-				{/* Stock Status */}
-				<div className="flex items-center gap-2 text-sm">
-					<div
-						className={`w-2 h-2 rounded-full ${
-							stockInfo.available
-								? "bg-green-500 animate-pulse-slow"
-								: "bg-red-500"
-						}`}
-					/>
-					<span
-						className={stockInfo.available ? "text-green-700" : "text-red-700"}
-					>
-						{stockInfo.message}
-					</span>
-				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }
