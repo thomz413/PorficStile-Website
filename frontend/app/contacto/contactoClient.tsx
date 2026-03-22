@@ -230,29 +230,11 @@ export default function ContactoCliente({
 
 			<Footer />
 
-			{/* Sticky WhatsApp Button with enhanced entrance animation */}
-			<motion.div
-				initial={{ scale: 0, opacity: 0, rotate: -180 }}
-				animate={{ scale: 1, opacity: 1, rotate: 0 }}
-				transition={{
-					delay: 1.2,
-					type: "spring",
-					stiffness: 200,
-					damping: 15,
-					duration: 0.8,
-				}}
-				whileHover={{
-					scale: 1.1,
-					transition: { duration: 0.2 },
-				}}
-				whileTap={{ scale: 0.95 }}
-			>
-				<WhatsAppCTA
-					whatsappNumber={whatsappNumber}
-					variant="sticky"
-					messageConfig={{ type: "general_question" }}
-				/>
-			</motion.div>
+			<WhatsAppCTA
+				whatsappNumber={whatsappNumber}
+				variant="sticky"
+				messageConfig={{ type: "general_question" }}
+			/>
 		</main>
 	);
 }

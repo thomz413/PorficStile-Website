@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getProducts, getCategories, getSettings } from "@/lib/strapi";
 import ProductCard from "@/components/ProductCard";
 import StickyCart from "@/components/StickyCart";
-import { Filter, Grid, List } from "lucide-react";
+import { Filter } from "lucide-react";
 import { SiteSettings } from "@/lib/strapi/types/settings";
 import { Producto } from "@/lib/strapi/types/product";
 import { Category } from "@/lib/strapi/types/category";
@@ -21,7 +21,6 @@ export default function ProductsPage() {
 	// TODO tallas y rango de precio
 
 	const [loading, setLoading] = useState(true);
-	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 	const [settings, setSettings] = useState<SiteSettings | null>(null);
 
 	useEffect(() => {
@@ -144,41 +143,6 @@ export default function ProductsPage() {
 						</motion.div>
 					</div>
 
-					{/* View Mode Toggle */}
-					<motion.div
-						initial={{ opacity: 0, x: 20 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ delay: 0.5, duration: 0.3 }}
-						className="flex justify-end mb-6"
-					>
-						<div className="flex gap-2 bg-muted p-1 rounded-lg">
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={() => setViewMode("grid")}
-								className={`p-2 rounded transition-all duration-200 ${
-									viewMode === "grid"
-										? "bg-background shadow-sm"
-										: "hover:bg-background/50"
-								}`}
-							>
-								<Grid className="h-4 w-4" />
-							</motion.button>
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={() => setViewMode("list")}
-								className={`p-2 rounded transition-all duration-200 ${
-									viewMode === "list"
-										? "bg-background shadow-sm"
-										: "hover:bg-background/50"
-								}`}
-							>
-								<List className="h-4 w-4" />
-							</motion.button>
-						</div>
-					</motion.div>
-
 					{/* Products Grid/List */}
 					<AnimatePresence mode="wait">
 						{filteredProducts.length === 0 ? (
@@ -214,9 +178,7 @@ export default function ProductsPage() {
 								variants={animations.container}
 								transition={transitions.smooth}
 								className={
-									viewMode === "grid"
-										? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-										: "space-y-4"
+									"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
 								}
 							>
 								{filteredProducts.map((product) => (
@@ -226,10 +188,7 @@ export default function ProductsPage() {
 										whileHover={{ y: -4 }}
 										layout
 									>
-										<ProductCard
-											product={product}
-											className={viewMode === "list" ? "flex flex-row" : ""}
-										/>
+										<ProductCard product={product} />
 									</motion.div>
 								))}
 							</motion.div>
