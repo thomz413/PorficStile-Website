@@ -120,11 +120,9 @@ export default function ProductDetailPage() {
 	// Helpers: compute final price for a variant or product (mirrors previous logic)
 	const computeFinalPriceForVariant = (variant?: Variante | null) => {
 		if (!product) return 0;
-		let basePrice = product.precio;
 		let finalPrice = product.precio;
 
 		if (variant?.precioSobreescribir) {
-			basePrice = variant.precioSobreescribir;
 			finalPrice = variant.precioSobreescribir;
 		}
 
@@ -327,7 +325,9 @@ export default function ProductDetailPage() {
 			nombre: product.nombre,
 			precio: computeFinalPriceForVariant(null),
 			precioDescuento: undefined,
-			categoria: product.categoria,
+			categoria: product.categoria
+				? { nombre: product.categoria.nombre ?? "Sin categoría" }
+				: undefined,
 			imagen: product.imagenPrincipal
 				? { url: product.imagenPrincipal.url }
 				: undefined,

@@ -1,13 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {createContext, ReactNode, useContext, useState} from "react";
 
 export interface CartItem {
 	id: string;
 	nombre: string;
 	precio: number;
 	precioDescuento?: number;
-	enOferta: boolean;
 	categoria?: { nombre: string };
 	imagen?: { url: string };
 	tallas: Array<{
@@ -140,19 +139,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
 	const getCartSummary = () => {
 		if (cart.length === 0) return "";
 
-		const summary = cart
+		return cart
 			.map((item) => {
-				const itemDetails = item.selectedItems
+				return item.selectedItems
 					.map(
 						(selected) =>
 							`${selected.cantidad}x ${item.nombre} - Talla ${selected.talla}`,
 					)
 					.join("\n");
-				return itemDetails;
 			})
 			.join("\n");
-
-		return summary;
 	};
 
 	return (
