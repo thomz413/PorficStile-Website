@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect, Suspense} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -36,7 +36,7 @@ type SelectedItem = {
 	quantity: number;
 };
 
-export default function ProductDetailPage() {
+function ProductDetailContent() {
 	const params = useParams();
 	const productId = params.id as string;
 
@@ -853,5 +853,105 @@ export default function ProductDetailPage() {
 				)}
 			</div>
 		</main>
+	);
+}
+function ProductSkeleton() {
+	return (
+		<div className="w-full animate-pulse">
+			{/* Breadcrumb Skeleton */}
+			<div className="bg-white border-b">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+					<div className="h-5 w-40 bg-gray-200 rounded-md" />
+				</div>
+			</div>
+
+			{/* Product Detail Skeleton */}
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+					{/* Left: Product Gallery Skeleton */}
+					<div className="space-y-4">
+						{/* Main large image */}
+						<div className="aspect-square w-full bg-gray-200 rounded-2xl" />
+						{/* Thumbnail strip */}
+						<div className="flex gap-4 overflow-hidden">
+							<div className="h-20 w-20 md:h-24 md:w-24 shrink-0 bg-gray-200 rounded-xl" />
+							<div className="h-20 w-20 md:h-24 md:w-24 shrink-0 bg-gray-200 rounded-xl" />
+							<div className="h-20 w-20 md:h-24 md:w-24 shrink-0 bg-gray-200 rounded-xl" />
+							<div className="h-20 w-20 md:h-24 md:w-24 shrink-0 bg-gray-200 rounded-xl hidden sm:block" />
+						</div>
+					</div>
+
+					{/* Right: Product Info Skeleton */}
+					<div className="space-y-6 pt-2 md:pt-6">
+						{/* Category Badge */}
+						<div className="h-6 w-24 bg-gray-200 rounded-full" />
+
+						{/* Title */}
+						<div className="space-y-3">
+							<div className="h-9 w-full bg-gray-300 rounded-lg" />
+							<div className="h-9 w-3/4 bg-gray-300 rounded-lg" />
+						</div>
+
+						{/* Price */}
+						<div className="h-10 w-1/3 bg-gray-200 rounded-lg pt-2" />
+
+						{/* Variant Selector (Tallas/Colores) */}
+						<div className="pt-4 space-y-4">
+							<div className="h-5 w-16 bg-gray-200 rounded" />
+							<div className="flex gap-3">
+								<div className="h-10 w-14 bg-gray-200 rounded-md" />
+								<div className="h-10 w-14 bg-gray-200 rounded-md" />
+								<div className="h-10 w-14 bg-gray-200 rounded-md" />
+							</div>
+						</div>
+
+						{/* Quantity & Add to Selection */}
+						<div className="pt-4 space-y-3">
+							<div className="h-5 w-20 bg-gray-200 rounded" />
+							<div className="flex items-center gap-3">
+								<div className="h-9 w-32 bg-gray-200 rounded-md" />
+								<div className="h-9 w-40 bg-gray-300 rounded-md" />
+							</div>
+							<div className="h-4 w-28 bg-gray-200 rounded mt-2" />
+						</div>
+
+						{/* Actions (3 big buttons) */}
+						<div className="space-y-4 pt-8">
+							<div className="h-12 w-full bg-gray-300 rounded-md" /> {/* Add to cart */}
+							<div className="h-12 w-full bg-gray-200 rounded-md" /> {/* WhatsApp */}
+							<div className="h-12 w-full bg-gray-200 rounded-md" /> {/* Favorite */}
+						</div>
+					</div>
+				</div>
+
+				{/* Bottom: Additional Info Skeleton */}
+				<div className="mt-16 pt-8 border-t grid grid-cols-1 lg:grid-cols-2 gap-12">
+					<div className="space-y-5">
+						<div className="h-8 w-48 bg-gray-300 rounded-lg" />
+						<div className="space-y-3 pt-2">
+							<div className="h-5 w-full bg-gray-200 rounded" />
+							<div className="h-5 w-5/6 bg-gray-200 rounded" />
+							<div className="h-5 w-4/6 bg-gray-200 rounded" />
+						</div>
+					</div>
+
+					<div className="space-y-5">
+						<div className="h-8 w-40 bg-gray-300 rounded-lg" />
+						<div className="h-5 w-full bg-gray-200 rounded pt-2" />
+						<div className="h-12 w-full bg-gray-200 rounded-md mt-4" />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+
+export default function ProductDetailPage() {
+	return (
+		<Suspense fallback={<ProductSkeleton />}>
+			<ProductDetailContent />
+		</Suspense>
 	);
 }
