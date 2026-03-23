@@ -31,9 +31,9 @@ export function addToCart(
 	}
 
 	// Discount priority: 1. Variant discount, 2. Product discount
-	if (variant?.enOferta && variant.precioOferta) {
+	if (variant?.precioOferta) {
 		finalPrice = variant.precioOferta;
-	} else if (product.enOferta && product.precioOferta) {
+	} else if (product.precioOferta) {
 		finalPrice = product.precioOferta;
 	}
 
