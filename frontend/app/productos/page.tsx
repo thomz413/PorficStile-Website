@@ -1,5 +1,5 @@
 import { getProducts, getCategories, getSettings } from "@/lib/strapi";
-import ProductsClient from "./ProductsClient"; // We will create this
+import ProductsClient from "./ProductsClient";
 import FooterWrapper from "@/components/footer/FooterWrapper";
 import Header from "@/components/Header";
 import { Suspense } from "react";

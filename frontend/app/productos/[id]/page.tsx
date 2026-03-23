@@ -855,6 +855,9 @@ function ProductDetailContent() {
 		</main>
 	);
 }
+
+
+
 function ProductSkeleton() {
 	return (
 		<div className="w-full animate-pulse">
@@ -946,7 +949,6 @@ function ProductSkeleton() {
 		</div>
 	);
 }
-
 
 export default function ProductDetailPage() {
 	return (

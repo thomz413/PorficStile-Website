@@ -14,8 +14,6 @@ export default function NosotrosClient({
 }: {
 	settings: SiteSettings | null;
 }) {
-	// Note: In a real Next.js App Router scenario, fetch the data in a Server Component
-	// and pass it to this Client Component as a prop.
 
 	const descripcionTienda = "Atlantis Porfic Stile ofrece ropa con diseño propio y fabricación local. Visítanos en Galería Santa Lucía — Piso 7, Tienda 709. Envíos a todo el país.";
 
