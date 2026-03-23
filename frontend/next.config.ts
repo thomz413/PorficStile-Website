@@ -19,9 +19,10 @@ const nextConfig: NextConfig = {
 		formats: ["image/avif", "image/webp"],
 		remotePatterns: [
 			{
-				protocol: strapiAddr.protocol.replace(":", "") as "http" | "https",
+				protocol: strapiAddr.protocol.slice(0, -1) as "http" | "https",
 				hostname: strapiAddr.hostname,
-				port: strapiAddr.port,
+				// Only include port if it's actually defined (like in localhost)
+				port: strapiAddr.port !== "" ? strapiAddr.port : undefined,
 				pathname: "/uploads/**",
 			},
 			{
