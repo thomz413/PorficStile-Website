@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, ShoppingCart, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
 import CurrencySelector from "./CurrencySelector";
 import StickyCart from "./StickyCart";
 import { useCart } from "@/contexts/CartContext";
@@ -18,6 +18,32 @@ export default function Header({
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
 	const { getTotalItems } = useCart();
+
+	// Get favorites count
+	const [favoritesCount, setFavoritesCount] = useState(0);
+
+	useEffect(() => {
+		const updateFavoritesCount = () => {
+			if (typeof window === 'undefined') return;
+			try {
+				const stored = localStorage.getItem("moda-peru-favorites");
+				const count = stored ? JSON.parse(stored).length : 0;
+				setFavoritesCount(count);
+			} catch {
+				setFavoritesCount(0);
+			}
+		};
+
+		updateFavoritesCount();
+
+		// Listen for storage changes
+		const handleStorageChange = () => {
+			updateFavoritesCount();
+		};
+
+		window.addEventListener('storage', handleStorageChange);
+		return () => window.removeEventListener('storage', handleStorageChange);
+	}, []);
 
 	return (
 		<>
@@ -74,6 +100,19 @@ export default function Header({
 							<div className={"text-foreground"}>
 								<CurrencySelector />
 							</div>
+
+							<Link
+								href="/favoritos"
+								className={`relative rounded-full p-2.5 transition-all active:scale-95 hover:bg-red-50 text-foreground`}
+								aria-label="Favoritos"
+							>
+								<Heart className="h-5 w-5 transition-colors duration-300" />
+								{favoritesCount > 0 && (
+									<span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-4 w-4 text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
+										{favoritesCount}
+									</span>
+								)}
+							</Link>
 
 							<button
 								onClick={() => setIsCartOpen(true)}
@@ -148,6 +187,14 @@ export default function Header({
 							className="text-lg font-bold uppercase tracking-tight"
 						>
 							Contacto
+						</Link>
+						<Link
+							href="/favoritos"
+							onClick={() => setIsOpen(false)}
+							className="text-lg font-bold uppercase tracking-tight flex items-center gap-2"
+						>
+							<Heart className="h-4 w-4" />
+							Favoritos
 						</Link>
 						<div className="pt-4 border-t border-border">
 							<CurrencySelector />

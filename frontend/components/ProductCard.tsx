@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
@@ -8,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 import { placeholderImage } from "@/lib/utils";
-import { toast } from "sonner"; // Assuming you use sonner for feedback
+import { toast } from "sonner";
 
 interface ProductCardProps {
 	product: Producto;
@@ -21,17 +22,10 @@ export default function ProductCard({
 									}: ProductCardProps) {
 	const { convertAndFormatPrice } = useCurrency();
 	const [isFavorite, setIsFavorite] = useState(false);
-	const [isHovered, setIsHovered] = useState(false);
-	const [isClient, setIsClient] = useState(false);
-
-	// Ensure client-side only rendering for hover effects
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
 
 	const productUrl = `/productos/${product.documentId}`;
 
-	// --- IMPROVED FAVORITES LOGIC (Synced with Detail Page) ---
+	// --- FAVORITES LOGIC ---
 	useEffect(() => {
 		try {
 			const stored = localStorage.getItem("moda-peru-favorites");
@@ -90,67 +84,45 @@ export default function ProductCard({
 		return { basePrice, finalPrice, showDiscount, discountPercentage };
 	}, [product, selectedVariant]);
 
-	// Stable className for server rendering
-	const containerClassName = "group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100/50";
-	const imageClassName = "object-cover transition-all duration-700 ease-out-expo opacity-100 scale-100";
-	const hoverImageClassName = "object-cover transition-all duration-700 ease-out-expo opacity-0 scale-105";
-	const categoryClassName = "text-[10px] font-bold text-indigo-500 uppercase tracking-[0.15em] opacity-80";
-	const priceClassName = "text-xl font-black text-gray-900";
-	const gapClassName = "flex items-center gap-2.5 pt-1";
-	const discountBadgeClassName = "bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-tighter";
-
 	return (
-		<motion.div
-			onMouseEnter={() => isClient && setIsHovered(true)}
-			onMouseLeave={() => isClient && setIsHovered(false)}
-			className={containerClassName}
-		>
-			{/* Image Section */}
-			<div className="relative aspect-4/5 w-full overflow-hidden bg-[#F9F9F9]">
+		<div key={product.documentId} className="group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100/50">
+
+			{/* Image Container */}
+			<div className="relative w-full h-80 overflow-hidden bg-[#F9F9F9]">
 				<Link href={productUrl} className="block w-full h-full">
 					<Image
 						src={images.main}
 						alt={product.nombre}
 						fill
-						className={isClient && isHovered ? "opacity-0 scale-105" : imageClassName}
+						className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
 						sizes="(max-width: 768px) 100vw, 33vw"
-					/>
-					<Image
-						src={images.hover}
-						alt={product.nombre}
-						fill
-						className={isClient && isHovered ? "opacity-100 scale-100" : hoverImageClassName}
-						sizes="(max-width: 768px) 100vw, 33vw"
+						priority
 					/>
 				</Link>
 
 				{/* Floating Discount Badge */}
-				<div className="absolute top-4 left-4 flex flex-col gap-2">
-					<AnimatePresence>
-						{priceInfo.showDiscount && (
-							<motion.span
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								className={discountBadgeClassName}
-							>
-								-{priceInfo.discountPercentage}%
-							</motion.span>
-						)}
-					</AnimatePresence>
-				</div>
+				{priceInfo.showDiscount && (
+					<div className="absolute top-4 left-4 z-20">
+            <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-tighter">
+              -{priceInfo.discountPercentage}%
+            </span>
+					</div>
+				)}
 
 				{/* Actions Overlay */}
-				<div className="absolute top-4 right-4 flex flex-col gap-2 transform translate-x-18 group-hover:translate-x-0 transition-transform duration-500">
+				<div className="absolute top-4 right-4 z-20 flex flex-col gap-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
 					<button
 						onClick={toggleFavorite}
-						className={isFavorite ? "p-3 rounded-full shadow-xl transition-all duration-300 bg-red-500 text-white" : "p-3 rounded-full shadow-xl transition-all duration-300 bg-white text-gray-900 hover:bg-gray-50"}
+						className={`p-3 rounded-full shadow-xl transition-all duration-300 ${
+							isFavorite ? "bg-red-500 text-white" : "bg-white text-gray-900 hover:bg-gray-50"
+						}`}
 					>
-						<Heart className={isFavorite ? "h-4 w-4 fill-current" : "h-4 w-4"} />
+						<Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
 					</button>
 				</div>
 
 				{/* Quick View Button */}
-				<div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+				<div className="absolute inset-x-0 bottom-0 z-20 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
 					<Link
 						href={productUrl}
 						className="w-full bg-white/90 backdrop-blur-md py-3 rounded-xl text-sm font-semibold text-gray-900 flex items-center justify-center gap-2 hover:bg-white transition-colors shadow-sm"
@@ -165,9 +137,9 @@ export default function ProductCard({
 			<div className="p-5 flex flex-col gap-2">
 				<div className="space-y-1">
 					{product.categoria?.nombre && (
-						<span className={categoryClassName}>
-                            {product.categoria.nombre}
-                        </span>
+						<span className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.15em] opacity-80">
+							{product.categoria.nombre}
+						</span>
 					)}
 					<Link href={productUrl}>
 						<h3 className="text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
@@ -176,19 +148,18 @@ export default function ProductCard({
 					</Link>
 				</div>
 
-				{/* PRICE SECTION WITH DASHED UI */}
-				<div className={gapClassName}>
-                    <span className={priceClassName}>
-                        {convertAndFormatPrice(priceInfo.finalPrice)}
-                    </span>
+				<div className="flex items-center gap-2.5 pt-1">
+					<span className="text-xl font-black text-gray-900">
+						{convertAndFormatPrice(priceInfo.finalPrice)}
+					</span>
 
 					{priceInfo.showDiscount && (
 						<span className="text-sm font-medium text-gray-400 line-through decoration-dashed decoration-gray-400/60">
-                            {convertAndFormatPrice(priceInfo.basePrice)}
-                        </span>
+							{convertAndFormatPrice(priceInfo.basePrice)}
+						</span>
 					)}
 				</div>
 			</div>
-		</motion.div>
+		</div>
 	);
 }
