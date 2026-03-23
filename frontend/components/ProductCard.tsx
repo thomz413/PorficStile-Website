@@ -22,6 +22,12 @@ export default function ProductCard({
 	const { convertAndFormatPrice } = useCurrency();
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
+	const [isClient, setIsClient] = useState(false);
+
+	// Ensure client-side only rendering for hover effects
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	const productUrl = `/productos/${product.documentId}`;
 
@@ -84,11 +90,20 @@ export default function ProductCard({
 		return { basePrice, finalPrice, showDiscount, discountPercentage };
 	}, [product, selectedVariant]);
 
+	// Stable className for server rendering
+	const containerClassName = "group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100/50";
+	const imageClassName = "object-cover transition-all duration-700 ease-out-expo opacity-100 scale-100";
+	const hoverImageClassName = "object-cover transition-all duration-700 ease-out-expo opacity-0 scale-105";
+	const categoryClassName = "text-[10px] font-bold text-indigo-500 uppercase tracking-[0.15em] opacity-80";
+	const priceClassName = "text-xl font-black text-gray-900";
+	const gapClassName = "flex items-center gap-2.5 pt-1";
+	const discountBadgeClassName = "bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-tighter";
+
 	return (
 		<motion.div
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
-			className={`group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100/50`}
+			onMouseEnter={() => isClient && setIsHovered(true)}
+			onMouseLeave={() => isClient && setIsHovered(false)}
+			className={containerClassName}
 		>
 			{/* Image Section */}
 			<div className="relative aspect-4/5 w-full overflow-hidden bg-[#F9F9F9]">
@@ -97,18 +112,14 @@ export default function ProductCard({
 						src={images.main}
 						alt={product.nombre}
 						fill
-						className={`object-cover transition-all duration-700 ease-out-expo ${
-							isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
-						}`}
+						className={isClient && isHovered ? "opacity-0 scale-105" : imageClassName}
 						sizes="(max-width: 768px) 100vw, 33vw"
 					/>
 					<Image
 						src={images.hover}
 						alt={product.nombre}
 						fill
-						className={`object-cover transition-all duration-700 ease-out-expo ${
-							isHovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
-						}`}
+						className={isClient && isHovered ? "opacity-100 scale-100" : hoverImageClassName}
 						sizes="(max-width: 768px) 100vw, 33vw"
 					/>
 				</Link>
@@ -120,9 +131,9 @@ export default function ProductCard({
 							<motion.span
 								initial={{ opacity: 0, scale: 0.8 }}
 								animate={{ opacity: 1, scale: 1 }}
-								className="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-tighter"
+								className={discountBadgeClassName}
 							>
-								{priceInfo.discountPercentage}% OFF
+								-{priceInfo.discountPercentage}%
 							</motion.span>
 						)}
 					</AnimatePresence>
@@ -132,13 +143,9 @@ export default function ProductCard({
 				<div className="absolute top-4 right-4 flex flex-col gap-2 transform translate-x-18 group-hover:translate-x-0 transition-transform duration-500">
 					<button
 						onClick={toggleFavorite}
-						className={`p-3 rounded-full shadow-xl transition-all duration-300 ${
-							isFavorite
-								? "bg-red-500 text-white"
-								: "bg-white text-gray-900 hover:bg-gray-50"
-						}`}
+						className={isFavorite ? "p-3 rounded-full shadow-xl transition-all duration-300 bg-red-500 text-white" : "p-3 rounded-full shadow-xl transition-all duration-300 bg-white text-gray-900 hover:bg-gray-50"}
 					>
-						<Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+						<Heart className={isFavorite ? "h-4 w-4 fill-current" : "h-4 w-4"} />
 					</button>
 				</div>
 
@@ -158,7 +165,7 @@ export default function ProductCard({
 			<div className="p-5 flex flex-col gap-2">
 				<div className="space-y-1">
 					{product.categoria?.nombre && (
-						<span className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.15em] opacity-80">
+						<span className={categoryClassName}>
                             {product.categoria.nombre}
                         </span>
 					)}
@@ -170,8 +177,8 @@ export default function ProductCard({
 				</div>
 
 				{/* PRICE SECTION WITH DASHED UI */}
-				<div className="flex items-center gap-2.5 pt-1">
-                    <span className={`text-xl font-black ${priceInfo.showDiscount ? 'text-indigo-600' : 'text-gray-900'}`}>
+				<div className={gapClassName}>
+                    <span className={priceClassName}>
                         {convertAndFormatPrice(priceInfo.finalPrice)}
                     </span>
 

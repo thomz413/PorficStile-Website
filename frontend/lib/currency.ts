@@ -6,10 +6,10 @@ export interface CurrencyInfo {
 }
 
 export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
-	// South American currencies (prioritized)
+	// All South American currencies
 	{ code: "PEN", symbol: "S/.", name: "Sol Peruano" },
 	{ code: "BOB", symbol: "Bs.", name: "Boliviano Boliviano" },
-	{ code: "USD", symbol: "$", name: "Dólar Americano (Ecuador)" },
+	{ code: "USD", symbol: "$", name: "Dólar Americano" },
 	{ code: "ARS", symbol: "$", name: "Peso Argentino" },
 	{ code: "CLP", symbol: "$", name: "Peso Chileno" },
 	{ code: "COP", symbol: "$", name: "Peso Colombiano" },
@@ -18,24 +18,17 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
 	{ code: "VES", symbol: "Bs.", name: "Bolívar Venezolano" },
 	{ code: "GYD", symbol: "$", name: "Dólar Guyanés" },
 	{ code: "SRD", symbol: "$", name: "Dólar Surinamés" },
+	{ code: "BRL", symbol: "R$", name: "Real Brasileño" },
 
 	// Major international currencies
 	{ code: "EUR", symbol: "€", name: "Euro" },
-	{ code: "GBP", symbol: "£", name: "Libra Esterlina" },
-	{ code: "CAD", symbol: "C$", name: "Dólar Canadiense" },
-	{ code: "AUD", symbol: "A$", name: "Dólar Australiano" },
-	{ code: "CHF", symbol: "Fr", name: "Franco Suizo" },
-	{ code: "JPY", symbol: "¥", name: "Yen Japonés" },
-	{ code: "CNY", symbol: "¥", name: "Yuan Chino" },
-	{ code: "MXN", symbol: "$", name: "Peso Mexicano" },
-	{ code: "BRL", symbol: "R$", name: "Real Brasileño" },
 ];
 
 // Fallback rates if API fails
 const FALLBACK_RATES = {
 	PEN: 1,
 	BOB: 2.0, // Boliviano
-	USD: 0.27, // US Dollar (Ecuador)
+	USD: 0.27, // US Dollar
 	ARS: 75.0, // Argentine Peso
 	CLP: 220.0, // Chilean Peso
 	COP: 1100.0, // Colombian Peso
@@ -44,15 +37,8 @@ const FALLBACK_RATES = {
 	VES: 3500000.0, // Venezuelan Bolivar (high inflation)
 	GYD: 55.0, // Guyanese Dollar
 	SRD: 7.5, // Surinamese Dollar
-	EUR: 0.25, // Euro
-	GBP: 0.21, // British Pound
-	CAD: 0.37, // Canadian Dollar
-	AUD: 0.41, // Australian Dollar
-	CHF: 0.24, // Swiss Franc
-	JPY: 40.5, // Japanese Yen
-	CNY: 1.9, // Chinese Yuan
-	MXN: 4.8, // Mexican Peso
 	BRL: 1.4, // Brazilian Real
+	EUR: 0.25, // Euro
 };
 
 // Simple fetch from free exchange rate API
