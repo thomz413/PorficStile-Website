@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
 				hostname: "placehold.co",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "*.media.strapiapp.com",
+				pathname: "/**",
+			},
 		],
 		dangerouslyAllowSVG: false,
 		dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
