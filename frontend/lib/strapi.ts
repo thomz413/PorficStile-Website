@@ -9,7 +9,7 @@ import {
 } from "./strapi/types/product";
 import qs from "qs";
 import { STRAPI_URL } from "@/lib/constants";
-import { buildProductQuery } from "@/lib/utils";
+import {buildProductListQuery, buildProductQuery} from "@/lib/utils";
 import { cacheLife, cacheTag } from "next/cache";
 
 /** Get featured productos (destacado = true) */
@@ -18,7 +18,7 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 	cacheTag("products", "featured-products");
 	cacheLife("products");
 
-	const qs = "filters[destacado][$eq]=true&" + buildProductQuery();
+	const qs = "filters[destacado][$eq]=true&" + buildProductListQuery();
 	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
@@ -33,7 +33,7 @@ export async function getProducts(): Promise<Producto[]> {
 	cacheTag("products");
 	cacheLife("products");
 
-	const qs = buildProductQuery();
+	const qs = buildProductListQuery();
 	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
@@ -49,10 +49,8 @@ export async function getProductById(id: string): Promise<Producto | null> {
 	cacheLife("products");
 
 	const qs = buildProductQuery();
-	console.log(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
-	const res = await fetch(
-		`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
-	);
+
+	const res = await fetch(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 

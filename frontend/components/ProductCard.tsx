@@ -24,7 +24,7 @@ export default function ProductCard({
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
-	const productUrl = `/productos/${product.documentId || product.id}`;
+	const productUrl = `/productos/${product.documentId}`;
 
 	// Image Logic: Show gallery[0] on hover if it exists
 	const images = useMemo(() => {

@@ -13,6 +13,7 @@ import {
 	TextReveal,
 } from "@/components/Animations";
 import FooterWrapper from "@/components/footer/FooterWrapper";
+import {Suspense} from "react";
 
 export default async function Home() {
 	// 1. Fetch data directly on the server
@@ -216,7 +217,9 @@ export default async function Home() {
 				</FadeIn>
 			</section>
 
-			<FooterWrapper />
+			<Suspense fallback={<footer className="h-64 bg-muted animate-pulse" />}>
+				<FooterWrapper />
+			</Suspense>
 
 			{whatsappNumber && (
 				<WhatsAppCTA

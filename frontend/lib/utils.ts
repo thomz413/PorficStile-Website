@@ -53,6 +53,32 @@ export function buildProductQuery() {
 	return qs.stringify(queryObj, { encodeValuesOnly: true });
 }
 
+export function buildProductListQuery() {
+	const queryObj = {
+		fields: [
+			"documentId",
+			"nombre",
+			"precio",
+			"precioOferta",
+			"tipoDescuento",
+			"valorDescuento",
+			// "slug" // Add this back if ProductCard needs it for the link
+		],
+		populate: {
+			// Only fetch the first image needed for the card
+			imagenPrincipal: {
+				fields: ["url", "alternativeText"]
+			},
+			// Needed for your category filtering logic
+			categoria: {
+				fields: ["nombre"]
+			},
+		},
+	};
+
+	return qs.stringify(queryObj, { encodeValuesOnly: true });
+}
+
 export function placeholderImage({
 	text = "No Imagen",
 	width = 600,

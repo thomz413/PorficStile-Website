@@ -2,12 +2,9 @@ import { getFooterSettings } from "@/lib/strapi";
 import Footer from "@/components/footer/Footer";
 
 export default async function FooterWrapper() {
-    // Fetch only the number here
     const footerSettings = await getFooterSettings();
 
-    return (
-        <>
-            <Footer settings={footerSettings} />
-        </>
-    );
+    // If data is missing, we still want to show the footer structure
+    // maybe with empty links, rather than crashing or showing nothing.
+    return <Footer settings={footerSettings} />;
 }
