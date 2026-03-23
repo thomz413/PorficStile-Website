@@ -62,7 +62,6 @@ function ProductDetailContent() {
 	}, []);
 
 	useEffect(() => {
-
 		const checkFavoriteStatus = () => {
 			try {
 				const stored = localStorage.getItem("moda-peru-favorites");
@@ -112,7 +111,7 @@ function ProductDetailContent() {
 			let favs: string[] = stored ? JSON.parse(stored) : [];
 
 			if (favs.includes(productId)) {
-				favs = favs.filter(id => id !== productId);
+				favs = favs.filter((id) => id !== productId);
 				toast.info("Eliminado de favoritos");
 			} else {
 				favs.push(productId);

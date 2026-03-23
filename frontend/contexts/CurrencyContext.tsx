@@ -23,7 +23,9 @@ interface CurrencyContextType {
 	convertAndFormatPrice: (priceInPEN: number) => string;
 }
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+	undefined,
+);
 
 interface CurrencyProviderProps {
 	children: ReactNode;
@@ -87,7 +89,11 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
 		const rate = estimatedRates[currency];
 		if (rate && rate > 0) {
 			const convertedPrice = priceInPEN * rate;
-			return formatPrice(convertedPrice, currencyInfo.symbol, currencyInfo.code);
+			return formatPrice(
+				convertedPrice,
+				currencyInfo.symbol,
+				currencyInfo.code,
+			);
 		}
 
 		return formatPrice(priceInPEN, penCurrency.symbol, penCurrency.code);
@@ -101,7 +107,11 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
 		convertAndFormatPrice,
 	};
 
-	return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
+	return (
+		<CurrencyContext.Provider value={value}>
+			{children}
+		</CurrencyContext.Provider>
+	);
 }
 
 export function useCurrency() {

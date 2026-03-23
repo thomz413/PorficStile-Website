@@ -24,7 +24,7 @@ export default function Header({
 
 	useEffect(() => {
 		const updateFavoritesCount = () => {
-			if (typeof window === 'undefined') return;
+			if (typeof window === "undefined") return;
 			try {
 				const stored = localStorage.getItem("moda-peru-favorites");
 				const count = stored ? JSON.parse(stored).length : 0;
@@ -41,8 +41,8 @@ export default function Header({
 			updateFavoritesCount();
 		};
 
-		window.addEventListener('storage', handleStorageChange);
-		return () => window.removeEventListener('storage', handleStorageChange);
+		window.addEventListener("storage", handleStorageChange);
+		return () => window.removeEventListener("storage", handleStorageChange);
 	}, []);
 
 	return (

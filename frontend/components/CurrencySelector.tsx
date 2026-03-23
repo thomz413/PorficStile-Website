@@ -26,10 +26,10 @@ export default function CurrencySelector({
 
 	useEffect(() => {
 		if (!isClient) return;
-		
+
 		const mq = window.matchMedia("(max-width: 768px)");
 		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-		
+
 		setIsMobile(mq.matches);
 		mq.addEventListener("change", onChange);
 		return () => mq.removeEventListener("change", onChange);
@@ -42,8 +42,9 @@ export default function CurrencySelector({
 	// Update current currency only on client
 	useEffect(() => {
 		if (!isClient) return;
-		
-		const foundCurrency = SUPPORTED_CURRENCIES.find((c) => c.code === currency) || defaultCurrency;
+
+		const foundCurrency =
+			SUPPORTED_CURRENCIES.find((c) => c.code === currency) || defaultCurrency;
 		setCurrentCurrency(foundCurrency);
 	}, [currency, isClient]);
 
@@ -53,9 +54,12 @@ export default function CurrencySelector({
 	};
 
 	// Pre-computed stable class names
-	const buttonBaseClasses = "flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-300 border rounded-lg";
-	const transparentClasses = "text-white/80 hover:text-white border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm";
-	const normalClasses = "text-muted-foreground hover:text-foreground border-border hover:border-primary bg-transparent";
+	const buttonBaseClasses =
+		"flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-300 border rounded-lg";
+	const transparentClasses =
+		"text-white/80 hover:text-white border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm";
+	const normalClasses =
+		"text-muted-foreground hover:text-foreground border-border hover:border-primary bg-transparent";
 	const buttonStyles = `${buttonBaseClasses} ${isTransparent ? transparentClasses : normalClasses}`;
 
 	return (
@@ -104,7 +108,11 @@ export default function CurrencySelector({
 							<li key={currencyOption.code}>
 								<button
 									onClick={() => handleCurrencyChange(currencyOption.code)}
-									className={currency === currencyOption.code ? "w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between bg-primary/10 text-primary font-bold" : "w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between text-foreground"}
+									className={
+										currency === currencyOption.code
+											? "w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between bg-primary/10 text-primary font-bold"
+											: "w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between text-foreground"
+									}
 								>
 									<div className="flex items-center gap-3">
 										<span className="text-lg font-bold">

@@ -82,41 +82,65 @@ export default async function Home() {
 					>
 						<Link
 							href="/productos"
-							className="bg-gold-premium-shimmer text-accent-foreground px-8 py-4 font-black hover:-translate-y-1 transition-all uppercase tracking-widest text-sm shadow-2xl"
+							className="bg-gold-premium-shimmer text-accent-foreground w-full sm:w-64 py-4 font-black hover:-translate-y-1 transition-all uppercase tracking-widest text-sm shadow-2xl flex items-center justify-center"
 						>
 							Ver Catálogo
 							<ArrowRight className="inline ml-2 h-4 w-4" />
 						</Link>
 
 						{whatsappNumber && (
-							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
-								messageConfig={generalQuestionConfig}
-								label="Contactanos"
-								className="bg-white/10 backdrop-blur-sm text-white border-white/20"
-							/>
+							<div className="w-full sm:w-64">
+								<WhatsAppCTA
+									whatsappNumber={whatsappNumber}
+									messageConfig={generalQuestionConfig}
+									label="Contactanos"
+									className="bg-white/10 backdrop-blur-sm text-white border-white/20 h-full py-4"
+								/>
+							</div>
 						)}
 					</FadeIn>
 				</div>
 			</section>
 
 			{/* Featured Products */}
-			<section className="py-20 md:py-32 bg-background">
-				<div className="mx-auto max-w-7xl px-4">
-					{/* 3D Word Reveal for Section Title */}
-					<TextReveal
-						text="Productos Destacados"
-						className="justify-center text-4xl md:text-7xl font-black text-center mb-16"
-					/>
+			<section className="py-16 md:py-32 bg-background">
+				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+					{/* 3D Word Reveal for Section Title - Responsive Sizing */}
+					<div className="mb-10 md:mb-16">
+						<TextReveal
+							text="Productos"
+							className="justify-center text-3xl md:text-7xl font-black text-center"
+						/>
+						<TextReveal
+							text="Destacados"
+							className="justify-center text-3xl md:text-7xl font-black text-center -mt-2 md:-mt-4"
+						/>
+					</div>
 
-					{/* Staggered Grid Reveal */}
-					<StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+					<StaggerContainer className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-12">
 						{featuredProducts.map((product) => (
-							<StaggerItem key={product.id}>
+							<StaggerItem key={product.id} className="w-full">
 								<ProductCard product={product} />
 							</StaggerItem>
 						))}
 					</StaggerContainer>
+
+					{/* View All Products CTA */}
+					<div className="mt-12 lg:pt-20 pt-16 md:mt-20 flex justify-center">
+						<Link
+							href="/productos"
+							className="group relative inline-flex items-center gap-3 px-8 py-4 font-black uppercase tracking-widest text-sm overflow-hidden rounded-2xl border border-border bg-background hover:-translate-y-1 transition-all duration-300 shadow-xl"
+						>
+							{/* Animated background glow */}
+							<span className="absolute inset-0 bg-gold-premium-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+							{/* Content */}
+							<span className="relative z-10 flex items-center gap-3 text-foreground group-hover:text-accent-foreground transition-colors">
+								Ver Toda la Colección
+								<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+							</span>
+						</Link>
+					</div>
 				</div>
 			</section>
 

@@ -27,12 +27,12 @@ export default function FavoritesPage() {
 					const favoriteIds = JSON.parse(stored) as string[];
 
 					const productPromises = favoriteIds.map((id) =>
-						getProductById(id).catch(() => null)
+						getProductById(id).catch(() => null),
 					);
 
 					const products = await Promise.all(productPromises);
 					const validProducts = products.filter(
-						(product) => product !== null
+						(product) => product !== null,
 					) as Producto[];
 
 					setFavorites(validProducts);
@@ -47,27 +47,11 @@ export default function FavoritesPage() {
 		loadFavorites();
 	}, []);
 
-	const removeFavorite = (productId: string) => {
-		try {
-			const stored = localStorage.getItem("moda-peru-favorites");
-			let favs: string[] = stored ? JSON.parse(stored) : [];
-
-			favs = favs.filter((id) => id !== productId);
-			localStorage.setItem("moda-peru-favorites", JSON.stringify(favs));
-
-			setFavorites((prev) =>
-				prev.filter((product) => product.documentId !== productId)
-			);
-		} catch (error) {
-			console.error("Error removing favorite:", error);
-		}
-	};
-
 	if (loading) {
 		return (
 			<>
 				<Header />
-				<main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 lg:pt-20 pt-16 pb-16">
+				<main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 lg:pt-20 pt-16 pb-16">
 					<div className="container mx-auto px-4 py-8">
 						<motion.div
 							initial="hidden"
@@ -123,7 +107,7 @@ export default function FavoritesPage() {
 									Agrega productos a tus favoritos para verlos aquí más tarde
 								</p>
 								<Link href="/productos">
-									<Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+									<Button className="!bg-indigo-600 hover:!bg-indigo-700 text-white">
 										<ShoppingBag className="h-4 w-4 mr-2" />
 										Explorar Productos
 									</Button>
