@@ -4,7 +4,6 @@ import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { getFeaturedProducts, getSettings } from "@/lib/strapi";
-import FooterWrapper from "@/components/footer/Footer";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 import HeaderTransition from "@/components/HeaderTransition";
 import {
@@ -13,6 +12,7 @@ import {
 	StaggerItem,
 	TextReveal,
 } from "@/components/Animations";
+import FooterWrapper from "@/components/footer/FooterWrapper";
 
 export default async function Home() {
 	// 1. Fetch data directly on the server

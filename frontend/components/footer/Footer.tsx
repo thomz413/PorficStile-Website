@@ -4,11 +4,12 @@ import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { FaFacebook, FaTiktok } from "react-icons/fa";
 import CopyrightYear from "@/components/CopyRightYear";
 import Image from "next/image";
+import {FooterSettings} from "@/lib/strapi/types/settings";
 
 export default function Footer({
-	whatsappNumber,
+	settings,
 }: {
-	whatsappNumber?: string;
+	settings?: FooterSettings | null;
 }) {
 	return (
 		<footer className="bg-[#0f172a] text-slate-200 pt-16 pb-8 relative overflow-hidden border-t border-white/5">
@@ -41,16 +42,21 @@ export default function Footer({
 
 						{/* Socials */}
 						<div className="flex items-center gap-3 pt-2">
-							<SocialLink
-								href="#"
-								icon={<FaTiktok size={16} />}
-								label="TikTok"
-							/>
-							<SocialLink
-								href="#"
-								icon={<FaFacebook size={16} />}
-								label="Facebook"
-							/>
+							{settings?.linkTiktok && (
+								<SocialLink
+									href={settings.linkTiktok}
+									icon={<FaTiktok size={16} />}
+									label="TikTok"
+								/>
+							)}
+
+							{settings?.linkFacebook && (
+								<SocialLink
+									href={settings.linkFacebook}
+									icon={<FaFacebook size={16} />}
+									label="Facebook"
+								/>
+							)}
 						</div>
 					</div>
 
@@ -85,7 +91,6 @@ export default function Footer({
 								</p>
 							</div>
 							<a
-								href="mailto:contacto@atlantisporfic.com"
 								className="flex gap-3 items-center text-slate-400 hover:text-white transition-colors duration-300"
 							>
 								<Mail size={18} className="text-accent" />
@@ -102,13 +107,13 @@ export default function Footer({
 						reservados.
 					</p>
 
-					{whatsappNumber && (
+					{settings && (
 						<div className="flex items-center gap-3">
 							<span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
 								Atención al cliente
 							</span>
 							<WhatsAppCTA
-								whatsappNumber={whatsappNumber}
+								whatsappNumber={settings?.numeroWhatsapp}
 								messageConfig={{ type: "general_question" }}
 								label="WhatsApp"
 								className="rounded-full bg-white/10 hover:bg-accent text-white px-5 py-2 text-xs font-semibold transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]"

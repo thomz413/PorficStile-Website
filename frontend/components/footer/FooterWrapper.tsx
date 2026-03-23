@@ -1,13 +1,13 @@
-import { getWhatsAppNumber } from "@/lib/strapi";
+import { getFooterSettings } from "@/lib/strapi";
 import Footer from "@/components/footer/Footer";
 
 export default async function FooterWrapper() {
     // Fetch only the number here
-    const whatsappNumber = await getWhatsAppNumber();
+    const footerSettings = await getFooterSettings();
 
     return (
         <>
-            <Footer whatsappNumber={whatsappNumber} />
+            <Footer settings={footerSettings} />
         </>
     );
 }

@@ -473,7 +473,6 @@ export interface ApiConfiguracionConfiguracion extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    descripcionTienda: Schema.Attribute.Text;
     direccionTienda: Schema.Attribute.String;
     estadisticas: Schema.Attribute.Component<'hero.estadistica', true> &
       Schema.Attribute.SetMinMax<
@@ -483,6 +482,8 @@ export interface ApiConfiguracionConfiguracion extends Struct.SingleTypeSchema {
         number
       >;
     imagenHero: Schema.Attribute.Media<'files' | 'images' | 'videos'>;
+    linkFacebook: Schema.Attribute.String;
+    linkTiktok: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -496,7 +497,6 @@ export interface ApiConfiguracionConfiguracion extends Struct.SingleTypeSchema {
     subtituloHero: Schema.Attribute.Text &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Tu tienda de confianza en Gamarra para hermosos textiles y ropa peruana. Explora nuestra colecci\u00F3n o chat\u00E9a con nosotros por WhatsApp para ayuda personalizada.'>;
-    textoCTA: Schema.Attribute.String;
     tituloHero: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Excelente Calidad, Precios Imbatibles'>;

@@ -1,7 +1,7 @@
 "use cache";
 
 import { Category, CategoriesSchema } from "@/lib/strapi/types/category";
-import { SiteSettingsSchema, SiteSettings } from "@/lib/strapi/types/settings";
+import {SiteSettingsSchema, SiteSettings, FooterSettings, FooterSettingsSchema} from "@/lib/strapi/types/settings";
 import {
 	ProductoSchema,
 	Producto,
@@ -107,9 +107,9 @@ export async function getSettings(): Promise<SiteSettings | null> {
 				"documentId",
 				"tituloHero",
 				"subtituloHero",
-				"descripcionTienda",
 				"numeroWhatsapp",
-				"textoCTA",
+				"linkTiktok",
+				"linkFacebook",
 			],
 			populate: {
 				imagenHero: { fields: ["url", "name", "alternativeText"] },
@@ -129,13 +129,17 @@ export async function getSettings(): Promise<SiteSettings | null> {
 	return SiteSettingsSchema.parse(data);
 }
 
-export async function getWhatsAppNumber(): Promise<string | undefined> {
+export async function getFooterSettings(): Promise<FooterSettings | undefined> {
 	"use cache";
 	cacheTag("settings");
 
-	const query = qs.stringify({ fields: ["numeroWhatsapp"] });
+	const query = qs.stringify({ fields: ["numeroWhatsapp", "linkTiktok", "linkFacebook"] });
 	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
 
+	console.log(`${STRAPI_URL}/api/configuracion?${query}`);
 	const { data } = await res.json();
-	return data?.numeroWhatsapp ?? undefined;
+
+	if (!data) return undefined;
+
+	return FooterSettingsSchema.parse(data);
 }

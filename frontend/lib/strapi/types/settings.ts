@@ -14,11 +14,19 @@ export const SiteSettingsSchema = z.object({
 	documentId: z.string().optional().default(""),
 	tituloHero: z.string().optional().default(""),
 	subtituloHero: z.string().optional().default(""),
-	descripcionTienda: z.string().nullable().default(""),
 	numeroWhatsapp: z.string().optional().default(""),
-	textoCTA: z.string().optional().nullable().default(""),
 	imagenHero: ImageSchema.default({ url: "", name: "", alternativeText: "" }),
 	estadisticas: z.array(StatisticSchema).optional().default([]),
 	direccionTienda: z.string().optional().default(""),
+	linkTiktok: z.string().optional().default(""),
+	linkFacebook: z.string().optional().default(""),
 });
 export type SiteSettings = z.infer<typeof SiteSettingsSchema>;
+
+export const FooterSettingsSchema = SiteSettingsSchema.pick({
+	linkFacebook: true,
+	linkTiktok: true,
+	numeroWhatsapp: true,
+});
+
+export type FooterSettings = z.infer<typeof FooterSettingsSchema>;

@@ -9,7 +9,7 @@ import { Filter } from "lucide-react";
 import { SiteSettings } from "@/lib/strapi/types/settings";
 import { Producto } from "@/lib/strapi/types/product";
 import { Category } from "@/lib/strapi/types/category";
-import FooterWrapper from "@/components/footer/Footer";
+import FooterWrapper from "@/components/footer/FooterWrapper";
 import Header from "@/components/Header";
 import { animations, transitions } from "@/lib/animations";
 

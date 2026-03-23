@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
 import Image from "next/image";
 import { WhatsAppMessageConfig } from "@/lib/whatsapp";
-import FooterWrapper from "@/components/footer/Footer";
 import Header from "@/components/Header";
 import { animations, transitions } from "@/lib/animations";
 import { SiteSettings, Statistic } from "@/lib/strapi/types/settings";
+import Footer from "@/components/footer/Footer";
 
 export default function NosotrosClient({
 	settings,
@@ -17,9 +17,7 @@ export default function NosotrosClient({
 	// Note: In a real Next.js App Router scenario, fetch the data in a Server Component
 	// and pass it to this Client Component as a prop.
 
-	const descripcionTienda =
-		settings?.descripcionTienda ??
-		"Atlantis Porfic Stile ofrece ropa con diseño propio y fabricación local. Visítanos en Galería Santa Lucía — Piso 7, Tienda 709. Envíos a todo el país.";
+	const descripcionTienda = "Atlantis Porfic Stile ofrece ropa con diseño propio y fabricación local. Visítanos en Galería Santa Lucía — Piso 7, Tienda 709. Envíos a todo el país.";
 
 	const estadisticas = settings?.estadisticas ?? [];
 	const whatsappNumber = settings?.numeroWhatsapp;
@@ -269,7 +267,7 @@ export default function NosotrosClient({
 				</div>
 			</motion.section>
 
-			<FooterWrapper />
+			<Footer settings={settings} />
 		</main>
 	);
 }
