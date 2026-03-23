@@ -103,14 +103,14 @@ export default function Header({
 
 							<Link
 								href="/favoritos"
-								className={`relative rounded-full p-2.5 transition-all active:scale-95 hover:bg-red-50 text-foreground`}
+								className="relative rounded-full p-2.5 transition-all active:scale-95 hover:bg-red-50 text-foreground"
 								aria-label="Favoritos"
 							>
 								<Heart className="h-5 w-5 transition-colors duration-300" />
 								{favoritesCount > 0 && (
-									<span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-4 w-4 text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
-										{favoritesCount}
-									</span>
+									<span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-background">
+      {favoritesCount}
+    </span>
 								)}
 							</Link>
 

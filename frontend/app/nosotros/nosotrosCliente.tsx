@@ -204,9 +204,9 @@ export default function NosotrosClient({
 								color: "secondary",
 							},
 							{
-								title: "Hecho en Perú",
-								label: "Producción local",
-								desc: "Todas nuestras piezas se producen en talleres locales...",
+								title: "Envíos y Devoluciones",
+								label: "Compra sin riesgo",
+								desc: "Ofrecemos cambios fáciles y envíos rápidos para que estrenes sin preocupaciones.",
 								color: "accent",
 							},
 						].map((card, i) => (
@@ -251,7 +251,7 @@ export default function NosotrosClient({
 							¿Necesitas algo personalizado?
 						</h2>
 						<p className="text-sm md:text-base text-muted-foreground max-w-xl">
-							Uniformes, colecciones o piezas únicas. Cuéntanos tu idea.
+							Uniformes, colecciones o piezas únicas. Cuéntanos.
 						</p>
 					</div>
 					<div className="w-full lg:w-auto lg:flex-1">

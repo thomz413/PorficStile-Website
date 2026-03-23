@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import StickyCart from "@/components/StickyCart";
-import { Filter, ShoppingBag } from "lucide-react";
+import { Filter } from "lucide-react";
 import { SiteSettings } from "@/lib/strapi/types/settings";
 import { Producto } from "@/lib/strapi/types/product";
 import { Category } from "@/lib/strapi/types/category";
@@ -17,110 +17,116 @@ type Props = {
 };
 
 export default function ProductsClient({
-	products,
-	categories,
-	settings,
-}: Props) {
+										   products,
+										   categories,
+										   settings,
+									   }: Props) {
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
 	const filteredProducts = selectedCategory
 		? products.filter(
-				(product) => product.categoria?.nombre === selectedCategory,
-			)
+			(product) => product.categoria?.nombre === selectedCategory,
+		)
 		: products;
 
+	const handleCategoryFilter = (categoryName: string) => {
+		setSelectedCategory(
+			categoryName === selectedCategory ? null : categoryName,
+		);
+	};
+
 	return (
-		<section className="pt-16  px-4 sm:px-6 lg:px-8 bg-background">
+		<section className="pt-20 pb-[140px] md:pb-[180px] px-4 sm:px-6 lg:px-8">
 			<div className="max-w-7xl mx-auto">
-				{/* Header Section - Better spacing for mobile */}
 				<motion.div
 					initial="hidden"
 					animate="visible"
 					variants={animations.container}
-					className="text-left md:text-center mb-8 md:mb-12 space-y-2"
+					transition={transitions.smooth}
+					className="text-center mb-12"
 				>
 					<motion.h1
 						variants={animations.fadeInUp}
-						className="text-3xl md:text-5xl font-bold tracking-tight text-foreground"
+						transition={transitions.smooth}
+						className="text-4xl md:text-5xl font-bold text-foreground mb-4"
 					>
-						Nuestra <span className="text-primary italic">Colección</span>
+						Nuestros Productos
 					</motion.h1>
 					<motion.p
 						variants={animations.fadeInUp}
-						className="text-sm md:text-lg text-muted-foreground max-w-2xl md:mx-auto leading-relaxed"
+						transition={transitions.smooth}
+						className="text-lg text-muted-foreground max-w-2xl mx-auto"
 					>
-						Ropa premium peruana con diseño único y calidad excepcional.
+						Descubre nuestra colección exclusiva de ropa premium peruana con
+						diseño único y calidad excepcional.
 					</motion.p>
 				</motion.div>
 
-				{/* Enhanced Sticky Category Filter Bar */}
-				<div className="sticky top-[64px] z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-xl border-b border-border/50 mb-6 overflow-hidden">
-					<div className="relative">
-						<motion.div
-							initial="hidden"
-							animate="visible"
-							variants={animations.container}
-							className="flex overflow-x-auto hide-scrollbar gap-2 pb-1 snap-x snap-mandatory sm:flex-wrap sm:justify-center items-center"
+				{/* Sticky Category Filter Bar */}
+				<div className="sticky top-16 z-30 pt-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 bg-background/90 backdrop-blur-md border-b border-border/40 mb-8">
+					<motion.div
+						initial="hidden"
+						animate="visible"
+						variants={animations.container}
+						transition={transitions.smooth}
+						className="flex overflow-x-auto hide-scrollbar gap-2 sm:gap-3 sm:flex-wrap sm:justify-center items-center"
+					>
+						<motion.button
+							variants={animations.scaleIn}
+							transition={transitions.fast}
+							onClick={() => setSelectedCategory(null)}
+							className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+								selectedCategory === null
+									? "bg-foreground text-background shadow-md scale-100"
+									: "bg-background text-muted-foreground border-foreground border-2 hover:text-foreground scale-95 hover:scale-100"
+							}`}
 						>
-							{/* "Todos" Button */}
+							Todos
+						</motion.button>
+
+						{categories.map((category) => (
 							<motion.button
+								key={category.id}
 								variants={animations.scaleIn}
-								onClick={() => setSelectedCategory(null)}
-								className={`snap-start whitespace-nowrap px-6 py-2 rounded-full text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
-									selectedCategory === null
-										? "bg-foreground text-background shadow-lg"
-										: "bg-muted text-muted-foreground border border-transparent hover:border-foreground/20"
+								transition={transitions.fast}
+								onClick={() => handleCategoryFilter(category.nombre || "")}
+								className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+									selectedCategory === category.nombre
+										? "bg-foreground text-background shadow-md scale-100"
+										: "bg-background text-muted-foreground border-foreground border-2 hover:text-foreground scale-95 hover:scale-100"
 								}`}
 							>
-								Todos
-								<span className="opacity-50 text-[10px]">
-									{products.length}
-								</span>
+								{category.nombre}
 							</motion.button>
-
-							{categories.map((category) => {
-								const count = products.filter(
-									(p) => p.categoria?.nombre === category.nombre,
-								).length;
-								return (
-									<motion.button
-										key={category.id}
-										variants={animations.scaleIn}
-										onClick={() => setSelectedCategory(category.nombre || "")}
-										className={`snap-start whitespace-nowrap px-6 py-2 rounded-full text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
-											selectedCategory === category.nombre
-												? "bg-foreground text-background shadow-lg"
-												: "bg-muted text-muted-foreground border border-transparent hover:border-foreground/20"
-										}`}
-									>
-										{category.nombre}
-										<span className="opacity-50 text-[10px]">{count}</span>
-									</motion.button>
-								);
-							})}
-						</motion.div>
-
-						{/* Gradient Fade for Mobile Scroll Hint */}
-						<div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent md:hidden" />
-					</div>
+						))}
+					</motion.div>
 				</div>
 
-				{/* Products Grid - 2 columns on mobile is key! */}
+				{/* Products Grid/List */}
 				<AnimatePresence mode="wait">
 					{filteredProducts.length === 0 ? (
 						<motion.div
 							key="empty"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="flex flex-col items-center justify-center py-20 text-center"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -20 }}
+							transition={{ duration: 0.3 }}
+							className="text-center py-12"
 						>
-							<div className="bg-muted p-4 rounded-full mb-4">
-								<Filter className="h-8 w-8 text-muted-foreground" />
-							</div>
-							<h3 className="text-lg font-bold">No hay resultados</h3>
-							<p className="text-sm text-muted-foreground mt-1">
-								Intenta seleccionando otra categoría.
+							<motion.div
+								animate={{ y: [-10, 0, -10] }}
+								transition={{ duration: 2, repeat: Infinity }}
+								className="inline-block"
+							>
+								<Filter className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+							</motion.div>
+							<h3 className="text-lg font-medium mb-2">
+								{selectedCategory
+									? `No hay productos en "${selectedCategory}"`
+									: "No hay productos disponibles"}
+							</h3>
+							<p className="text-sm text-muted-foreground">
+								Intenta seleccionar otra categoría o ajusta los filtros.
 							</p>
 						</motion.div>
 					) : (
@@ -129,13 +135,14 @@ export default function ProductsClient({
 							initial="hidden"
 							animate="visible"
 							variants={animations.container}
-							/* Grid Fix: 2 columns on very small screens, 3 on tablets, 4 on desktop */
+							transition={transitions.smooth}
 							className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 lg:gap-8"
 						>
 							{filteredProducts.map((product) => (
 								<motion.div
 									key={product.id}
 									variants={animations.fadeInUp}
+									whileHover={{ y: -4 }}
 									layout
 									className="w-full"
 								>
@@ -145,10 +152,13 @@ export default function ProductsClient({
 						</motion.div>
 					)}
 				</AnimatePresence>
+
+				{/* Spacer to prevent overlap with fixed cart */}
+				<div className="h-16 md:h-24" />
 			</div>
 
-			{/* Sticky Components */}
-			<div className="fixed bottom-0 left-0 right-0 p-4 pointer-events-none z-50">
+			{/* Sticky Cart (fixed, with breathing space) */}
+			<div className="fixed bottom-4 left-0 right-0 px-4 z-50 pointer-events-none">
 				<div className="max-w-7xl mx-auto flex justify-end pointer-events-auto">
 					<StickyCart whatsappNumber={settings?.numeroWhatsapp} />
 				</div>
