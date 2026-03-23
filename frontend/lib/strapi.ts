@@ -1,7 +1,12 @@
 "use cache";
 
 import { Category, CategoriesSchema } from "@/lib/strapi/types/category";
-import {SiteSettingsSchema, SiteSettings, FooterSettings, FooterSettingsSchema} from "@/lib/strapi/types/settings";
+import {
+	SiteSettingsSchema,
+	SiteSettings,
+	FooterSettings,
+	FooterSettingsSchema,
+} from "@/lib/strapi/types/settings";
 import {
 	ProductoSchema,
 	Producto,
@@ -9,7 +14,7 @@ import {
 } from "./strapi/types/product";
 import qs from "qs";
 import { STRAPI_URL } from "@/lib/constants";
-import {buildProductListQuery, buildProductQuery} from "@/lib/utils";
+import { buildProductListQuery, buildProductQuery } from "@/lib/utils";
 import { cacheLife, cacheTag } from "next/cache";
 
 /** Get featured productos (destacado = true) */
@@ -50,7 +55,9 @@ export async function getProductById(id: string): Promise<Producto | null> {
 
 	const qs = buildProductQuery();
 
-	const res = await fetch(`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`);
+	const res = await fetch(
+		`${STRAPI_URL}/api/productos/${encodeURIComponent(id)}?${qs}`,
+	);
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
@@ -131,7 +138,9 @@ export async function getFooterSettings(): Promise<FooterSettings | undefined> {
 	"use cache";
 	cacheTag("settings");
 
-	const query = qs.stringify({ fields: ["numeroWhatsapp", "linkTiktok", "linkFacebook"] });
+	const query = qs.stringify({
+		fields: ["numeroWhatsapp", "linkTiktok", "linkFacebook"],
+	});
 	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
 
 	console.log(`${STRAPI_URL}/api/configuracion?${query}`);

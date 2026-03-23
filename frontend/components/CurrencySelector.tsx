@@ -4,12 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
-export default function CurrencySelector() {
+interface CurrencySelectorProps {
+	isTransparent?: boolean;
+}
+
+export default function CurrencySelector({
+	isTransparent = false,
+}: CurrencySelectorProps) {
 	const { currency, setCurrency } = useCurrency();
 	const [isOpen, setIsOpen] = useState(false);
 	const listRef = useRef<HTMLUListElement | null>(null);
 
-	// 1. Initialize state with a function to check the window immediately
 	const [isMobile, setIsMobile] = useState(() => {
 		if (typeof window === "undefined") return false;
 		return window.matchMedia("(max-width: 768px)").matches;
@@ -20,47 +25,38 @@ export default function CurrencySelector() {
 		SUPPORTED_CURRENCIES[0];
 
 	useEffect(() => {
-		// 2. Remove the "setIsMobile(mq.matches)" from here
 		const mq = window.matchMedia("(max-width: 768px)");
-
 		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-
 		mq.addEventListener("change", onChange);
-		return () => {
-			mq.removeEventListener("change", onChange);
-		};
+		return () => mq.removeEventListener("change", onChange);
 	}, []);
-
-	useEffect(() => {
-		// when opening on desktop focus the list for keyboard users
-		if (isOpen && listRef.current && !isMobile) {
-			listRef.current.focus();
-		}
-	}, [isOpen, isMobile]);
 
 	const handleCurrencyChange = (currencyCode: string) => {
 		setCurrency(currencyCode);
 		setIsOpen(false);
 	};
 
+	// Dynamic Classes based on Header State
+	const buttonStyles = isTransparent
+		? "text-white/80 hover:text-white border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm"
+		: "text-muted-foreground hover:text-foreground border-border hover:border-primary bg-transparent";
+
 	return (
 		<div className="relative">
 			<button
 				onClick={() => setIsOpen((s) => !s)}
-				className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg hover:border-primary"
+				className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-300 border rounded-lg ${buttonStyles}`}
 				aria-expanded={isOpen}
 				aria-haspopup="listbox"
-				aria-label="Seleccionar moneda"
 				type="button"
 			>
-				<span className="text-lg">{currentCurrency.symbol}</span>
+				<span className="text-lg leading-none">{currentCurrency.symbol}</span>
 				<span className="hidden xs:inline">{currentCurrency.code}</span>
 				<svg
-					className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+					className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
-					aria-hidden
 				>
 					<path
 						strokeLinecap="round"
@@ -73,64 +69,42 @@ export default function CurrencySelector() {
 
 			{isOpen && (
 				<>
-					{/* backdrop — covers whole viewport to catch outside clicks */}
 					<div
 						className="fixed inset-0 z-10"
 						onClick={() => setIsOpen(false)}
-						aria-hidden
 					/>
 
-					{/* Desktop: small absolute menu; Mobile: full-width fixed panel below header */}
 					<ul
 						ref={listRef}
-						role="listbox"
-						tabIndex={-1}
 						className={
 							isMobile
-								? // mobile: full width panel anchored under header (adjust top if your header height differs)
-									"fixed left-0 right-0 top-16 z-20 bg-background border-t border-border shadow-md max-h-[60vh] overflow-y-auto px-2 py-3"
-								: // desktop: compact dropdown positioned to the right of the button
-									"absolute right-0 top-full mt-2 w-48 bg-background border border-border rounded-lg shadow-lg z-20 overflow-hidden max-h-60 overflow-y-auto"
+								? "fixed left-0 right-0 top-16 z-20 bg-background/98 backdrop-blur-xl border-t border-border shadow-2xl max-h-[60vh] overflow-y-auto px-2 py-3"
+								: "absolute right-0 top-full mt-2 w-48 bg-background border border-border rounded-xl shadow-2xl z-20 overflow-hidden"
 						}
 					>
 						{SUPPORTED_CURRENCIES.map((currencyOption) => (
-							<li key={currencyOption.code} className="">
+							<li key={currencyOption.code}>
 								<button
 									onClick={() => handleCurrencyChange(currencyOption.code)}
 									className={`w-full px-4 py-3 text-left text-sm hover:bg-muted transition-colors flex items-center justify-between ${
 										currency === currencyOption.code
-											? "bg-primary/10 text-primary font-medium"
+											? "bg-primary/10 text-primary font-bold"
 											: "text-foreground"
 									}`}
-									role="option"
-									aria-selected={currency === currencyOption.code}
-									type="button"
 								>
 									<div className="flex items-center gap-3">
-										<span className="text-lg font-medium">
+										<span className="text-lg font-bold">
 											{currencyOption.symbol}
 										</span>
-										<div className="truncate">
-											<div className="font-medium">{currencyOption.code}</div>
-											<div className="text-xs text-muted-foreground truncate">
+										<div className="flex flex-col">
+											<span className="font-bold leading-tight">
+												{currencyOption.code}
+											</span>
+											<span className="text-[10px] uppercase tracking-tighter opacity-60">
 												{currencyOption.name}
-											</div>
+											</span>
 										</div>
 									</div>
-									{currency === currencyOption.code && (
-										<svg
-											className="w-5 h-5 text-primary"
-											fill="currentColor"
-											viewBox="0 0 20 20"
-											aria-hidden
-										>
-											<path
-												fillRule="evenodd"
-												d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-												clipRule="evenodd"
-											/>
-										</svg>
-									)}
 								</button>
 							</li>
 						))}

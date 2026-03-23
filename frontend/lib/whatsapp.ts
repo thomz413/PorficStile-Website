@@ -24,54 +24,103 @@ export function generateWhatsAppMessage(config: WhatsAppMessageConfig): string {
 		type,
 		productName,
 		productPrice,
-		currency,
+		currency = "S/.", // Default to Soles
 		size,
 		quantity,
-		category,
 		customNote,
 	} = config;
 
-	let message = "";
+	// We use an array to build the message line by line.
+	// This prevents awkward blank lines if a property is undefined.
+	const messageLines: string[] = [];
+
+	// Helper to format price
+	const formatPrice = (price: number) => `${currency} ${price.toFixed(2)}`;
 
 	switch (type) {
 		case "product_order":
-			message = `🛒 ¡Hola! Quiero comprar:
+			messageLines.push("¡Hola! Me gustaría realizar una compra.");
+			messageLines.push(""); // Empty string creates a blank line
 
-📦 ${productName}
-${productPrice ? `💰 ${currency || "S/."} ${productPrice.toFixed(2)}` : ""}
-${size ? `📏 Talla: ${size}` : ""}
-${quantity ? `🔢 Cantidad: ${quantity}` : ""}
+			if (productName) messageLines.push(`*Producto:* ${productName}`);
 
-${customNote ? `📝 Nota: ${customNote}` : ""}
+			// Combine size and quantity for a more natural sentence flow
+			if (quantity || size) {
+				const qtyText = quantity
+					? `${quantity} unidad${quantity > 1 ? "es" : ""}`
+					: "";
+				const sizeText = size ? `en talla *${size}*` : "";
+				if (qtyText && sizeText) {
+					messageLines.push(`*Detalles:* ${qtyText} ${sizeText}`);
+				} else if (qtyText || sizeText) {
+					messageLines.push(`*Detalles:* ${qtyText}${sizeText}`);
+				}
+			}
 
-¿Hay stock y cómo puedo pagar?`;
+			if (productPrice)
+				messageLines.push(`*Precio unitario:* ${formatPrice(productPrice)}`);
+			if (customNote) {
+				messageLines.push("");
+				messageLines.push(`*Nota del pedido:* _${customNote}_`);
+			}
+
+			messageLines.push("");
+			messageLines.push(
+				"¿Tienen disponibilidad para coordinar el pago y la entrega?",
+			);
 			break;
 
 		case "custom_order":
-			message = `🎨 ¡Hola! Quiero un pedido personalizado:
+			messageLines.push("¡Hola! Quisiera cotizar un pedido especial.");
+			messageLines.push("");
 
-${productName ? `📦 Basado en: ${productName}` : "🎨 Producto personalizado"}
-${size ? `📏 Talla: ${size}` : ""}
-${quantity ? `🔢 Cantidad: ${quantity}` : ""}
+			if (productName)
+				messageLines.push(`*Modelo de referencia:* ${productName}`);
+			if (quantity)
+				messageLines.push(`*Cantidad aproximada:* ${quantity} unidades`);
+			if (size) messageLines.push(`*Tallas requeridas:* ${size}`);
 
-${customNote ? `✏️ Detalles: ${customNote}` : "✏️ Cuéntame qué necesitas..."}
+			messageLines.push("");
+			if (customNote) {
+				messageLines.push("*Especificaciones del pedido:*");
+				messageLines.push(`_${customNote}_`);
+			} else {
+				messageLines.push(
+					"_Me gustaría brindarles más detalles sobre lo que necesito._",
+				);
+			}
 
-¿Pueden hacerlo y cuál sería el precio?`;
+			messageLines.push("");
+			messageLines.push(
+				"¿Me podrían confirmar si es posible fabricarlo y cuál sería el costo?",
+			);
 			break;
 
 		case "general_question":
 		default:
-			message = `👋 ¡Hola! 
+			messageLines.push("¡Hola! Tengo una consulta.");
+			messageLines.push("");
 
-${productName ? `📦 Vi el producto: ${productName}` : "📦 Estoy viendo sus productos"}
+			if (productName) {
+				messageLines.push(`Estoy viendo el producto: *${productName}*`);
+				messageLines.push("");
+			}
 
-${customNote ? `❓ ${customNote}` : "❓ Tengo una pregunta sobre los productos..."}
+			if (customNote) {
+				messageLines.push(`*Mi consulta es:* ${customNote}`);
+			} else {
+				messageLines.push("Me gustaría obtener más información, por favor.");
+			}
 
-¿Me pueden ayudar?`;
+			messageLines.push("");
+			messageLines.push("Quedo atento a su respuesta. ¡Gracias!");
 			break;
 	}
 
-	return message;
+	// Filter out any undefined/null values, then join with line breaks
+	return messageLines
+		.filter((line) => line !== undefined && line !== null)
+		.join("\n");
 }
 
 // Helper function for multi-size orders
@@ -84,9 +133,11 @@ export function createMultiSizeOrderMessage(
 		(sum, qty) => sum + qty,
 		0,
 	);
+
+	// Formats sizes nicely: "• 2 en talla M"
 	const sizeDetails = Object.entries(sizeSelections)
 		.filter(([_, qty]) => qty > 0)
-		.map(([size, qty]) => `${qty}x talla ${size}`)
+		.map(([size, qty]) => `• ${qty} en talla ${size}`)
 		.join("\n");
 
 	const config: WhatsAppMessageConfig = {
@@ -96,11 +147,11 @@ export function createMultiSizeOrderMessage(
 			product.enOferta && product.precioDescuento
 				? product.precioDescuento
 				: product.precio,
-		currency: "PEN",
+		currency: "S/.",
 		category: product.categoria,
 		quantity: totalQuantity,
-		size: sizeDetails,
-		customNote: customNote || `Pedido múltiple:\n${sizeDetails}`,
+		size: `\n${sizeDetails}`, // Adds a break before the bullet points
+		customNote: customNote,
 	};
 
 	return generateWhatsAppMessage(config);
@@ -120,7 +171,7 @@ export function createProductOrderMessage(
 			product.enOferta && product.precioDescuento
 				? product.precioDescuento
 				: product.precio,
-		currency: "PEN",
+		currency: "S/.",
 		category: product.categoria,
 		quantity,
 		size,

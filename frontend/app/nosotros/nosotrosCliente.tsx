@@ -14,8 +14,8 @@ export default function NosotrosClient({
 }: {
 	settings: SiteSettings | null;
 }) {
-
-	const descripcionTienda = "Atlantis Porfic Stile ofrece ropa con diseño propio y fabricación local. Visítanos en Galería Santa Lucía — Piso 7, Tienda 709. Envíos a todo el país.";
+	const descripcionTienda =
+		"Atlantis Porfic Stile ofrece ropa con diseño propio y fabricación local. Visítanos en Galería Santa Lucía — Piso 7, Tienda 709. Envíos a todo el país.";
 
 	const estadisticas = settings?.estadisticas ?? [];
 	const whatsappNumber = settings?.numeroWhatsapp;

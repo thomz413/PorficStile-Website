@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect, Suspense} from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -62,24 +62,27 @@ function ProductDetailContent() {
 	}, []);
 
 	useEffect(() => {
+
+		const checkFavoriteStatus = () => {
+			try {
+				const stored = localStorage.getItem("moda-peru-favorites");
+				if (stored) {
+					const favs = JSON.parse(stored) as string[];
+					setIsFavorite(favs.includes(productId));
+				}
+			} catch (e) {
+				console.error("Error accessing favorites", e);
+			}
+		};
+
 		async function loadProduct() {
 			try {
 				const [productData, settings] = await Promise.all([
 					getProductById(productId),
 					getSettings(),
 				]);
-				console.log(productData);
 				setProduct(productData);
 				setWhatsappNumber(settings?.numeroWhatsapp);
-
-				// Initialize favorite from localStorage
-				try {
-					const favsRaw = localStorage.getItem("moda-peru-favs") || "{}";
-					const favs = JSON.parse(favsRaw) as Record<string, boolean>;
-					setIsFavorite(Boolean(favs[productId]));
-				} catch (e) {
-					// ignore
-				}
 
 				// Auto-select first available variant if exists
 				if (productData?.variantes && productData.variantes.length > 0) {
@@ -98,24 +101,30 @@ function ProductDetailContent() {
 				setLoading(false);
 			}
 		}
+		if (productId) checkFavoriteStatus();
 
 		loadProduct();
 	}, [productId]);
 
-	function toggleFavorite() {
-		setIsFavorite((s) => {
-			const next = !s;
-			try {
-				const favsRaw = localStorage.getItem("moda-peru-favs") || "{}";
-				const favs = JSON.parse(favsRaw) as Record<string, boolean>;
-				favs[productId] = next;
-				localStorage.setItem("moda-peru-favs", JSON.stringify(favs));
-			} catch (e) {
-				// ignore
+	const toggleFavorite = () => {
+		try {
+			const stored = localStorage.getItem("moda-peru-favorites");
+			let favs: string[] = stored ? JSON.parse(stored) : [];
+
+			if (favs.includes(productId)) {
+				favs = favs.filter(id => id !== productId);
+				toast.info("Eliminado de favoritos");
+			} else {
+				favs.push(productId);
+				toast.success("¡Agregado a favoritos!");
 			}
-			return next;
-		});
-	}
+
+			localStorage.setItem("moda-peru-favorites", JSON.stringify(favs));
+			setIsFavorite(favs.includes(productId));
+		} catch (e) {
+			toast.error("No se pudo actualizar favoritos");
+		}
+	};
 
 	// Helpers: compute final price for a variant or product (mirrors previous logic)
 	const computeFinalPriceForVariant = (variant?: Variante | null) => {
@@ -298,7 +307,7 @@ function ProductDetailContent() {
 				? selectedItems
 				: [
 						{
-							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "",
 							variant: selectedVariant ?? null,
 							quantity: workingQuantity,
 						},
@@ -350,7 +359,7 @@ function ProductDetailContent() {
 		const cartSelectedItems = itemsToAdd.map((it) => {
 			const precioUnitario = computeFinalPriceForVariant(it.variant ?? null);
 			return {
-				talla: it.variant?.talla ?? "Default",
+				talla: it.variant?.talla ?? "",
 				cantidad: it.quantity,
 				precioUnitario,
 			};
@@ -369,7 +378,7 @@ function ProductDetailContent() {
 				? selectedItems
 				: [
 						{
-							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "default",
+							key: selectedVariant?.id ? `v-${selectedVariant.id}` : "",
 							variant: selectedVariant ?? null,
 							quantity: workingQuantity,
 						},
@@ -511,17 +520,68 @@ function ProductDetailContent() {
 						</motion.h1>
 
 						{/* Price (for the working selection) */}
+						{/* Price Section with Discount Logic */}
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.5, duration: 0.5 }}
-							className="space-y-2"
+							className="space-y-1"
 						>
-							<div className="text-3xl font-bold text-gray-900">
-								{convertAndFormatPrice(
-									computeFinalPriceForVariant(selectedVariant ?? null),
-								)}
-							</div>
+							{(() => {
+								// 1. Determine the "Base" price (Variant override OR Product price)
+								const basePrice =
+									selectedVariant?.precioSobreescribir ?? product.precio;
+
+								// 2. Get the Final calculated price (after discounts/offers)
+								const finalPrice = computeFinalPriceForVariant(
+									selectedVariant ?? null,
+								);
+
+								// 3. Check if there's actually a discount
+								const hasDiscount = finalPrice < basePrice;
+
+								// 4. Calculate percentage for the badge
+								const discountPercentage = hasDiscount
+									? Math.round(((basePrice - finalPrice) / basePrice) * 100)
+									: 0;
+
+								return (
+									<div className="flex flex-col gap-1">
+										<div className="flex items-center gap-3">
+											{/* New Price */}
+											<span className="text-4xl font-extrabold text-primary tracking-tight">
+												{convertAndFormatPrice(finalPrice)}
+											</span>
+
+											{/* Original Price (Strikethrough) */}
+											{hasDiscount && (
+												<span className="text-xl text-gray-400 line-through decoration-gray-400/70 font-medium">
+													{convertAndFormatPrice(basePrice)}
+												</span>
+											)}
+
+											{/* Discount Badge */}
+											{hasDiscount && (
+												<motion.div
+													initial={{ scale: 0 }}
+													animate={{ scale: 1 }}
+													className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider"
+												>
+													{discountPercentage}% DTO
+												</motion.div>
+											)}
+										</div>
+
+										{/* Optional: Subtle "Save X amount" text */}
+										{hasDiscount && (
+											<p className="text-sm text-green-600 font-medium">
+												¡Ahorras {convertAndFormatPrice(basePrice - finalPrice)}
+												!
+											</p>
+										)}
+									</div>
+								);
+							})()}
 						</motion.div>
 
 						{/* Variant Selector (keeps existing contract) */}
@@ -619,7 +679,11 @@ function ProductDetailContent() {
 									whileTap={{ scale: 0.95 }}
 									className="ml-4"
 								>
-									<Button className="text-white"  size="sm" onClick={addSelection}>
+									<Button
+										className="text-white"
+										size="sm"
+										onClick={addSelection}
+									>
 										Añadir a la selección
 									</Button>
 								</motion.div>
@@ -856,8 +920,6 @@ function ProductDetailContent() {
 	);
 }
 
-
-
 function ProductSkeleton() {
 	return (
 		<div className="w-full animate-pulse">
@@ -871,7 +933,6 @@ function ProductSkeleton() {
 			{/* Product Detail Skeleton */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
 					{/* Left: Product Gallery Skeleton */}
 					<div className="space-y-4">
 						{/* Main large image */}
@@ -921,9 +982,12 @@ function ProductSkeleton() {
 
 						{/* Actions (3 big buttons) */}
 						<div className="space-y-4 pt-8">
-							<div className="h-12 w-full bg-gray-300 rounded-md" /> {/* Add to cart */}
-							<div className="h-12 w-full bg-gray-200 rounded-md" /> {/* WhatsApp */}
-							<div className="h-12 w-full bg-gray-200 rounded-md" /> {/* Favorite */}
+							<div className="h-12 w-full bg-gray-300 rounded-md" />{" "}
+							{/* Add to cart */}
+							<div className="h-12 w-full bg-gray-200 rounded-md" />{" "}
+							{/* WhatsApp */}
+							<div className="h-12 w-full bg-gray-200 rounded-md" />{" "}
+							{/* Favorite */}
 						</div>
 					</div>
 				</div>

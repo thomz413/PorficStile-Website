@@ -18,14 +18,12 @@ export default function HeaderTransition({
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
-	const [mounted, setMounted] = useState(false);
+	const [mounted, setMounted] = useState(true);
 	const [isOverHero, setIsOverHero] = useState(true);
 	const { getTotalItems } = useCart();
 	const observerRef = useRef<IntersectionObserver | null>(null);
 
 	useEffect(() => {
-		setMounted(true);
-
 		const heroEl = document.querySelector(heroSelector);
 
 		if (heroEl && "IntersectionObserver" in window) {
@@ -158,7 +156,7 @@ export default function HeaderTransition({
 							className="flex items-center gap-4"
 						>
 							<div className={isTransparent ? "text-white" : "text-foreground"}>
-								<CurrencySelector />
+								<CurrencySelector isTransparent={isTransparent} />
 							</div>
 
 							<button
@@ -260,7 +258,7 @@ export default function HeaderTransition({
 									Contacto
 								</Link>
 								<div className="pt-4 border-t border-border">
-									<CurrencySelector />
+									<CurrencySelector isTransparent={isTransparent} />
 								</div>
 							</nav>
 						</motion.div>

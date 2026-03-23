@@ -4,7 +4,7 @@ import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { FaFacebook, FaTiktok } from "react-icons/fa";
 import CopyrightYear from "@/components/CopyRightYear";
 import Image from "next/image";
-import {FooterSettings} from "@/lib/strapi/types/settings";
+import { FooterSettings } from "@/lib/strapi/types/settings";
 
 export default function Footer({
 	settings,
@@ -90,9 +90,7 @@ export default function Footer({
 									Gamarra, Lima
 								</p>
 							</div>
-							<a
-								className="flex gap-3 items-center text-slate-400 hover:text-white transition-colors duration-300"
-							>
+							<a className="flex gap-3 items-center text-slate-400 hover:text-white transition-colors duration-300">
 								<Mail size={18} className="text-accent" />
 								<span>contacto@atlantisporfic.com</span>
 							</a>

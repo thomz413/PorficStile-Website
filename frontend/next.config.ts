@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
 			expire: 86400,
 		},
 	},
-	
+
 	// Image optimizations
 	images: {
 		formats: ["image/avif", "image/webp"],
@@ -42,21 +42,21 @@ const nextConfig: NextConfig = {
 		dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
 		minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
 	},
-	
+
 	// Build optimizations
 	compiler: {
 		removeConsole: process.env.NODE_ENV === "production",
 	},
-	
+
 	// Compression
 	compress: true,
-	
+
 	// Experimental features for performance
 	experimental: {
 		optimizeCss: true,
 		optimizeServerReact: true,
 	},
-	
+
 	// Headers for caching and security
 	async headers() {
 		return [
@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
-	
+
 	// Redirects for SEO
 	async redirects() {
 		return [];

@@ -37,7 +37,7 @@ export default function RootLayout({
 				<CurrencyProvider>
 					<CartProvider>
 						{children}
-						<Toaster />
+						<Toaster position={"bottom-center"} />
 					</CartProvider>
 				</CurrencyProvider>
 			</body>

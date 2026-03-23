@@ -67,11 +67,11 @@ export function buildProductListQuery() {
 		populate: {
 			// Only fetch the first image needed for the card
 			imagenPrincipal: {
-				fields: ["url", "alternativeText"]
+				fields: ["url", "alternativeText"],
 			},
 			// Needed for your category filtering logic
 			categoria: {
-				fields: ["nombre"]
+				fields: ["nombre"],
 			},
 		},
 	};
