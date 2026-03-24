@@ -112,6 +112,7 @@ export async function getSettings(): Promise<SiteSettings | null> {
 				"documentId",
 				"tituloHero",
 				"subtituloHero",
+				"direccionTienda",
 				"numeroWhatsapp",
 				"linkTiktok",
 				"linkFacebook",

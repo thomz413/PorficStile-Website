@@ -36,8 +36,7 @@ export default function Footer({
 						</div>
 
 						<p className="text-slate-400 leading-relaxed text-sm max-w-sm">
-							Elevando la moda premium peruana. Fusionamos técnicas ancestrales
-							con cortes contemporáneos para la mujer de hoy.
+							Prendas que te acompañan. Diseñamos ropa cómoda y con estilo para que te veas bien todos los días.
 						</p>
 
 						{/* Socials */}

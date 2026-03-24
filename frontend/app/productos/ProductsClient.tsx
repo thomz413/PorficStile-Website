@@ -57,8 +57,7 @@ export default function ProductsClient({
 						transition={transitions.smooth}
 						className="text-lg text-muted-foreground max-w-2xl mx-auto"
 					>
-						Descubre nuestra colección exclusiva de ropa premium peruana con
-						diseño único y calidad excepcional.
+						Descubre nuestra colección exclusiva de ropa de calidad excepcional.
 					</motion.p>
 				</motion.div>
 

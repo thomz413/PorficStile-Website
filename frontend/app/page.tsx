@@ -157,8 +157,8 @@ export default async function Home() {
 							/>
 							<FadeIn delay={0.3}>
 								<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-									En Atlantis Porfic Stile creamos ropa de alta calidad con
-									diseños que combinan tradición y modernidad.
+									Ropa hecha para durar. Queremos que te veas
+									increíble sin complicaciones y con la calidad que te mereces.
 								</p>
 							</FadeIn>
 						</div>
@@ -168,34 +168,22 @@ export default async function Home() {
 								<div className="w-20 h-20 mx-auto bg-accent/10 rounded-full flex items-center justify-center">
 									<Star className="h-8 w-8 text-accent" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">
-									Diseño Único
-								</h3>
-								<p className="text-muted-foreground">
-									Piezas originales creadas con atención al detalle
-								</p>
+								<h3 className="text-xl font-black text-foreground">El mejor precio</h3>
+								<p className="text-muted-foreground">Directo de nuestra producción a tu closet, sin costos extra.</p>
 							</StaggerItem>
 							<StaggerItem className="text-center space-y-4">
 								<div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
 									<Award className="h-8 w-8 text-primary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">
-									Alta Calidad
-								</h3>
-								<p className="text-muted-foreground">
-									Materiales seleccionados y acabados duraderos
-								</p>
+								<h3 className="text-xl font-black text-foreground">Hecho para ti</h3>
+								<p className="text-muted-foreground">Cortes que favorecen y diseños que no pasan de moda.</p>
 							</StaggerItem>
 							<StaggerItem className="text-center space-y-4">
 								<div className="w-20 h-20 mx-auto bg-secondary/10 rounded-full flex items-center justify-center">
 									<Heart className="h-8 w-8 text-secondary" />
 								</div>
-								<h3 className="text-xl font-black text-foreground">
-									Estilo Peruano
-								</h3>
-								<p className="text-muted-foreground">
-									Diseños que reflejan nuestra cultura
-								</p>
+								<h3 className="text-xl font-black text-foreground">Calidad Real</h3>
+								<p className="text-muted-foreground">Telas resistentes que aguantan el uso diario y las lavadas.</p>
 							</StaggerItem>
 						</StaggerContainer>
 					</div>

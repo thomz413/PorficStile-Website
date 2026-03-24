@@ -188,10 +188,10 @@ export default function HeaderTransition({
 							{isOpen ? <X size={28} /> : <Menu size={28} />}
 						</motion.button>
 
-						<motion.div variants={itemVariants}>
+						<motion.div variants={itemVariants} className="flex items-center justify-center">
 							<Link
 								href="/"
-								className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center transition-all duration-300 ${
+								className={`absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-300 ${
 									isTransparent
 										? "opacity-0 pointer-events-none -translate-y-2"
 										: "opacity-100 pointer-events-auto translate-y-0"
@@ -202,9 +202,9 @@ export default function HeaderTransition({
 								<Image
 									src="/Atlantis.svg"
 									alt="Atlantis logo"
-									width={120}
-									height={120}
-									className={`transition-all duration-300 ${isTransparent ? "brightness-0 invert" : ""}`}
+									width={100} // Slightly reduced for mobile vertical fit
+									height={40}  // Explicitly defining a smaller height helps centering
+									className={`object-contain transition-all duration-300 ${isTransparent ? "brightness-0 invert" : ""}`}
 									priority
 								/>
 							</Link>
