@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 
 interface VariantSelectorProps {
@@ -11,12 +11,15 @@ interface VariantSelectorProps {
 }
 
 export default function VariantSelector({
-	product,
-	selectedVariant,
-	onVariantSelect,
-	className = "",
-}: VariantSelectorProps) {
-	// local selected talla/color to allow independent selection before resolving a variant
+											product,
+											selectedVariant,
+											onVariantSelect,
+											className = "",
+										}: VariantSelectorProps) {
+	// 1. Keep track of the prop to know if it changed from the outside
+	const [prevPropVariant, setPrevPropVariant] = useState<Variante | null>(selectedVariant);
+
+	// 2. Local selected talla/color to allow independent selection
 	const [selectedTalla, setSelectedTalla] = useState<string | null>(
 		selectedVariant?.talla ?? null,
 	);
@@ -24,22 +27,22 @@ export default function VariantSelector({
 		selectedVariant?.color ?? null,
 	);
 
-	// keep local state in sync when parent changes selectedVariant
-	useEffect(() => {
+	// 3. THE FIX: Sync state during render if the parent changed the prop externally.
+	// This entirely replaces the useEffect and satisfies ESLint without cascading renders.
+	if (selectedVariant !== prevPropVariant) {
+		setPrevPropVariant(selectedVariant);
 		setSelectedTalla(selectedVariant?.talla ?? null);
 		setSelectedColor(selectedVariant?.color ?? null);
-	}, [selectedVariant]);
+	}
 
 	// helpers: determine if a variant is "available" for UI enabling purposes
-	// availability rule for selection UI: a variant is considered available if
-	// - variant.disponible === true OR
-	// - variant.stock (number) > 0
-	const isVariantAvailableForUI = (v: Variante) => {
+	// Wrapped in useCallback so it can be safely used in dependency arrays
+	const isVariantAvailableForUI = useCallback((v: Variante) => {
 		if (v.disponible) return true;
 		return typeof v.stock === "number" && v.stock > 0;
-	};
+	}, []);
 
-	// All unique tallas in product (preserve the TallaEnum order if present)
+	// All unique tallas in product
 	const tallasFromProduct = useMemo(() => {
 		const seen = new Set<string>();
 		const arr: string[] = [];
@@ -50,7 +53,7 @@ export default function VariantSelector({
 			}
 		});
 		return arr;
-	}, [product]);
+	}, [product.variantes]);
 
 	// All unique colors in product
 	const colorsFromProduct = useMemo(() => {
@@ -63,7 +66,7 @@ export default function VariantSelector({
 			}
 		});
 		return arr;
-	}, [product]);
+	}, [product.variantes]);
 
 	// For each talla decide if there exists at least one variant for that talla that is available
 	const tallaAvailability = useMemo(() => {
@@ -76,63 +79,52 @@ export default function VariantSelector({
 			};
 			const available = isVariantAvailableForUI(v);
 			if (available) curr.available = true;
-			// accumulate stock numbers present at variant-level (not product-level)
+			// accumulate stock numbers present at variant-level
 			if (typeof v.stock === "number") {
 				curr.totalStock = (curr.totalStock ?? 0) + v.stock;
 			}
 			map.set(v.talla, curr);
 		});
 		return map;
-	}, [product]);
+	}, [product.variantes, isVariantAvailableForUI]);
 
-	// For a given talla, return available colors (only those colors that have an available variant for talla+color)
-	const getAvailableColorsForTalla = (talla?: string | null) => {
+	// For a given talla, return available colors
+	// Wrapped in useCallback to satisfy the availableColorsForCurrentTalla useMemo
+	const getAvailableColorsForTalla = useCallback((talla?: string | null) => {
 		const set = new Set<string>();
 		(product.variantes ?? []).forEach((v) => {
 			if (!v.color) return;
-			// if talla filter provided, require it
 			if (talla && v.talla !== talla) return;
 			if (isVariantAvailableForUI(v)) {
 				set.add(v.color);
-			} else {
-				// if not available for UI on variant-level, we still might want to show color
-				// only if other variants with same color (and talla) are available — handled by loop
 			}
 		});
 		return Array.from(set);
-	};
+	}, [product.variantes, isVariantAvailableForUI]);
 
 	// Given selectedTalla/selectedColor, resolve a variant.
-	// Priority:
-	// 1) variant that matches both and is disponible === true
-	// 2) variant that matches both and has stock > 0
-	// 3) any variant that matches both
-	// 4) if only talla selected: pick the first variant for that talla following the same priority
-	const resolveVariant = (talla?: string | null, color?: string | null) => {
+	// Wrapped in useCallback so it doesn't break the resolvedVariant useMemo
+	const resolveVariant = useCallback((talla?: string | null, color?: string | null) => {
 		const candidates = (product.variantes ?? []).filter((v) => {
 			if (talla && v.talla !== talla) return false;
 			return !(color && v.color !== color);
 		});
 		if (candidates.length === 0) return null;
 
-		// prefer disponible true
 		const preferDisponible = candidates.find((v) => v.disponible === true);
 		if (preferDisponible) return preferDisponible;
 
-		// then prefer stock > 0
 		const preferStock = candidates.find(
 			(v) => typeof v.stock === "number" && v.stock > 0,
 		);
 		if (preferStock) return preferStock;
 
 		return candidates[0];
-	};
+	}, [product.variantes]);
 
 	// When user clicks a talla button
 	const handleTallaClick = (talla: string) => {
-		// If clicking the already selected talla, toggle it off
 		const nextTalla = selectedTalla === talla ? null : talla;
-		// If color is set but that color isn't available for the next talla, clear color
 		const colorsForTalla = getAvailableColorsForTalla(nextTalla);
 		let nextColor = selectedColor;
 		if (
@@ -153,7 +145,6 @@ export default function VariantSelector({
 	// When user clicks a color button
 	const handleColorClick = (color: string) => {
 		const nextColor = selectedColor === color ? null : color;
-		// if talla selected but this color doesn't exist for that talla, clear talla
 		let nextTalla = selectedTalla;
 		if (nextTalla) {
 			const colorsForTalla = getAvailableColorsForTalla(nextTalla);
@@ -161,7 +152,6 @@ export default function VariantSelector({
 				colorsForTalla.length > 0 &&
 				!colorsForTalla.includes(nextColor ?? "")
 			) {
-				// color not available for current talla — try to find a talla that has this color
 				const variantThatHasColor = (product.variantes ?? []).find(
 					(v) => v.color === nextColor && isVariantAvailableForUI(v),
 				);
@@ -182,13 +172,13 @@ export default function VariantSelector({
 		onVariantSelect(null);
 	};
 
-	// Current resolved variant (derived from selectedVariant prop; but recalc just in case)
+	// Current resolved variant
 	const resolvedVariant = useMemo(
 		() => resolveVariant(selectedTalla, selectedColor) ?? selectedVariant,
-		[selectedTalla, selectedColor, selectedVariant, product],
+		[selectedTalla, selectedColor, selectedVariant, resolveVariant],
 	);
 
-	// stock info to display: prefer variant.stock, fallback to product.cantidadStock, or "Disponible" if disponible true but no numbers
+	// stock info to display
 	const stockMessage = useMemo(() => {
 		const v = resolvedVariant ?? selectedVariant;
 		if (v) {
@@ -196,25 +186,22 @@ export default function VariantSelector({
 				if (v.disponible) return `✓ ${v.stock} unidades disponibles`;
 				return `✗ Agotado (${v.stock})`;
 			}
-			// variant has no stock number: fallback to product
 			if (typeof product.cantidadStock === "number") {
 				if (v.disponible)
 					return `✓ ${product.cantidadStock} disponibles (nivel producto)`;
 				return `✗ Agotado (nivel producto: ${product.cantidadStock})`;
 			}
-			// no numeric stock anywhere: use disponible flag
 			return v.disponible ? "✓ Disponible" : "✗ Agotado";
 		}
 
-		// no specific variant selected: inspect product-level
 		return product.disponible
 			? `✓ ${product.cantidadStock} disponibles`
 			: `✗ Agotado (${product.cantidadStock})`;
-	}, [resolvedVariant, selectedVariant, product]);
+	}, [resolvedVariant, selectedVariant, product.cantidadStock, product.disponible]);
 
 	const availableColorsForCurrentTalla = useMemo(
 		() => getAvailableColorsForTalla(selectedTalla),
-		[selectedTalla, product],
+		[selectedTalla, getAvailableColorsForTalla],
 	);
 
 	return (
@@ -260,8 +247,6 @@ export default function VariantSelector({
 					<h3 className="text-sm font-medium text-gray-900 mb-2">Color</h3>
 					<div className="flex flex-wrap gap-2">
 						{colorsFromProduct.map((color) => {
-							// Determine if this color is available for the current talla (if talla selected),
-							// otherwise check if any variant with this color is available.
 							let available = false;
 							if (selectedTalla) {
 								available = availableColorsForCurrentTalla.includes(color);

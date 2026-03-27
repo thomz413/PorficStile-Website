@@ -1,19 +1,19 @@
 {
-  "collectionName": "components_hero_estadisticas",
-  "info": {
-    "displayName": "Estadistica",
-    "icon": "eye"
-  },
-  "options": {},
-  "attributes": {
-    "textoArriba": {
-      "type": "string",
-      "required": false
-    },
-    "textoAbajo": {
-      "type": "string",
-      "required": false
-    }
-  },
-  "config": {}
+	"collectionName": "components_hero_estadisticas",
+	"info": {
+		"displayName": "Estadistica",
+		"icon": "eye"
+	},
+	"options": {},
+	"attributes": {
+		"textoArriba": {
+			"type": "string",
+			"required": false
+		},
+		"textoAbajo": {
+			"type": "string",
+			"required": false
+		}
+	},
+	"config": {}
 }

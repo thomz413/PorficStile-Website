@@ -1,14 +1,14 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Filter } from "lucide-react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import StickyCart from "@/components/StickyCart";
-import { Filter } from "lucide-react";
-import { SiteSettings } from "@/lib/strapi/types/settings";
-import { Producto } from "@/lib/strapi/types/product";
-import { Category } from "@/lib/strapi/types/category";
 import { animations, transitions } from "@/lib/animations";
+import { Category } from "@/lib/strapi/types/category";
+import { Producto } from "@/lib/strapi/types/product";
+import { SiteSettings } from "@/lib/strapi/types/settings";
 
 type Props = {
 	products: Producto[];

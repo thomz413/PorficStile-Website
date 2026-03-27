@@ -1,94 +1,83 @@
 {
-  "kind": "collectionType",
-  "collectionName": "productos",
-  "info": {
-    "singularName": "producto",
-    "pluralName": "productos",
-    "displayName": "Producto"
-  },
-  "options": {
-    "draftAndPublish": true
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "nombre": {
-      "type": "string",
-      "required": true
-    },
-    "descripcion": {
-      "type": "text"
-    },
-    "precio": {
-      "type": "decimal",
-      "required": true
-    },
-    "slug": {
-      "type": "uid",
-      "targetField": "nombre",
-      "required": true
-    },
-    "destacado": {
-      "type": "boolean",
-      "required": true,
-      "default": true
-    },
-    "disponible": {
-      "type": "boolean",
-      "default": true
-    },
-    "cantidadStock": {
-      "type": "integer"
-    },
-    "categoria": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::categoria.categoria"
-    },
-    "variantes": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::variante.variante",
-      "mappedBy": "producto"
-    },
-    "imagenPrincipal": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files"
-      ]
-    },
-    "galeria": {
-      "type": "media",
-      "multiple": true,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "textoBadgeOferta": {
-      "type": "string"
-    },
-    "precioOferta": {
-      "type": "decimal"
-    },
-    "tipoDescuento": {
-      "type": "enumeration",
-      "enum": [
-        "porcentaje",
-        "fijo"
-      ]
-    },
-    "valorDescuento": {
-      "type": "decimal"
-    },
-    "fechaInicioOferta": {
-      "type": "datetime"
-    },
-    "fechaFinOferta": {
-      "type": "datetime"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "productos",
+	"info": {
+		"singularName": "producto",
+		"pluralName": "productos",
+		"displayName": "Producto"
+	},
+	"options": {
+		"draftAndPublish": true
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"nombre": {
+			"type": "string",
+			"required": true
+		},
+		"descripcion": {
+			"type": "text"
+		},
+		"precio": {
+			"type": "decimal",
+			"required": true
+		},
+		"slug": {
+			"type": "uid",
+			"targetField": "nombre",
+			"required": true
+		},
+		"destacado": {
+			"type": "boolean",
+			"required": true,
+			"default": true
+		},
+		"disponible": {
+			"type": "boolean",
+			"default": true
+		},
+		"cantidadStock": {
+			"type": "integer"
+		},
+		"categoria": {
+			"type": "relation",
+			"relation": "oneToOne",
+			"target": "api::categoria.categoria"
+		},
+		"variantes": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "api::variante.variante",
+			"mappedBy": "producto"
+		},
+		"imagenPrincipal": {
+			"type": "media",
+			"multiple": false,
+			"allowedTypes": ["images", "files"]
+		},
+		"galeria": {
+			"type": "media",
+			"multiple": true,
+			"allowedTypes": ["images", "files", "videos", "audios"]
+		},
+		"textoBadgeOferta": {
+			"type": "string"
+		},
+		"precioOferta": {
+			"type": "decimal"
+		},
+		"tipoDescuento": {
+			"type": "enumeration",
+			"enum": ["porcentaje", "fijo"]
+		},
+		"valorDescuento": {
+			"type": "decimal"
+		},
+		"fechaInicioOferta": {
+			"type": "datetime"
+		},
+		"fechaFinOferta": {
+			"type": "datetime"
+		}
+	}
 }
