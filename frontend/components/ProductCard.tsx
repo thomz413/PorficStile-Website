@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ArrowRight } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 import { placeholderImage } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface ProductCardProps {
 	product: Producto;
@@ -25,7 +25,7 @@ export default function ProductCard({
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
-	const productUrl = `/productos/${product.documentId}`;
+	const productUrl = `/productos/${product.slug}`;
 
 	// --- FAVORITES LOGIC ---
 	useEffect(() => {

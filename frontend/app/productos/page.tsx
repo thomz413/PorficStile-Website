@@ -1,8 +1,8 @@
-import { getProducts, getCategories, getSettings } from "@/lib/strapi";
-import ProductsClient from "./ProductsClient";
+import { Suspense } from "react";
 import FooterWrapper from "@/components/footer/FooterWrapper";
 import Header from "@/components/Header";
-import { Suspense } from "react";
+import { getCategories, getProducts, getSettings } from "@/lib/strapi";
+import ProductsClient from "./ProductsClient";
 
 export default async function ProductsPage() {
 	// Fetch initial data on the server for better SEO/Speed

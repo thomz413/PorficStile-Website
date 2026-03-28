@@ -141,7 +141,7 @@ export default function NosotrosClient({
 								]
 						).map((item: Statistic, idx: number) => (
 							<motion.div
-								key={item.id || idx}
+								key={item.documentId || idx}
 								variants={animations.scaleIn}
 								transition={transitions.smooth}
 								whileHover={{ y: -4 }}

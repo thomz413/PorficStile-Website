@@ -1,56 +1,63 @@
 {
-	"kind": "collectionType",
-	"collectionName": "variantes",
-	"info": {
-		"singularName": "variante",
-		"pluralName": "variantes",
-		"displayName": "Variante"
-	},
-	"options": {
-		"draftAndPublish": true
-	},
-	"pluginOptions": {},
-	"attributes": {
-		"sku": {
-			"type": "string"
-		},
-		"talla": {
-			"type": "enumeration",
-			"enum": ["XS", "S", "M", "L", "XL", "XXL"]
-		},
-		"color": {
-			"type": "string"
-		},
-		"stock": {
-			"type": "integer"
-		},
-		"disponible": {
-			"type": "boolean"
-		},
-		"precioSobreescribir": {
-			"type": "decimal"
-		},
-		"precioOferta": {
-			"type": "decimal"
-		},
-		"tipoDescuento": {
-			"type": "enumeration",
-			"enum": ["porcentaje", "fijo"]
-		},
-		"valorDescuento": {
-			"type": "decimal"
-		},
-		"fechaInicioOferta": {
-			"type": "datetime"
-		},
-		"fechaFinOferta": {
-			"type": "datetime"
-		},
-		"producto": {
-			"type": "relation",
-			"relation": "manyToOne",
-			"target": "api::producto.producto",
-			"inversedBy": "variantes"
-		}
-	}
+  "kind": "collectionType",
+  "collectionName": "variantes",
+  "info": {
+    "singularName": "variante",
+    "pluralName": "variantes",
+    "displayName": "Variante"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "talla": {
+      "type": "enumeration",
+      "enum": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ]
+    },
+    "color": {
+      "type": "string"
+    },
+    "stock": {
+      "type": "integer"
+    },
+    "disponible": {
+      "type": "boolean"
+    },
+    "precioSobreescribir": {
+      "type": "decimal"
+    },
+    "precioOferta": {
+      "type": "decimal"
+    },
+    "tipoDescuento": {
+      "type": "enumeration",
+      "enum": [
+        "porcentaje",
+        "fijo"
+      ]
+    },
+    "valorDescuento": {
+      "type": "decimal"
+    },
+    "fechaInicioOferta": {
+      "type": "datetime"
+    },
+    "fechaFinOferta": {
+      "type": "datetime"
+    },
+    "producto": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::producto.producto",
+      "inversedBy": "variantes"
+    }
+  }
 }

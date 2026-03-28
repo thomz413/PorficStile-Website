@@ -25,79 +25,8 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
 ];
 
 // Fallback rates if API fails
-const FALLBACK_RATES = {
-	PEN: 1,
-	BOB: 2.0, // Boliviano
-	USD: 0.27, // US Dollar
-	ARS: 75.0, // Argentine Peso
-	CLP: 220.0, // Chilean Peso
-	COP: 1100.0, // Colombian Peso
-	PYG: 2000.0, // Paraguayan Guarani
-	UYU: 11.0, // Uruguayan Peso
-	VES: 3500000.0, // Venezuelan Bolivar (high inflation)
-	GYD: 55.0, // Guyanese Dollar
-	SRD: 7.5, // Surinamese Dollar
-	BRL: 1.4, // Brazilian Real
-	EUR: 0.25, // Euro
-};
-
 // Simple fetch from free exchange rate API
-export async function getExchangeRates() {
-	try {
-		const response = await fetch(
-			"https://api.exchangerate-api.com/v4/latest/PEN",
-		);
-		if (!response.ok) throw new Error("API request failed");
-		const data = await response.json();
-		return data.rates || FALLBACK_RATES;
-	} catch (error) {
-		console.warn("Using fallback exchange rates:", error);
-		return FALLBACK_RATES;
-	}
-}
-
 // Convert price from PEN to target currency
-export async function convertPrice(priceInPEN: number, targetCurrency: string) {
-	if (targetCurrency === "PEN") {
-		const currency = SUPPORTED_CURRENCIES.find((c) => c.code === "PEN")!;
-		return {
-			price: priceInPEN,
-			symbol: currency.symbol,
-			currency: currency.code,
-		};
-	}
-
-	const rates = await getExchangeRates();
-	const rate = rates[targetCurrency];
-
-	if (!rate || rate === 0) {
-		// Fallback to PEN if conversion fails
-		const currency = SUPPORTED_CURRENCIES.find((c) => c.code === "PEN")!;
-		return {
-			price: priceInPEN,
-			symbol: currency.symbol,
-			currency: currency.code,
-		};
-	}
-
-	const currency = SUPPORTED_CURRENCIES.find((c) => c.code === targetCurrency);
-	if (!currency) {
-		// Fallback to PEN if currency not found
-		const defaultCurrency = SUPPORTED_CURRENCIES.find((c) => c.code === "PEN")!;
-		return {
-			price: priceInPEN,
-			symbol: defaultCurrency.symbol,
-			currency: defaultCurrency.code,
-		};
-	}
-
-	return {
-		price: priceInPEN * rate,
-		symbol: currency.symbol,
-		currency: currency.code,
-	};
-}
-
 // Format price for display
 export function formatPrice(price: number, symbol: string, currency: string) {
 	try {

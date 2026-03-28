@@ -17,16 +17,16 @@ type Props = {
 };
 
 export default function ProductsClient({
-										   products,
-										   categories,
-										   settings,
-									   }: Props) {
+	products,
+	categories,
+	settings,
+}: Props) {
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
 	const filteredProducts = selectedCategory
 		? products.filter(
-			(product) => product.categoria?.nombre === selectedCategory,
-		)
+				(product) => product.categoria?.nombre === selectedCategory,
+			)
 		: products;
 
 	const handleCategoryFilter = (categoryName: string) => {
@@ -36,7 +36,7 @@ export default function ProductsClient({
 	};
 
 	return (
-		<section className="pt-20 pb-[140px] md:pb-[180px] px-4 sm:px-6 lg:px-8">
+		<section className="pt-20 pb-35 md:pb-45 px-4 sm:px-6 lg:px-8">
 			<div className="max-w-7xl mx-auto">
 				<motion.div
 					initial="hidden"
@@ -85,7 +85,7 @@ export default function ProductsClient({
 
 						{categories.map((category) => (
 							<motion.button
-								key={category.id}
+								key={category.documentId}
 								variants={animations.scaleIn}
 								transition={transitions.fast}
 								onClick={() => handleCategoryFilter(category.nombre || "")}
@@ -139,7 +139,7 @@ export default function ProductsClient({
 						>
 							{filteredProducts.map((product) => (
 								<motion.div
-									key={product.id}
+									key={product.documentId}
 									variants={animations.fadeInUp}
 									whileHover={{ y: -4 }}
 									layout

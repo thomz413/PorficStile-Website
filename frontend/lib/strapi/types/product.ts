@@ -8,10 +8,6 @@ export const TipoDescuentoEnum = z.enum(["porcentaje", "fijo"]);
 
 /* VARIANTE */
 export const VarianteSchema = z.object({
-	id: z.number().int().nullish(),
-
-	sku: z.string().nullish().default(""),
-
 	talla: TallaEnum.nullish(),
 
 	color: z.string().nullish(),
@@ -21,7 +17,7 @@ export const VarianteSchema = z.object({
 	// allow number or null
 
 	// If true then takes precedence if stock is none
-	disponible: z.boolean().default(true),
+	disponible: z.boolean().nullish().default(true),
 
 	precioSobreescribir: z.number().nullish(),
 
@@ -30,16 +26,15 @@ export const VarianteSchema = z.object({
 	tipoDescuento: TipoDescuentoEnum.nullish(),
 	valorDescuento: z.number().nullish(),
 
-	fechaInicioOferta: z.string().nullish().nullable(),
-	fechaFinOferta: z.string().nullish().nullable(),
+	fechaInicioOferta: z.string().nullish(),
+	fechaFinOferta: z.string().nullish(),
 });
 
 export type Variante = z.infer<typeof VarianteSchema>;
 
 /* PRODUCTO */
 export const ProductoSchema = z.object({
-	id: z.number().int(),
-	documentId: z.string().nullish().default(""),
+	documentId: z.string().nullish(),
 	nombre: z.string().default(""),
 	descripcion: z.string().nullish().nullable().default(""),
 	precio: z.number().default(0),
@@ -67,7 +62,7 @@ export const ProductoSchema = z.object({
 
 	imagenPrincipal: ImageSchema.nullish().nullable(),
 
-	destacado: z.boolean().default(true),
+	destacado: z.boolean().nullish().default(true),
 	slug: z.string().nullish().default(""),
 });
 

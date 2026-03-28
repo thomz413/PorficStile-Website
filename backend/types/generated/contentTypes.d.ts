@@ -586,7 +586,6 @@ export interface ApiVarianteVariante extends Struct.CollectionTypeSchema {
     precioSobreescribir: Schema.Attribute.Decimal;
     producto: Schema.Attribute.Relation<'manyToOne', 'api::producto.producto'>;
     publishedAt: Schema.Attribute.DateTime;
-    sku: Schema.Attribute.String;
     stock: Schema.Attribute.Integer;
     talla: Schema.Attribute.Enumeration<['XS', 'S', 'M', 'L', 'XL', 'XXL']>;
     tipoDescuento: Schema.Attribute.Enumeration<['porcentaje', 'fijo']>;

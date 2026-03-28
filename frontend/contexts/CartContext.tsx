@@ -3,7 +3,7 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 export interface CartItem {
-	id: string;
+	id: string; // This is now your documentId or slug
 	nombre: string;
 	precio: number;
 	precioDescuento?: number;
@@ -11,11 +11,14 @@ export interface CartItem {
 	imagen?: { url: string };
 	tallas: Array<{
 		talla: string;
+		color?: string | null; // Added color
 		stock: number;
 		disponible: boolean;
 	}>;
 	selectedItems: Array<{
+		variantKey: string; // NEW: Crucial for separating variants
 		talla: string;
+		color?: string | null; // NEW: To display in the cart UI
 		cantidad: number;
 		precioUnitario: number;
 	}>;
@@ -61,11 +64,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 				// Merge selected items
 				const mergedSelectedItems = [...existingItem.selectedItems];
 				selectedItems.forEach((newItem) => {
+					// FIXED: Now we match by variantKey, not just talla
 					const existingIndex = mergedSelectedItems.findIndex(
-						(item) => item.talla === newItem.talla,
+						(item) => item.variantKey === newItem.variantKey,
 					);
 					if (existingIndex >= 0) {
-						// Add quantities (+/- logic)
 						mergedSelectedItems[existingIndex].cantidad += newItem.cantidad;
 					} else {
 						mergedSelectedItems.push(newItem);
@@ -109,9 +112,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 		});
 	};
 
-	const clearCart = () => {
-		setCart([]);
-	};
+	const clearCart = () => setCart([]);
 
 	const getTotalItems = () => {
 		return cart.reduce((total, item) => {
@@ -142,10 +143,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 		return cart
 			.map((item) => {
 				return item.selectedItems
-					.map(
-						(selected) =>
-							`${selected.cantidad}x ${item.nombre} - Talla ${selected.talla}`,
-					)
+					.map((selected) => {
+						// FIXED: Include color in the summary if it exists
+						const colorText = selected.color ? ` - ${selected.color}` : "";
+						const tallaText = selected.talla
+							? ` - Talla ${selected.talla}`
+							: "";
+						return `${selected.cantidad}x ${item.nombre}${tallaText}${colorText}`;
+					})
 					.join("\n");
 			})
 			.join("\n");

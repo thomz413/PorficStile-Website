@@ -13,7 +13,6 @@ export function cn(...inputs: ClassValue[]) {
 export function buildProductQuery() {
 	const queryObj = {
 		fields: [
-			"id",
 			"documentId",
 			"nombre",
 			"descripcion",
@@ -23,17 +22,13 @@ export function buildProductQuery() {
 			"valorDescuento",
 			"disponible",
 			"cantidadStock",
-			"slug",
-			"destacado",
 		],
 		populate: {
 			imagenPrincipal: { fields: ["url", "name", "alternativeText"] },
 			galeria: { fields: ["url", "name", "alternativeText"] },
-			categoria: { fields: ["id", "documentId", "nombre", "descripcion"] },
+			categoria: { fields: ["documentId", "nombre", "descripcion"] },
 			variantes: {
 				fields: [
-					"id",
-					"sku",
 					"talla",
 					"color",
 					"stock",
@@ -62,7 +57,7 @@ export function buildProductListQuery() {
 			"precioOferta",
 			"tipoDescuento",
 			"valorDescuento",
-			// "slug" // Add this back if ProductCard needs it for the link
+			"slug",
 		],
 		populate: {
 			// Only fetch the first image needed for the card
@@ -94,4 +89,18 @@ export function placeholderImage({
 } = {}) {
 	const encoded = encodeURIComponent(text);
 	return `https://placehold.co/${width}x${height}/${bg}/${color}?text=${encoded}`;
+}
+
+export async function fetchWithRetry<T>(
+	fn: () => Promise<T>,
+	retries = 3,
+	delay = 500,
+): Promise<T> {
+	try {
+		return await fn();
+	} catch (err) {
+		if (retries <= 0) throw err;
+		await new Promise((res) => setTimeout(res, delay));
+		return fetchWithRetry(fn, retries - 1, delay * 2);
+	}
 }

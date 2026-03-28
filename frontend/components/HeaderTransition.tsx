@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { Menu, X, ShoppingCart } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useCart } from "@/contexts/CartContext";
 import CurrencySelector from "./CurrencySelector";
 import StickyCart from "./StickyCart";
-import { useCart } from "@/contexts/CartContext";
-import Image from "next/image";
-import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function HeaderTransition({
 	whatsappNumber,
@@ -188,7 +188,10 @@ export default function HeaderTransition({
 							{isOpen ? <X size={28} /> : <Menu size={28} />}
 						</motion.button>
 
-						<motion.div variants={itemVariants} className="flex items-center justify-center">
+						<motion.div
+							variants={itemVariants}
+							className="flex items-center justify-center"
+						>
 							<Link
 								href="/"
 								className={`absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-300 ${
@@ -203,7 +206,7 @@ export default function HeaderTransition({
 									src="/Atlantis.svg"
 									alt="Atlantis logo"
 									width={100} // Slightly reduced for mobile vertical fit
-									height={40}  // Explicitly defining a smaller height helps centering
+									height={40} // Explicitly defining a smaller height helps centering
 									className={`object-contain transition-all duration-300 ${isTransparent ? "brightness-0 invert" : ""}`}
 									priority
 								/>

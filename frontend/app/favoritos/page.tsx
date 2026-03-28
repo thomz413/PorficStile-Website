@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { animations } from "@/lib/animations";
-import Header from "@/components/Header";
-import ProductCard from "@/components/ProductCard";
-import Footer from "@/components/footer/Footer";
-import { getProductById } from "@/lib/strapi";
-import { Producto } from "@/lib/strapi/types/product";
 import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import Footer from "@/components/footer/Footer";
+import Header from "@/components/Header";
+import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import { animations } from "@/lib/animations";
+import {getProductsByIds } from "@/lib/strapi";
+import { Producto } from "@/lib/strapi/types/product";
 
 const fadeInUp = animations.fadeInUp;
 const containerVariants = animations.container;
@@ -23,20 +23,20 @@ export default function FavoritesPage() {
 		const loadFavorites = async () => {
 			try {
 				const stored = localStorage.getItem("moda-peru-favorites");
-				if (stored) {
-					const favoriteIds = JSON.parse(stored) as string[];
-
-					const productPromises = favoriteIds.map((id) =>
-						getProductById(id).catch(() => null),
-					);
-
-					const products = await Promise.all(productPromises);
-					const validProducts = products.filter(
-						(product) => product !== null,
-					) as Producto[];
-
-					setFavorites(validProducts);
+				if (!stored) {
+					setLoading(false);
+					return;
 				}
+
+				const favoriteIds = JSON.parse(stored) as string[];
+				if (favoriteIds.length === 0) {
+					setLoading(false);
+					return;
+				}
+
+				const validProducts = await getProductsByIds(favoriteIds);
+
+				setFavorites(validProducts);
 			} catch (error) {
 				console.error("Error loading favorites:", error);
 			} finally {

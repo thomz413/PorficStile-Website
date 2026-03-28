@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import WhatsAppCTA from "@/components/WhatsAppCTA";
-import { WhatsAppMessageConfig } from "@/lib/whatsapp";
+import Footer from "@/components/footer/Footer";
 import Header from "@/components/Header";
+import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { animations, transitions } from "@/lib/animations";
 import { SiteSettings } from "@/lib/strapi/types/settings";
-import Footer from "@/components/footer/Footer";
+import { WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 export default function ContactoCliente({
 	settings,

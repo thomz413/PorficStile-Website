@@ -2,17 +2,17 @@
 
 import React, {
 	createContext,
-	useContext,
-	useState,
-	useEffect,
 	ReactNode,
+	useContext,
+	useEffect,
+	useState,
 } from "react";
 import {
+	CurrencyInfo,
 	formatPrice,
 	getUserCurrency,
-	saveUserCurrency,
 	SUPPORTED_CURRENCIES,
-	CurrencyInfo,
+	saveUserCurrency,
 } from "@/lib/currency";
 
 interface CurrencyContextType {

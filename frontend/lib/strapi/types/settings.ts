@@ -2,24 +2,26 @@ import { z } from "zod";
 import { ImageSchema } from "@/lib/strapi/types/shared";
 
 export const StatisticSchema = z.object({
-	id: z.number().int().optional().default(0),
-	textoArriba: z.string().optional().default(""),
-	textoAbajo: z.string().optional().default(""),
+	documentId: z.string().nullish(),
+	textoArriba: z.string().nullish().default(""),
+	textoAbajo: z.string().nullish().default(""),
 });
 
 export type Statistic = z.infer<typeof StatisticSchema>;
 
 export const SiteSettingsSchema = z.object({
-	id: z.number().int(),
-	documentId: z.string().optional().default(""),
-	tituloHero: z.string().optional().default(""),
-	subtituloHero: z.string().optional().default(""),
-	numeroWhatsapp: z.string().optional().default(""),
-	imagenHero: ImageSchema.default({ url: "", name: "", alternativeText: "" }),
+	tituloHero: z.string().nullish().default(""),
+	subtituloHero: z.string().nullish().default(""),
+	numeroWhatsapp: z.string().nullish().default(""),
+	imagenHero: ImageSchema.nullish().default({
+		url: "",
+		name: "",
+		alternativeText: "",
+	}),
 	estadisticas: z.array(StatisticSchema).optional().default([]),
-	direccionTienda: z.string().optional().default(""),
-	linkTiktok: z.string().optional().default(""),
-	linkFacebook: z.string().optional().default(""),
+	direccionTienda: z.string().nullish().default(""),
+	linkTiktok: z.string().nullish().default(""),
+	linkFacebook: z.string().nullish().default(""),
 });
 export type SiteSettings = z.infer<typeof SiteSettingsSchema>;
 

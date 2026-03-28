@@ -11,13 +11,15 @@ interface VariantSelectorProps {
 }
 
 export default function VariantSelector({
-											product,
-											selectedVariant,
-											onVariantSelect,
-											className = "",
-										}: VariantSelectorProps) {
+	product,
+	selectedVariant,
+	onVariantSelect,
+	className = "",
+}: VariantSelectorProps) {
 	// 1. Keep track of the prop to know if it changed from the outside
-	const [prevPropVariant, setPrevPropVariant] = useState<Variante | null>(selectedVariant);
+	const [prevPropVariant, setPrevPropVariant] = useState<Variante | null>(
+		selectedVariant,
+	);
 
 	// 2. Local selected talla/color to allow independent selection
 	const [selectedTalla, setSelectedTalla] = useState<string | null>(
@@ -90,37 +92,43 @@ export default function VariantSelector({
 
 	// For a given talla, return available colors
 	// Wrapped in useCallback to satisfy the availableColorsForCurrentTalla useMemo
-	const getAvailableColorsForTalla = useCallback((talla?: string | null) => {
-		const set = new Set<string>();
-		(product.variantes ?? []).forEach((v) => {
-			if (!v.color) return;
-			if (talla && v.talla !== talla) return;
-			if (isVariantAvailableForUI(v)) {
-				set.add(v.color);
-			}
-		});
-		return Array.from(set);
-	}, [product.variantes, isVariantAvailableForUI]);
+	const getAvailableColorsForTalla = useCallback(
+		(talla?: string | null) => {
+			const set = new Set<string>();
+			(product.variantes ?? []).forEach((v) => {
+				if (!v.color) return;
+				if (talla && v.talla !== talla) return;
+				if (isVariantAvailableForUI(v)) {
+					set.add(v.color);
+				}
+			});
+			return Array.from(set);
+		},
+		[product.variantes, isVariantAvailableForUI],
+	);
 
 	// Given selectedTalla/selectedColor, resolve a variant.
 	// Wrapped in useCallback so it doesn't break the resolvedVariant useMemo
-	const resolveVariant = useCallback((talla?: string | null, color?: string | null) => {
-		const candidates = (product.variantes ?? []).filter((v) => {
-			if (talla && v.talla !== talla) return false;
-			return !(color && v.color !== color);
-		});
-		if (candidates.length === 0) return null;
+	const resolveVariant = useCallback(
+		(talla?: string | null, color?: string | null) => {
+			const candidates = (product.variantes ?? []).filter((v) => {
+				if (talla && v.talla !== talla) return false;
+				return !(color && v.color !== color);
+			});
+			if (candidates.length === 0) return null;
 
-		const preferDisponible = candidates.find((v) => v.disponible === true);
-		if (preferDisponible) return preferDisponible;
+			const preferDisponible = candidates.find((v) => v.disponible === true);
+			if (preferDisponible) return preferDisponible;
 
-		const preferStock = candidates.find(
-			(v) => typeof v.stock === "number" && v.stock > 0,
-		);
-		if (preferStock) return preferStock;
+			const preferStock = candidates.find(
+				(v) => typeof v.stock === "number" && v.stock > 0,
+			);
+			if (preferStock) return preferStock;
 
-		return candidates[0];
-	}, [product.variantes]);
+			return candidates[0];
+		},
+		[product.variantes],
+	);
 
 	// When user clicks a talla button
 	const handleTallaClick = (talla: string) => {
@@ -197,7 +205,12 @@ export default function VariantSelector({
 		return product.disponible
 			? `✓ ${product.cantidadStock} disponibles`
 			: `✗ Agotado (${product.cantidadStock})`;
-	}, [resolvedVariant, selectedVariant, product.cantidadStock, product.disponible]);
+	}, [
+		resolvedVariant,
+		selectedVariant,
+		product.cantidadStock,
+		product.disponible,
+	]);
 
 	const availableColorsForCurrentTalla = useMemo(
 		() => getAvailableColorsForTalla(selectedTalla),
