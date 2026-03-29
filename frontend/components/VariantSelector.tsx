@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Producto, Variante } from "@/lib/strapi/types/product";
 
 interface VariantSelectorProps {
@@ -16,26 +16,18 @@ export default function VariantSelector({
 	onVariantSelect,
 	className = "",
 }: VariantSelectorProps) {
-	// 1. Keep track of the prop to know if it changed from the outside
-	const [prevPropVariant, setPrevPropVariant] = useState<Variante | null>(
-		selectedVariant,
-	);
-
-	// 2. Local selected talla/color to allow independent selection
 	const [selectedTalla, setSelectedTalla] = useState<string | null>(
 		selectedVariant?.talla ?? null,
 	);
+	
 	const [selectedColor, setSelectedColor] = useState<string | null>(
 		selectedVariant?.color ?? null,
 	);
 
-	// 3. THE FIX: Sync state during render if the parent changed the prop externally.
-	// This entirely replaces the useEffect and satisfies ESLint without cascading renders.
-	if (selectedVariant !== prevPropVariant) {
-		setPrevPropVariant(selectedVariant);
+	useEffect(() => {
 		setSelectedTalla(selectedVariant?.talla ?? null);
 		setSelectedColor(selectedVariant?.color ?? null);
-	}
+	}, [selectedVariant]);
 
 	// helpers: determine if a variant is "available" for UI enabling purposes
 	// Wrapped in useCallback so it can be safely used in dependency arrays
