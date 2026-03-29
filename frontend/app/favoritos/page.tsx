@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { animations } from "@/lib/animations";
-import {getProductsByIds } from "@/lib/strapi";
+import { getProductsByIds } from "@/lib/strapi";
 import { Producto } from "@/lib/strapi/types/product";
 
 const fadeInUp = animations.fadeInUp;

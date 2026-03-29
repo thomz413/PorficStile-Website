@@ -1,11 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useCart } from "@/contexts/CartContext";
+import { useHasHydrated } from "@/hooks/useHasHydrated";
+import { useCartStore } from "@/stores/useCartStore";
 import CurrencySelector from "./CurrencySelector";
 import StickyCart from "./StickyCart";
 
@@ -18,9 +19,13 @@ export default function HeaderTransition({
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCartOpen, setIsCartOpen] = useState(false);
-	const [mounted, setMounted] = useState(true);
 	const [isOverHero, setIsOverHero] = useState(true);
-	const { getTotalItems } = useCart();
+
+	// --- ZUSTAND & HYDRATION ---
+	const getTotalItems = useCartStore((state) => state.getTotalItems);
+	const hasHydrated = useHasHydrated();
+	const cartCount = hasHydrated ? getTotalItems() : 0;
+
 	const observerRef = useRef<IntersectionObserver | null>(null);
 
 	useEffect(() => {
@@ -48,7 +53,6 @@ export default function HeaderTransition({
 
 	const isTransparent = isOverHero;
 
-	// Animation Variants for a premium staggered entrance
 	const headerVariants: Variants = {
 		hidden: { y: "-100%", opacity: 0 },
 		visible: {
@@ -56,7 +60,7 @@ export default function HeaderTransition({
 			opacity: 1,
 			transition: {
 				duration: 0.8,
-				ease: [0.21, 0.47, 0.32, 0.98], // Premium custom easing
+				ease: [0.21, 0.47, 0.32, 0.98],
 				when: "beforeChildren",
 				staggerChildren: 0.1,
 			},
@@ -91,11 +95,7 @@ export default function HeaderTransition({
 							variants={itemVariants}
 							className="flex items-center gap-3"
 						>
-							<Link
-								href="/"
-								className="flex items-center gap-3 group"
-								aria-label="Ir a la página principal"
-							>
+							<Link href="/" className="flex items-center gap-3 group">
 								<div className="flex flex-col items-center justify-center">
 									<div
 										className={`rounded-full p-1 transition-shadow duration-300 group-hover:scale-105 transform ${
@@ -103,7 +103,6 @@ export default function HeaderTransition({
 												? "bg-white/5 ring-0"
 												: "bg-linear-to-br from-yellow-300/10 via-amber-200/10 to-red-200/5 ring-1 ring-amber-200/10"
 										}`}
-										aria-hidden
 									>
 										<Image
 											src="/Atlantis.svg"
@@ -118,14 +117,8 @@ export default function HeaderTransition({
 											}`}
 										/>
 									</div>
-
 									<span
-										className={`mt-1 text-xs leading-4 font-black font-inter uppercase tracking-[0.22em] transition-colors duration-300 ${
-											isTransparent
-												? "text-gold-shimmer drop-shadow-md"
-												: "text-gold-dark"
-										}`}
-										aria-hidden
+										className={`mt-1 text-xs leading-4 font-black uppercase tracking-[0.22em] transition-colors ${isTransparent ? "text-gold-shimmer drop-shadow-md" : "text-gold-dark"}`}
 									>
 										PORFIC STILE
 									</span>
@@ -138,11 +131,7 @@ export default function HeaderTransition({
 								<motion.div variants={itemVariants} key={item}>
 									<Link
 										href={`/${item.toLowerCase() === "tienda" ? "productos" : item.toLowerCase()}`}
-										className={`text-xs font-bold transition-colors duration-300 px-5 py-2 uppercase tracking-widest relative group ${
-											isTransparent
-												? "text-white drop-shadow-sm"
-												: "text-foreground"
-										}`}
+										className={`text-xs font-bold transition-colors px-5 py-2 uppercase tracking-widest relative group ${isTransparent ? "text-white" : "text-foreground"}`}
 									>
 										{item}
 										<span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-1/2 transition-all duration-300 rounded-full" />
@@ -166,12 +155,12 @@ export default function HeaderTransition({
 										? "hover:bg-white/10 text-white"
 										: "hover:bg-primary/10 text-foreground"
 								}`}
-								aria-label="Carrito"
 							>
-								<ShoppingCart className="h-6 w-6 transition-colors duration-300" />
-								{mounted && getTotalItems() > 0 && (
+								<ShoppingCart className="h-6 w-6" />
+								{/* --- UPDATED COUNT --- */}
+								{cartCount > 0 && (
 									<span className="absolute top-0 right-0 bg-primary text-primary-foreground rounded-full h-5 w-5 text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
-										{getTotalItems()}
+										{cartCount}
 									</span>
 								)}
 							</button>
@@ -183,7 +172,7 @@ export default function HeaderTransition({
 						<motion.button
 							variants={itemVariants}
 							onClick={() => setIsOpen((s) => !s)}
-							className={`p-2 -ml-2 transition-colors duration-300 ${isTransparent ? "text-white" : "text-foreground"}`}
+							className={`p-2 -ml-2 ${isTransparent ? "text-white" : "text-foreground"}`}
 						>
 							{isOpen ? <X size={28} /> : <Menu size={28} />}
 						</motion.button>
@@ -194,20 +183,18 @@ export default function HeaderTransition({
 						>
 							<Link
 								href="/"
-								className={`absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-300 ${
+								className={`absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-all ${
 									isTransparent
 										? "opacity-0 pointer-events-none -translate-y-2"
-										: "opacity-100 pointer-events-auto translate-y-0"
+										: "opacity-100"
 								}`}
-								aria-label="Ir a la página principal"
-								aria-hidden={isTransparent}
 							>
 								<Image
 									src="/Atlantis.svg"
-									alt="Atlantis logo"
-									width={100} // Slightly reduced for mobile vertical fit
-									height={40} // Explicitly defining a smaller height helps centering
-									className={`object-contain transition-all duration-300 ${isTransparent ? "brightness-0 invert" : ""}`}
+									alt="Logo"
+									width={100}
+									height={40}
+									className={`object-contain ${isTransparent ? "brightness-0 invert" : ""}`}
 									priority
 								/>
 							</Link>
@@ -216,50 +203,38 @@ export default function HeaderTransition({
 						<motion.button
 							variants={itemVariants}
 							onClick={() => setIsCartOpen(true)}
-							className={`relative p-2 -mr-2 transition-colors duration-300 ${isTransparent ? "text-white" : "text-foreground"}`}
+							className={`relative p-2 -mr-2 ${isTransparent ? "text-white" : "text-foreground"}`}
 						>
 							<ShoppingCart size={26} />
-							{mounted && getTotalItems() > 0 && (
+							{/* --- UPDATED COUNT --- */}
+							{cartCount > 0 && (
 								<span className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full h-4 w-4 text-[9px] font-bold flex items-center justify-center">
-									{getTotalItems()}
+									{cartCount}
 								</span>
 							)}
 						</motion.button>
 					</div>
 				</div>
 
-				{/* Upgraded Mobile Menu Overlay with AnimatePresence */}
 				<AnimatePresence>
 					{isOpen && (
 						<motion.div
 							initial={{ opacity: 0, height: 0 }}
 							animate={{ opacity: 1, height: "auto" }}
 							exit={{ opacity: 0, height: 0 }}
-							transition={{ duration: 0.3, ease: "easeInOut" }}
 							className="lg:hidden absolute top-full left-0 w-full bg-background/98 backdrop-blur-xl border-b border-border overflow-hidden"
 						>
 							<nav className="flex flex-col p-6 gap-4 text-foreground">
-								<Link
-									href="/productos"
-									onClick={() => setIsOpen(false)}
-									className="text-lg font-bold uppercase tracking-tight"
-								>
-									Tienda
-								</Link>
-								<Link
-									href="/nosotros"
-									onClick={() => setIsOpen(false)}
-									className="text-lg font-bold uppercase tracking-tight"
-								>
-									Nosotros
-								</Link>
-								<Link
-									href="/contacto"
-									onClick={() => setIsOpen(false)}
-									className="text-lg font-bold uppercase tracking-tight"
-								>
-									Contacto
-								</Link>
+								{["Tienda", "Nosotros", "Contacto"].map((item) => (
+									<Link
+										key={item}
+										href={`/${item.toLowerCase() === "tienda" ? "productos" : item.toLowerCase()}`}
+										onClick={() => setIsOpen(false)}
+										className="text-lg font-bold uppercase tracking-tight"
+									>
+										{item}
+									</Link>
+								))}
 								<div className="pt-4 border-t border-border">
 									<CurrencySelector isTransparent={isTransparent} />
 								</div>

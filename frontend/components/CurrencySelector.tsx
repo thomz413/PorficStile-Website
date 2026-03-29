@@ -1,59 +1,62 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
-interface CurrencySelectorProps {
+type CurrencySelectorProps = {
 	isTransparent?: boolean;
-}
+};
 
 export default function CurrencySelector({
 	isTransparent = false,
 }: CurrencySelectorProps) {
+	// 1. External State (Context)
 	const { currency, setCurrency } = useCurrency();
+
+	// 2. Local UI State
 	const [isOpen, setIsOpen] = useState(false);
 	const [isClient, setIsClient] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
 	const listRef = useRef<HTMLUListElement | null>(null);
 
-	// Initialize client state after mount
+	// 3. SINGLE MOUNT EFFECT (Fixes the cascading render error)
+	// This runs exactly once when the component enters the browser.
 	useEffect(() => {
 		setIsClient(true);
+
+		// Initialize & Listen to Mobile Media Query
+		const mq = window.matchMedia("(max-width: 768px)");
+		setIsMobile(mq.matches);
+
+		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+		mq.addEventListener("change", onChange);
+
+		return () => mq.removeEventListener("change", onChange);
 	}, []);
 
-	// Initialize mobile state only on client
-	const [isMobile, setIsMobile] = useState(false);
+	// 4. DERIVED STATE (No useEffect needed)
+	// Instead of syncing currency to a local 'currentCurrency' state,
+	// we calculate it on the fly during the render phase.
+	const currentCurrency = useMemo(() => {
+		const defaultCurrency = SUPPORTED_CURRENCIES[0];
 
-	useEffect(() => {
-		if (!isClient) return;
+		// During SSR, we return the default.
+		// Once on client, we find the one matching our context.
+		if (!isClient) return defaultCurrency;
 
-		const mq = window.matchMedia("(max-width: 768px)");
-		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-
-		setIsMobile(mq.matches);
-		mq.addEventListener("change", onChange);
-		return () => mq.removeEventListener("change", onChange);
-	}, [isClient]);
-
-	// Stable default currency for SSR
-	const defaultCurrency = SUPPORTED_CURRENCIES[0]; // PEN
-	const [currentCurrency, setCurrentCurrency] = useState(defaultCurrency);
-
-	// Update current currency only on client
-	useEffect(() => {
-		if (!isClient) return;
-
-		const foundCurrency =
-			SUPPORTED_CURRENCIES.find((c) => c.code === currency) || defaultCurrency;
-		setCurrentCurrency(foundCurrency);
+		return (
+			SUPPORTED_CURRENCIES.find((c) => c.code === currency) || defaultCurrency
+		);
 	}, [currency, isClient]);
 
+	// 5. Handlers
 	const handleCurrencyChange = (currencyCode: string) => {
 		setCurrency(currencyCode);
 		setIsOpen(false);
 	};
 
-	// Pre-computed stable class names
+	// 6. Style Logic
 	const buttonBaseClasses =
 		"flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-300 border rounded-lg";
 	const transparentClasses =
@@ -62,6 +65,17 @@ export default function CurrencySelector({
 		"text-muted-foreground hover:text-foreground border-border hover:border-primary bg-transparent";
 	const buttonStyles = `${buttonBaseClasses} ${isTransparent ? transparentClasses : normalClasses}`;
 
+	// 7. HYDRATION GUARD
+	// To prevent "Hydration Mismatch" (Server vs Client content),
+	// we render a simplified version until the client is ready.
+	if (!isClient) {
+		return (
+			<div className={buttonStyles}>
+				<span className="text-lg">{SUPPORTED_CURRENCIES[0].symbol}</span>
+				<span className="hidden xs:inline">{SUPPORTED_CURRENCIES[0].code}</span>
+			</div>
+		);
+	}
 	return (
 		<div className="relative">
 			<button

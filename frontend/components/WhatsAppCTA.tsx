@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { generateWhatsAppMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
 import { FaWhatsapp } from "react-icons/fa";
+import { generateWhatsAppMessage, WhatsAppMessageConfig } from "@/lib/whatsapp";
 
 interface WhatsAppCTAProps {
 	whatsappNumber?: string | null;
@@ -23,7 +23,6 @@ export default function WhatsAppCTA({
 }: WhatsAppCTAProps) {
 	const [isClient, setIsClient] = useState(false);
 
-	// Initialize client state after mount
 	useEffect(() => {
 		setIsClient(true);
 	}, []);

@@ -52,28 +52,31 @@ export async function getProductsByIds(ids: string[]): Promise<Producto[]> {
 
 	const sortedIds = [...ids].sort();
 
-	const query = qs.stringify({
-		filters: {
-			documentId: { $in: sortedIds }
-		},
-		fields: [
-			"documentId",
-			"nombre",
-			"precio",
-			"precioOferta",
-			"tipoDescuento",
-			"valorDescuento",
-			"slug",
-		],
-		populate: {
-			imagenPrincipal: {
-				fields: ["url", "alternativeText"],
+	const query = qs.stringify(
+		{
+			filters: {
+				documentId: { $in: sortedIds },
 			},
-			categoria: {
-				fields: ["nombre"],
+			fields: [
+				"documentId",
+				"nombre",
+				"precio",
+				"precioOferta",
+				"tipoDescuento",
+				"valorDescuento",
+				"slug",
+			],
+			populate: {
+				imagenPrincipal: {
+					fields: ["url", "alternativeText"],
+				},
+				categoria: {
+					fields: ["nombre"],
+				},
 			},
 		},
-	}, { encodeValuesOnly: true });
+		{ encodeValuesOnly: true },
+	);
 
 	const res = await fetch(`${STRAPI_URL}/api/productos?${query}`);
 	const json = await res.json();

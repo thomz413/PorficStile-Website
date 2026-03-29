@@ -1,9 +1,9 @@
+import { MapPin, Phone } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Mail } from "lucide-react";
-import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { FaFacebook, FaTiktok } from "react-icons/fa";
 import CopyrightYear from "@/components/CopyRightYear";
-import Image from "next/image";
+import WhatsAppCTA from "@/components/WhatsAppCTA";
 import { FooterSettings } from "@/lib/strapi/types/settings";
 
 export default function Footer({
@@ -91,8 +91,8 @@ export default function Footer({
 								</p>
 							</div>
 							<a className="flex gap-3 items-center text-slate-400 hover:text-white transition-colors duration-300">
-								<Mail size={18} className="text-accent" />
-								<span>contacto@atlantisporfic.com</span>
+								<Phone size={18} className="text-accent" />
+								<span>{settings?.numeroWhatsapp}</span>
 							</a>
 						</div>
 					</div>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
 	ArrowLeft,
 	Heart,
+	MessageCircle,
 	Minus,
 	Plus,
 	ShoppingCart,
@@ -19,10 +20,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import VariantSelector from "@/components/VariantSelector";
-import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { animations } from "@/lib/animations";
 import { Producto, Variante } from "@/lib/strapi/types/product";
+import { useCartStore } from "@/stores/useCartStore";
 
 const fadeInUp = animations.fadeInUp;
 const fadeInRight = animations.fadeInRight;
@@ -55,7 +56,7 @@ function getFirstAvailableVariant(product: Producto): Variante | null {
 	);
 }
 
-// NEW: Helper to generate a unique key for variants since they no longer have an ID
+// Helper to generate a unique key for variants
 function getVariantKey(variant?: Variante | null): string {
 	if (!variant) return "default";
 	return `v-${variant.talla || "notalla"}-${variant.color || "nocolor"}`.toLowerCase();
@@ -74,12 +75,13 @@ export default function ProductDetailClient({
 	const [mounted, setMounted] = useState(false);
 
 	const { convertAndFormatPrice } = useCurrency();
-	const { addToCart: addToCartContext } = useCart();
+
+	const addToCart = useCartStore((state) => state.addToCart);
 
 	const whatsappNumber = footerSettings?.numeroWhatsapp ?? undefined;
 
 	// Fallback ID for React keys and LocalStorage
-	const productId = product.documentId || product.slug || "unknown-id";
+	const productId = product.documentId || "unknown-id";
 
 	useEffect(() => {
 		const id = window.setTimeout(() => setMounted(true), 10);
@@ -228,7 +230,7 @@ export default function ProductDetailClient({
 		const key = getVariantKey(selectedVariant);
 
 		if (workingQuantity < 1) {
-			toast.error("La cantidad debe ser al menos 1");
+			toast.error("La La cantidad debe ser al menos 1");
 			return;
 		}
 
@@ -318,14 +320,13 @@ export default function ProductDetailClient({
 			id: productId, // Using documentId or slug fallback
 			nombre: product.nombre,
 			precio: computeFinalPriceForVariant(selectedVariant ?? null),
-			precioDescuento: undefined, // Update this if you use it in the future
+			precioDescuento: undefined,
 			categoria: product.categoria
 				? { nombre: product.categoria.nombre ?? "Sin categoría" }
 				: undefined,
 			imagen: product.imagenPrincipal
 				? { url: product.imagenPrincipal.url }
 				: undefined,
-			// Map over itemsToAdd so the cart knows the stock/color of ALL items added
 			tallas: itemsToAdd.map((it) => ({
 				talla: it.variant?.talla ?? "",
 				color: it.variant?.color,
@@ -337,15 +338,17 @@ export default function ProductDetailClient({
 		const cartSelectedItems = itemsToAdd.map((it) => {
 			const precioUnitario = computeFinalPriceForVariant(it.variant ?? null);
 			return {
-				variantKey: it.key, // NEW: The unique key (e.g., 'v-m-rojo')
+				variantKey: it.key,
 				talla: it.variant?.talla ?? "",
-				color: it.variant?.color, // NEW: Pass the color for rendering
+				color: it.variant?.color ?? null,
 				cantidad: it.quantity,
 				precioUnitario,
 			};
 		});
 
-		addToCartContext(productData, cartSelectedItems);
+		// Call Zustand action
+		addToCart(productData, cartSelectedItems);
+
 		toast.success("Artículos agregados al carrito");
 		setSelectedItems([]);
 	};
@@ -707,13 +710,103 @@ export default function ProductDetailClient({
 								</Button>
 
 								{whatsappNumber && (
-									<Button
-										onClick={handleWhatsAppCheckout}
-										className="w-full hover-lift bg-secondary hover:bg-secondary/90 text-white border-[#25D366]"
-										size="lg"
-									>
-										Pedir por WhatsApp
-									</Button>
+									<div className="relative w-full group">
+										{/* 1. The Halo Effect (Active only when items are selected) */}
+										{selectedItems.length > 0 && (
+											<>
+												<motion.div
+													animate={{ scale: [1, 1.45], opacity: [0.5, 0] }}
+													transition={{
+														duration: 2,
+														repeat: Infinity,
+														ease: "easeOut",
+													}}
+													className="absolute inset-0 rounded-xl bg-[#25D366]/40 -z-10"
+												/>
+												<motion.div
+													animate={{ scale: [1, 1.25], opacity: [0.3, 0] }}
+													transition={{
+														duration: 2,
+														repeat: Infinity,
+														ease: "easeOut",
+														delay: 0.5,
+													}}
+													className="absolute inset-0 rounded-xl bg-[#25D366]/30 -z-10"
+												/>
+											</>
+										)}
+
+										{/* 2. The Heartbeat Container */}
+										<motion.div
+											animate={
+												selectedItems.length > 0 ? { scale: [1, 1.02, 1] } : {}
+											}
+											transition={{
+												duration: 1.5,
+												repeat: Infinity,
+												ease: [0.4, 0, 0.2, 1],
+											}}
+											whileHover={{ scale: 1.03 }} // Magnetic lift on hover
+											whileTap={{ scale: 0.97 }} // Physical compression on click
+											className="w-full"
+										>
+											<Button
+												onClick={handleWhatsAppCheckout}
+												className="
+          relative overflow-hidden w-full h-14 rounded-xl
+          /* Base Brand Colors */
+          bg-secondary text-white font-bold tracking-widest uppercase
+
+          /* Tactical Interaction States */
+          hover:brightness-110 hover:shadow-[0_0_25px_rgba(37,211,102,0.5)]
+          active:brightness-90 active:shadow-inner
+
+          /* Visual Transitions */
+          transition-all duration-300 border-none
+          shadow-[0_10px_20px_-10px_rgba(37,211,102,0.5)]
+        "
+												size="lg"
+											>
+												{/* 3. The Metallic Shimmer (Streetwear Gloss) */}
+												{selectedItems.length > 0 && (
+													<motion.div
+														initial={{ x: "-100%" }}
+														animate={{ x: "200%" }}
+														transition={{
+															repeat: Infinity,
+															duration: 3,
+															ease: "linear",
+															repeatDelay: 1,
+														}}
+														className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent -skew-x-12"
+													/>
+												)}
+
+												{/* 4. Content Layout */}
+												<div className="flex items-center justify-center gap-3 relative z-10">
+													<MessageCircle className="w-5 h-5 fill-current" />
+													<span className="text-sm md:text-base">
+														PEDIR POR WHATSAPP
+													</span>
+
+													{/* Animated Arrow that reacts to the pulse/hover */}
+													<motion.span
+														animate={
+															selectedItems.length > 0 ? { x: [0, 3, 0] } : {}
+														}
+														transition={{
+															duration: 1.5,
+															repeat: Infinity,
+															ease: "easeInOut",
+														}}
+														className="hidden sm:inline-block"
+													>
+														→
+													</motion.span>
+												</div>
+											</Button>
+										</motion.div>
+									</div>
 								)}
 
 								<Button

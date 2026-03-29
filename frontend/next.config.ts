@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
 			/** * Keep it for a long time on the client.
 			 * User's don't expect their favorite list to change unless they click 'remove'.
 			 */
-			stale: 86400,    // 24 hours client-side
+			stale: 86400, // 24 hours client-side
 			/** * Check Strapi for price/stock updates every 5 minutes.
 			 * Since people often "watch" favorites for price drops, we check more often than general products.
 			 */
