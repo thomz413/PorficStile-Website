@@ -23,10 +23,24 @@ export default function Error({
 			<h2 className="text-3xl font-bold text-gray-900 mb-4">
 				¡Ups! Algo salió mal
 			</h2>
-			<p className="text-gray-600 max-w-md mb-8">
+			<p className="text-gray-600 max-w-md mb-6">
 				Tuvimos un problema al cargar los detalles de este producto. Por favor, 
 				intenta recargar la página o vuelve al inicio.
 			</p>
+
+			{/* Debug info */}
+			<div className="w-full max-w-2xl bg-red-50 p-4 rounded-md mb-8 text-left overflow-auto border border-red-200">
+				<p className="text-red-800 font-semibold mb-2">Detalles del Error (Debug):</p>
+				<p className="text-red-900 font-mono text-sm mb-2">{error.message}</p>
+				{error.digest && (
+					<p className="text-red-900 font-mono text-sm mb-2">Digest: {error.digest}</p>
+				)}
+				{error.stack && (
+					<pre className="text-red-900 font-mono text-xs whitespace-pre-wrap mt-2">
+						{error.stack}
+					</pre>
+				)}
+			</div>
 			
 			<div className="flex gap-4">
 				<Button 

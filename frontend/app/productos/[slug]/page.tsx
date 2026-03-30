@@ -33,8 +33,27 @@ export default async function ProductPage({
 			console.log(`Cold start detected for product ${slug}, delegating to client`);
 			isColdStart = true;
 		} else {
-			// Real errors should hit the error boundary
-			throw error;
+			const errorMessage = error instanceof Error 
+				? `${error.name}: ${error.message}\n\nStack:\n${error.stack}` 
+				: String(error);
+
+			return (
+				<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem", backgroundColor: "#fef2f2" }}>
+					<div style={{ width: "100%", maxWidth: "48rem", backgroundColor: "white", padding: "2rem", borderRadius: "0.5rem", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+						<h1 style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#dc2626", marginBottom: "1rem" }}>
+							Server Error in Production (Debug)
+						</h1>
+						<p style={{ color: "#4b5563", marginBottom: "1rem" }}>
+							Failed to load data for product: <strong>{slug}</strong>
+						</p>
+						<div style={{ backgroundColor: "#f3f4f6", padding: "1rem", borderRadius: "0.25rem", overflow: "auto", maxHeight: "60vh" }}>
+							<pre style={{ fontSize: "0.875rem", color: "#1f2937", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+								{errorMessage}
+							</pre>
+						</div>
+					</div>
+				</div>
+			);
 		}
 	}
 
