@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Producto, Variante } from "@/lib/strapi/types/product";
-import { placeholderImage } from "@/lib/utils";
+import { placeholderImage, cn } from "@/lib/utils"; // Assuming you have a cn helper
 
 interface ProductCardProps {
 	product: Producto;
@@ -17,10 +17,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
-	product,
-	selectedVariant,
-	className = "",
-}: ProductCardProps) {
+										product,
+										selectedVariant,
+										className = "",
+									}: ProductCardProps) {
 	const { convertAndFormatPrice } = useCurrency();
 	const [isFavorite, setIsFavorite] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
@@ -62,20 +62,15 @@ export default function ProductCard({
 		}
 	};
 
-	// --- PRICE & IMAGE LOGIC ---
-	const images = useMemo(() => {
-		const main = product.imagenPrincipal?.url || placeholderImage();
-		const hover = product.galeria?.[0]?.url || main;
-		return { main, hover };
-	}, [product]);
+	const images = useMemo(() => ({
+		main: product.imagenPrincipal?.url || placeholderImage(),
+		hover: product.galeria?.[0]?.url || product.imagenPrincipal?.url || placeholderImage(),
+	}), [product]);
 
 	const priceInfo = useMemo(() => {
 		let basePrice = product.precio;
 		const activeOferta = selectedVariant?.precioOferta || product.precioOferta;
-
-		if (selectedVariant?.precioSobreescribir) {
-			basePrice = selectedVariant.precioSobreescribir;
-		}
+		if (selectedVariant?.precioSobreescribir) basePrice = selectedVariant.precioSobreescribir;
 
 		const showDiscount = !!(activeOferta && activeOferta < basePrice);
 		const finalPrice = showDiscount ? activeOferta : basePrice;
@@ -90,9 +85,12 @@ export default function ProductCard({
 		<motion.div
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
-			className={`group relative flex flex-col bg-white rounded-3xl overflow-hidden transition-all duration-500 ${className}`}
+			className={cn(
+				"group relative flex flex-col bg-white rounded-[2rem] overflow-hidden transition-all duration-500",
+				className
+			)}
 		>
-			{/* Image Section */}
+			{/* Image Section - Using aspect-4/5 which we know works in your config */}
 			<div className="relative aspect-4/5 w-full overflow-hidden bg-[#F9F9F9]">
 				<Link href={productUrl} className="block w-full h-full">
 					{/* Primary Image */}
@@ -100,54 +98,52 @@ export default function ProductCard({
 						src={images.main}
 						alt={product.nombre}
 						fill
-						className={`object-cover transition-all duration-700 ease-out-expo ${
-							isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
-						}`}
-						sizes="(max-width: 768px) 100vw, 33vw"
+						className={cn(
+							"object-cover transition-all duration-700 ease-in-out",
+							"opacity-100", // Always visible by default
+							isHovered ? "md:opacity-0 md:scale-105" : "scale-100"
+						)}
+						sizes="(max-width: 768px) 50vw, 33vw"
 					/>
-					{/* Hover Image (Secondary) */}
+					{/* Hover Image (Desktop only effect) */}
 					<Image
 						src={images.hover}
 						alt={product.nombre}
 						fill
-						className={`object-cover transition-all duration-700 ease-out-expo ${
+						className={cn(
+							"object-cover transition-all duration-700 ease-in-out hidden md:block",
 							isHovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
-						}`}
-						sizes="(max-width: 768px) 100vw, 33vw"
+						)}
+						sizes="33vw"
 					/>
 				</Link>
 
 				{/* Floating Badges */}
-				<div className="absolute top-4 left-4 flex flex-col gap-2">
-					<AnimatePresence>
-						{priceInfo.showDiscount && (
-							<motion.span
-								initial={{ opacity: 0, x: -10 }}
-								animate={{ opacity: 1, x: 0 }}
-								className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md"
-							>
-								-{priceInfo.discountPercentage}%
-							</motion.span>
-						)}
-					</AnimatePresence>
+				<div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-2">
+					{priceInfo.showDiscount && (
+						<span className="bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-full shadow-lg backdrop-blur-md">
+              -{priceInfo.discountPercentage}%
+            </span>
+					)}
 				</div>
 
-				{/* Actions Overlay */}
-				<div className="absolute top-4 right-4 flex flex-col gap-2 transform translate-x-18 group-hover:translate-x-0 transition-transform duration-500">
+				{/* Favorite Button - Visible on mobile, slides in on desktop */}
+				<div className="absolute top-3 right-3 md:top-4 md:right-4">
 					<button
 						onClick={toggleFavorite}
-						className={`p-3 rounded-full shadow-xl transition-all duration-300 ${
+						className={cn(
+							"p-2.5 md:p-3 rounded-full shadow-xl transition-all duration-300",
 							isFavorite
 								? "bg-red-500 text-white"
-								: "bg-white text-gray-900 hover:bg-gray-50"
-						}`}
+								: "bg-white/90 text-gray-900 hover:bg-white md:translate-x-12 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100"
+						)}
 					>
-						<Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+						<Heart className={cn("h-4 w-4 md:h-5 md:w-5", isFavorite && "fill-current")} />
 					</button>
 				</div>
 
-				{/* Quick View Button (Slide up from bottom) */}
-				<div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+				{/* Quick View Button - Desktop Only */}
+				<div className="hidden md:block absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
 					<Link
 						href={productUrl}
 						className="w-full bg-white/90 backdrop-blur-md py-3 rounded-xl text-sm font-semibold text-gray-900 flex items-center justify-center gap-2 hover:bg-white transition-colors"
@@ -159,28 +155,28 @@ export default function ProductCard({
 			</div>
 
 			{/* Content Section */}
-			<div className="p-5 flex flex-col gap-2">
-				<div className="space-y-1">
+			<div className="p-3 md:p-5 flex flex-col gap-1 md:gap-2">
+				<div className="space-y-0.5">
 					{product.categoria?.nombre && (
-						<span className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest opacity-80">
-							{product.categoria.nombre}
-						</span>
+						<span className="text-[9px] md:text-[11px] font-bold text-indigo-600 uppercase tracking-widest opacity-80">
+              {product.categoria.nombre}
+            </span>
 					)}
 					<Link href={productUrl}>
-						<h3 className="text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+						<h3 className="text-sm md:text-base font-semibold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
 							{product.nombre}
 						</h3>
 					</Link>
 				</div>
 
-				<div className="flex items-center gap-3 pt-1">
-					<span className="text-xl font-bold text-gray-900">
-						{convertAndFormatPrice(priceInfo.finalPrice)}
-					</span>
+				<div className="flex items-center gap-2 md:gap-3">
+          <span className="text-base md:text-xl font-bold text-gray-900">
+            {convertAndFormatPrice(priceInfo.finalPrice)}
+          </span>
 					{priceInfo.showDiscount && (
-						<span className="text-sm font-medium text-gray-400 line-through">
-							{convertAndFormatPrice(priceInfo.basePrice)}
-						</span>
+						<span className="text-[10px] md:text-sm font-medium text-gray-400 line-through">
+              {convertAndFormatPrice(priceInfo.basePrice)}
+            </span>
 					)}
 				</div>
 			</div>

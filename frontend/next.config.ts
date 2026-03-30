@@ -13,29 +13,26 @@ const nextConfig: NextConfig = {
 	cacheComponents: true,
 	cacheLife: {
 		products: {
-			stale: 3600, // 1 hour client-side
-			revalidate: 900, // 15 mins server background refresh
-			expire: 86400, // 1 day hard expiry
+			stale: 3600,      // 1 hour: Browser won't even ask the server for a refresh.
+			revalidate: 1800,  // 30 mins: Server checks Strapi in the background.
+			expire: 86400,    // 1 day: If no one visits for a day, delete the cache.
 		},
+
+		// 2. FAVORITES: The "User-Specific"
+		// Since these are specific to the user's session/ID, we keep them long-term.
 		favourites: {
-			/** * Keep it for a long time on the client.
-			 * User's don't expect their favorite list to change unless they click 'remove'.
-			 */
-			stale: 86400, // 24 hours client-side
-			/** * Check Strapi for price/stock updates every 5 minutes.
-			 * Since people often "watch" favorites for price drops, we check more often than general products.
-			 */
-			revalidate: 300,
-			/** * Hard expiry after a week.
-			 * If they haven't checked their favorites in 7 days, clear the cache entry.
-			 */
-			expire: 604800,
+			stale: 604800,    // 1 week: Keep it on the client; it's very "sticky".
+			revalidate: 3600, // 1 hour: Only check for price/stock changes once an hour.
+			expire: 2592000,  // 30 days: Monthly cleanup.
 		},
-		// MEDIUM: For Categories (Added occasionally)
+
+		// 3. CATEGORIES: The "Structural"
+		// Categories (Men, Women, Tech, etc.) almost NEVER change.
+		// Only hit Strapi once every 12 hours.
 		categories: {
-			stale: 86400, // 1 day
-			revalidate: 3600, // 1 hour background refresh
-			expire: 604800, // 1 week hard expiry
+			stale: 604800,     // 1 week client-side.
+			revalidate: 43200, // 12 hours: Background refresh twice a day.
+			expire: 2592000,   // 30 days.
 		},
 		// SLOW: For Store Settings (Rarely changes)
 		settings: {

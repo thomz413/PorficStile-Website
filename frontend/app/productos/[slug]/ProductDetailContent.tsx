@@ -84,12 +84,18 @@ export default function ProductDetailClient({
 	const productId = product.documentId || "unknown-id";
 
 	useEffect(() => {
-		const id = window.setTimeout(() => setMounted(true), 10);
-		return () => window.clearTimeout(id);
+		// Only set mounted on client side to prevent hydration issues
+		if (typeof window !== 'undefined') {
+			const id = window.setTimeout(() => setMounted(true), 10);
+			return () => window.clearTimeout(id);
+		}
 	}, []);
 
 	// Favorites Logic using documentId
 	useEffect(() => {
+		// Only run on client side to prevent hydration issues
+		if (typeof window === 'undefined') return;
+		
 		try {
 			const stored = localStorage.getItem("moda-peru-favorites");
 			if (stored) {
@@ -380,7 +386,7 @@ export default function ProductDetailClient({
 		: 0;
 
 	return (
-		<main className="min-h-screen bg-background pt-21">
+		<main className="min-h-screen bg-background pt-20 lg:pt-20">
 			<Header />
 
 			<motion.div

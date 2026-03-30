@@ -5,6 +5,7 @@ import { Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import {useStore} from "zustand/react";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
 import { useCartStore } from "@/stores/useCartStore";
 import CurrencySelector from "./CurrencySelector";
@@ -22,9 +23,9 @@ export default function HeaderTransition({
 	const [isOverHero, setIsOverHero] = useState(true);
 
 	// --- ZUSTAND & HYDRATION ---
-	const getTotalItems = useCartStore((state) => state.getTotalItems);
+	const totalItems = useStore(useCartStore, (state) => state.getTotalItems());
 	const hasHydrated = useHasHydrated();
-	const cartCount = hasHydrated ? getTotalItems() : 0;
+	const cartCount = hasHydrated ? totalItems : 0;
 
 	const observerRef = useRef<IntersectionObserver | null>(null);
 

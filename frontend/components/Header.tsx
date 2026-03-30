@@ -63,7 +63,7 @@ export default function Header({
 					<div className="hidden lg:flex items-center justify-between h-20">
 						<Link href="/" className="flex items-center gap-3 group">
 							<div className="flex flex-col items-center justify-center">
-								<div className="rounded-full p-1 transition-shadow duration-300 group-hover:scale-105 transform bg-linear-to-br from-yellow-300/10 via-amber-200/10 to-red-200/5 ring-1 ring-amber-200/10">
+								<div className="rounded-full p-1 transition-shadow duration-300 group-hover:scale-105 transform bg-gradient-to-br from-yellow-300/10 via-amber-200/10 to-red-200/5 ring-1 ring-amber-200/10">
 									<Image
 										src="/Atlantis.svg"
 										alt="Atlantis logo"

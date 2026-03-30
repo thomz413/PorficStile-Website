@@ -24,9 +24,7 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 	cacheLife("products"); // Fast refresh
 
 	const qs = "filters[destacado][$eq]=true&" + buildProductListQuery();
-	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
-		signal: AbortSignal.timeout(6000),
-	});
+	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 	const json = await res.json();
@@ -89,34 +87,25 @@ export async function getProductsByIds(ids: string[]): Promise<Producto[]> {
 	return ProductosSchema.parse(json.data);
 }
 
-/** Get product by slug with fallback to ID */
+/** Get product by slug with retry logic and better error handling */
 export async function getProductBySlug(slug: string): Promise<Producto | null> {
 	"use cache";
-	// Target the specific slug for invalidation
 	cacheTag("products", "product-detail", `product-${slug}`);
 	cacheLife("products");
 
 	const qs = buildProductQuery();
-
-	// Try slug first (for better SEO)
 	const slugUrl = `${STRAPI_URL}/api/productos?filters[slug][$eq]=${encodeURIComponent(slug)}&${qs}`;
 
 	try {
-		const res = await fetch(slugUrl, { 
-			signal: AbortSignal.timeout(15000),
-			headers: {
-				'Cache-Control': 'no-cache', // Prevent stale responses
-			}
+		// Try with retry logic for cold starts
+		const { fetchStrapiWithRetry } = await import("./strapi-with-retry");
+		const res = await fetchStrapiWithRetry(slugUrl, {}, {
+			maxRetries: 2,
+			retryDelay: 1000,
+			timeout: 3000, // Safe timeout for Netlify Server Functions
 		});
 		
-		if (!res.ok) {
-			console.error(`Strapi API error: ${res.status} for slug: ${slug}`);
-			return null;
-		}
-
 		const json = await res.json();
-
-		// Strapi filter queries return an array in 'data'
 		const productData = json.data?.[0];
 
 		if (!productData) {
@@ -131,8 +120,37 @@ export async function getProductBySlug(slug: string): Promise<Producto | null> {
 			return null;
 		}
 	} catch (error) {
-		console.error(`Network error fetching product ${slug}:`, error);
-		return null;
+		console.error(`Failed to fetch product ${slug}:`, error);
+		
+		// Fallback to original fetch without retry for critical errors
+		try {
+			const res = await fetch(slugUrl, { 
+				signal: AbortSignal.timeout(10000),
+			});
+			
+			if (!res.ok) {
+				console.error(`Fallback API error: ${res.status} for slug: ${slug}`);
+				return null;
+			}
+
+			const json = await res.json();
+			const productData = json.data?.[0];
+
+			if (!productData) {
+				console.log(`No product found for slug: ${slug} (fallback)`);
+				return null;
+			}
+
+			try {
+				return ProductoSchema.parse(productData);
+			} catch (err) {
+				console.error(`Fallback validation error for product slug ${slug}:`, err);
+				return null;
+			}
+		} catch (fallbackError) {
+			console.error(`Fallback also failed for product ${slug}:`, fallbackError);
+			return null;
+		}
 	}
 }
 
@@ -256,12 +274,17 @@ export async function getFooterSettings(): Promise<FooterSettings | undefined> {
 	const query = qs.stringify({
 		fields: ["numeroWhatsapp", "linkTiktok", "linkFacebook"],
 	});
-	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`, {
-		signal: AbortSignal.timeout(6000),
+	
+	const { fetchStrapiWithRetry } = await import("./strapi-with-retry");
+	const res = await fetchStrapiWithRetry(`${STRAPI_URL}/api/configuracion?${query}`, {}, {
+		maxRetries: 2,
+		retryDelay: 1000,
+		timeout: 3000,
 	});
 
 	console.log(`${STRAPI_URL}/api/configuracion?${query}`);
-	const { data } = await res.json();
+	const json = await res.json();
+	const data = json.data;
 
 	if (!data) return undefined;
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CategorySchema } from "@/lib/strapi/types/category";
-import { ImageSchema } from "./shared"; // make sure this matches usage below
+import { ImageSchema } from "./shared";
 
 /* ENUMS */
 export const TallaEnum = z.enum(["XS", "S", "M", "L", "XL", "XXL"]);
