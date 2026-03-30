@@ -22,6 +22,7 @@ export function buildProductQuery() {
 			"valorDescuento",
 			"disponible",
 			"cantidadStock",
+			"slug", // Added slug field for product detail queries
 		],
 		populate: {
 			imagenPrincipal: { fields: ["url", "name", "alternativeText"] },

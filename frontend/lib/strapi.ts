@@ -89,7 +89,7 @@ export async function getProductsByIds(ids: string[]): Promise<Producto[]> {
 	return ProductosSchema.parse(json.data);
 }
 
-/** Get product by ID */
+/** Get product by slug with fallback to ID */
 export async function getProductBySlug(slug: string): Promise<Producto | null> {
 	"use cache";
 	// Target the specific slug for invalidation
@@ -98,26 +98,82 @@ export async function getProductBySlug(slug: string): Promise<Producto | null> {
 
 	const qs = buildProductQuery();
 
-	// We add the filter to the query string
-	// This assumes your UID field in Strapi}is named 'slug'
-	const url = `${STRAPI_URL}/api/productos?filters[slug][$eq]=${encodeURIComponent(slug)}&${qs}`;
-
-	const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
-
-	const json = await res.json();
-
-	console.log(json);
-
-	// Strapi filter queries return an array in 'data'
-	const productData = json.data?.[0];
-
-	if (!productData) return null;
+	// Try slug first (for better SEO)
+	const slugUrl = `${STRAPI_URL}/api/productos?filters[slug][$eq]=${encodeURIComponent(slug)}&${qs}`;
 
 	try {
-		return ProductoSchema.parse(productData);
-	} catch (err) {
-		console.error(`Validation error for product slug ${slug}:`, err);
+		const res = await fetch(slugUrl, { 
+			signal: AbortSignal.timeout(15000),
+			headers: {
+				'Cache-Control': 'no-cache', // Prevent stale responses
+			}
+		});
+		
+		if (!res.ok) {
+			console.error(`Strapi API error: ${res.status} for slug: ${slug}`);
+			return null;
+		}
+
+		const json = await res.json();
+
+		// Strapi filter queries return an array in 'data'
+		const productData = json.data?.[0];
+
+		if (!productData) {
+			console.log(`No product found for slug: ${slug}`);
+			return null;
+		}
+
+		try {
+			return ProductoSchema.parse(productData);
+		} catch (err) {
+			console.error(`Validation error for product slug ${slug}:`, err);
+			return null;
+		}
+	} catch (error) {
+		console.error(`Network error fetching product ${slug}:`, error);
+		return null;
+	}
+}
+
+/** Get product by ID (fallback function) */
+export async function getProductById(id: string): Promise<Producto | null> {
+	"use cache";
+	cacheTag("products", "product-detail", `product-${id}`);
+	cacheLife("products");
+
+	const qs = buildProductQuery();
+	const url = `${STRAPI_URL}/api/productos/${id}?${qs}`;
+
+	try {
+		const res = await fetch(url, { 
+			signal: AbortSignal.timeout(10000),
+			headers: {
+				'Cache-Control': 'no-cache',
+			}
+		});
+		
+		if (!res.ok) {
+			console.error(`Strapi API error: ${res.status} for ID: ${id}`);
+			return null;
+		}
+
+		const json = await res.json();
+		const productData = json.data;
+
+		if (!productData) {
+			console.log(`No product found for ID: ${id}`);
+			return null;
+		}
+
+		try {
+			return ProductoSchema.parse(productData);
+		} catch (err) {
+			console.error(`Validation error for product ID ${id}:`, err);
+			return null;
+		}
+	} catch (error) {
+		console.error(`Network error fetching product ${id}:`, error);
 		return null;
 	}
 }

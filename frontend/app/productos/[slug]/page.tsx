@@ -19,12 +19,13 @@ export default async function ProductPage({
 		]);
 
 		if (!product) {
+			console.log(`Product not found for slug: ${slug}`);
 			notFound();
 		}
 	} catch (error) {
 		console.error(`Failed to load data for product ${slug}:`, error);
-		// Let the error boundary (error.tsx) handle it instead of forcing a 404
-		throw error;
+		// Graceful fallback - show 404 instead of throwing
+		notFound();
 	}
 
 	return (

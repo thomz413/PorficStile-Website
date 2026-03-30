@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 // Helper to parse your API URL
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+//const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+
+const STRAPI_URL = "https://big-festival-62d725d687.strapiapp.com";
 
 const strapiAddr = new URL(STRAPI_URL);
 
