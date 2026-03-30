@@ -12,33 +12,32 @@ const nextConfig: NextConfig = {
 	reactStrictMode: false,
 	cacheComponents: true,
 	cacheLife: {
+		// 1. PRODUCTS: Managed via Strapi Webhooks
 		products: {
-			stale: 3600,      // 1 hour: Browser won't even ask the server for a refresh.
-			revalidate: 1800,  // 30 mins: Server checks Strapi in the background.
-			expire: 86400,    // 1 day: If no one visits for a day, delete the cache.
+			stale: 86400,         // 1 day browser safety net
+			revalidate: 31536000, // 1 year (Wait for manual/webhook trigger)
+			expire: 31536000,     // 1 year
 		},
 
-		// 2. FAVORITES: The "User-Specific"
-		// Since these are specific to the user's session/ID, we keep them long-term.
+		// 2. FAVORITES: User-specific data
 		favourites: {
-			stale: 604800,    // 1 week: Keep it on the client; it's very "sticky".
-			revalidate: 3600, // 1 hour: Only check for price/stock changes once an hour.
-			expire: 2592000,  // 30 days: Monthly cleanup.
+			stale: 604800,        // 1 week client-side persistence
+			revalidate: 3600,     // 1 hour check for stock/price updates
+			expire: 2592000,      // 30 days
 		},
 
-		// 3. CATEGORIES: The "Structural"
-		// Categories (Men, Women, Tech, etc.) almost NEVER change.
-		// Only hit Strapi once every 12 hours.
+		// 3. CATEGORIES: Structural navigation
 		categories: {
-			stale: 604800,     // 1 week client-side.
-			revalidate: 43200, // 12 hours: Background refresh twice a day.
-			expire: 2592000,   // 30 days.
+			stale: 86400,         // 1 day browser safety net
+			revalidate: 31536000, // 1 year (Wait for manual/webhook trigger)
+			expire: 31536000,
 		},
-		// SLOW: For Store Settings (Rarely changes)
+
+		// 4. SETTINGS: Global store configuration
 		settings: {
-			stale: 604800, // 1 week
-			revalidate: 86400, // 1 day background refresh
-			expire: 2592000, // 30 days hard expiry
+			stale: 86400,         // 1 day browser safety net
+			revalidate: 31536000, // 1 year (Wait for manual/webhook trigger)
+			expire: 31536000,
 		},
 	},
 

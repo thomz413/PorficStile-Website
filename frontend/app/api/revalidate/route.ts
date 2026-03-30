@@ -13,39 +13,43 @@ export async function POST(request: NextRequest) {
 
 	try {
 		const body = await request.json();
-		const model = body.model; // e.g., 'producto', 'categoria', or 'configuracion'
-		const entry = body.entry; // The actual data that changed
-		console.log("The actual Data from Strapi:", JSON.stringify(body, null, 2));
-		console.log(`Strapi Webhook received for model: ${model}`);
+		const model = body.model; // Strapi model name
+		const entry = body.entry; // The actual data
 
-		// 2. Surgical Revalidation Logic
+		console.log(`Revalidating ${model} for entry: ${entry?.documentId || 'unknown'}`);
+
+		// --- 1. PRODUCT REVALIDATION ---
 		if (model === "producto") {
-			// Clear the general list AND the specific product detail
+			// Clear general lists (Featured, All, Category lists)
 			revalidateTag("products", "max");
-			if (entry?.documentId) {
-				revalidateTag(`product-${entry.documentId}`, "max");
+			revalidateTag("product-list", "max");
+
+			if (entry?.slug) {
+				revalidateTag(`product-${entry.slug}`, "max");
 			}
-		} else if (model === "categoria") {
-			// Categories affect the category list AND the products within them
-			revalidateTag("categories", "max");
-			revalidateTag("products", "max");
-		} else if (model === "configuracion") {
-			// Only clear the settings/footer
-			revalidateTag("settings", "max");
 		}
 
-		return NextResponse.json({
-			revalidated: true,
-			model,
-			now: Date.now(),
-		});
+		// --- 2. CATEGORY REVALIDATION ---
+		else if (model === "categoria") {
+			revalidateTag("categories", "max");
+			// Categories affect product lists, so we clear them too
+			revalidateTag("products", "max");
+			revalidateTag("product-list", "max");
+		}
+
+		// --- 3. SETTINGS REVALIDATION ---
+		else if (model === "configuracion") {
+			revalidateTag("settings", "max");
+			revalidateTag("site-settings", "max");
+			revalidateTag("footer-settings", "max");
+		}
+
+		return NextResponse.json({ revalidated: true, now: Date.now() });
+
 	} catch (err) {
-		// If the body is empty or malformed, just clear everything as a safety fallback
+		// Fallback: Clear core tags if something goes wrong
 		revalidateTag("products", "max");
 		revalidateTag("settings", "max");
-		return NextResponse.json(
-			{ message: "Revalidated All (Fallback)" },
-			{ status: 200 },
-		);
+		return NextResponse.json({ message: "Fallback Revalidation Triggered" }, { status: 200 });
 	}
 }
