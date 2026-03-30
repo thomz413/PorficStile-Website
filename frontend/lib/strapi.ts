@@ -101,8 +101,12 @@ export async function getProductBySlug(slug: string): Promise<Producto | null> {
 
 	const json = await res.json();
 
+	console.log(json);
+
 	// Strapi filter queries return an array in 'data'
 	const productData = json.data?.[0];
+
+	console.log(productData);
 
 	return productData ? ProductoSchema.parse(productData) : null;
 }

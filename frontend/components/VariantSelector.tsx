@@ -19,7 +19,7 @@ export default function VariantSelector({
 	const [selectedTalla, setSelectedTalla] = useState<string | null>(
 		selectedVariant?.talla ?? null,
 	);
-	
+
 	const [selectedColor, setSelectedColor] = useState<string | null>(
 		selectedVariant?.color ?? null,
 	);

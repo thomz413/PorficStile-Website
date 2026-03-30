@@ -8,6 +8,7 @@ import StickyCart from "./StickyCart";
 import Image from "next/image";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
 import { useCartStore } from "@/stores/useCartStore";
+import {useStore} from "zustand/react";
 
 export default function Header({
 	whatsappNumber,
@@ -20,11 +21,11 @@ export default function Header({
 	const [favoritesCount, setFavoritesCount] = useState(0);
 
 	// 2. Pull the logic from Zustand
-	const getTotalItems = useCartStore((state) => state.getTotalItems);
 	const hasHydrated = useHasHydrated();
 
+	const totalItems = useStore(useCartStore, (state) => state.getTotalItems());
 	// We call the function to get the actual number
-	const cartCount = hasHydrated ? getTotalItems() : 0;
+	const cartCount = hasHydrated ? totalItems : 0;
 
 	useEffect(() => {
 		const updateFavoritesCount = () => {

@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 // Helper to parse your API URL
-const STRAPI_URL =
-	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
 const strapiAddr = new URL(STRAPI_URL);
 
 const nextConfig: NextConfig = {
 	// Performance optimizations
+	reactStrictMode: false,
 	cacheComponents: true,
 	cacheLife: {
 		products: {
@@ -78,10 +78,6 @@ const nextConfig: NextConfig = {
 	compress: true,
 
 	// Experimental features for performance
-	experimental: {
-		optimizeCss: true,
-		optimizeServerReact: true,
-	},
 
 	// Headers for caching and security
 	async headers() {

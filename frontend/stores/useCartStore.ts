@@ -36,7 +36,11 @@ type CartState = {
 		productId: string,
 		selectedItems: CartItem["selectedItems"],
 	) => void;
-	updateVariantQuantity: (productId: string, variantKey: string, delta: number) => void;
+	updateVariantQuantity: (
+		productId: string,
+		variantKey: string,
+		delta: number,
+	) => void;
 	clearCart: () => void;
 	getTotalItems: () => number;
 	getTotalPrice: () => number;
@@ -116,12 +120,15 @@ export const useCartStore = create<CartState>()(
 
 			clearCart: () => set({ cart: [] }),
 
+			// Inside useCartStore.ts
 			getTotalItems: () => {
 				return get().cart.reduce((total, item) => {
+					// Safe fallback: if selectedItems doesn't exist yet, treat as empty array
+					const safeSelectedItems = item.selectedItems || [];
 					return (
 						total +
-						item.selectedItems.reduce(
-							(subtotal, selectedItem) => subtotal + selectedItem.cantidad,
+						safeSelectedItems.reduce(
+							(subtotal, selectedItem) => subtotal + (selectedItem.cantidad || 0),
 							0,
 						)
 					);
@@ -130,11 +137,12 @@ export const useCartStore = create<CartState>()(
 
 			getTotalPrice: () => {
 				return get().cart.reduce((total, item) => {
+					const safeSelectedItems = item.selectedItems || [];
 					return (
 						total +
-						item.selectedItems.reduce((subtotal, selectedItem) => {
+						safeSelectedItems.reduce((subtotal, selectedItem) => {
 							return (
-								subtotal + selectedItem.precioUnitario * selectedItem.cantidad
+								subtotal + (selectedItem.precioUnitario || 0) * (selectedItem.cantidad || 0)
 							);
 						}, 0)
 					);
@@ -143,11 +151,12 @@ export const useCartStore = create<CartState>()(
 
 			getCartSummary: () => {
 				const { cart } = get();
-				if (cart.length === 0) return "";
+				if (!cart || cart.length === 0) return "";
 
 				return cart
 					.map((item) => {
-						return item.selectedItems
+						const safeSelectedItems = item.selectedItems || [];
+						return safeSelectedItems
 							.map((selected) => {
 								const colorText = selected.color ? ` - ${selected.color}` : "";
 								const tallaText = selected.talla
@@ -157,6 +166,7 @@ export const useCartStore = create<CartState>()(
 							})
 							.join("\n");
 					})
+					.filter(Boolean) // Remove any empty strings from old cart items
 					.join("\n");
 			},
 

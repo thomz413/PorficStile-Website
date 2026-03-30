@@ -22,8 +22,14 @@ export default function StickyCart({
 	onExternalClose,
 	whatsappNumber,
 }: StickyCartProps = {}) {
-	const { cart, getTotalItems, getTotalPrice, removeFromCart, clearCart, updateVariantQuantity } =
-		useCartStore();
+	const {
+		cart,
+		getTotalItems,
+		getTotalPrice,
+		removeFromCart,
+		clearCart,
+		updateVariantQuantity,
+	} = useCartStore();
 	const hasHydrated = useHasHydrated();
 	const { convertAndFormatPrice } = useCurrency();
 	const [internalOpen, setInternalOpen] = useState(false);
