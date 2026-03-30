@@ -78,6 +78,10 @@ const nextConfig: NextConfig = {
 	compress: true,
 
 	// Experimental features for performance
+	experimental: {
+		optimizeCss: true,
+		optimizeServerReact: true,
+	},
 
 	// Headers for caching and security
 	async headers() {
