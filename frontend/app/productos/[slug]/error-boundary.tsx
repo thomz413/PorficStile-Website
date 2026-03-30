@@ -50,9 +50,9 @@ export default class ErrorBoundary extends Component<Props, State> {
 								<Link href="/productos">Volver a productos</Link>
 							</Button>
 						</div>
-						{process.env.NODE_ENV === 'development' && this.state.error && (
+					{this.state.error && (
 							<details className="text-left text-xs text-gray-500 mt-4">
-								<summary className="cursor-pointer">Error details (dev only)</summary>
+								<summary className="cursor-pointer">Error details</summary>
 								<pre className="mt-2 p-2 bg-gray-100 rounded overflow-auto">
 									{this.state.error.stack}
 								</pre>
