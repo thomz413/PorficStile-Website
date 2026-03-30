@@ -56,9 +56,15 @@ export const ProductoSchema = z.object({
 	categoria: CategorySchema.nullish(),
 
 	// after normalization this will be a flat array of variants
-	variantes: z.array(VarianteSchema).nullish().default([]),
+	variantes: z.array(z.any()).nullish().transform((arr) => {
+		if (!arr) return [];
+		return z.array(VarianteSchema).parse(arr.filter((item) => item !== null && item !== undefined));
+	}).default([]),
 
-	galeria: z.array(ImageSchema).nullish().default([]),
+	galeria: z.array(z.any()).nullish().transform((arr) => {
+		if (!arr) return [];
+		return z.array(ImageSchema).parse(arr.filter((item) => item !== null && item !== undefined));
+	}).default([]),
 
 	imagenPrincipal: ImageSchema.nullish().nullable(),
 

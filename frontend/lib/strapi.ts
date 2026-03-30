@@ -106,9 +106,14 @@ export async function getProductBySlug(slug: string): Promise<Producto | null> {
 	// Strapi filter queries return an array in 'data'
 	const productData = json.data?.[0];
 
-	console.log(productData);
+	if (!productData) return null;
 
-	return productData ? ProductoSchema.parse(productData) : null;
+	try {
+		return ProductoSchema.parse(productData);
+	} catch (err) {
+		console.error(`Validation error for product slug ${slug}:`, err);
+		return null;
+	}
 }
 
 /** Get all categories */
