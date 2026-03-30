@@ -24,7 +24,9 @@ export async function getFeaturedProducts(): Promise<Producto[]> {
 	cacheLife("products"); // Fast refresh
 
 	const qs = "filters[destacado][$eq]=true&" + buildProductListQuery();
-	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
+	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
+		signal: AbortSignal.timeout(6000),
+	});
 
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 	const json = await res.json();
@@ -37,7 +39,9 @@ export async function getProducts(): Promise<Producto[]> {
 	cacheLife("products");
 
 	const qs = buildProductListQuery();
-	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`);
+	const res = await fetch(`${STRAPI_URL}/api/productos?${qs}`, {
+		signal: AbortSignal.timeout(6000),
+	});
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 	const json = await res.json();
 	return ProductosSchema.parse(json.data ?? []);
@@ -78,7 +82,9 @@ export async function getProductsByIds(ids: string[]): Promise<Producto[]> {
 		{ encodeValuesOnly: true },
 	);
 
-	const res = await fetch(`${STRAPI_URL}/api/productos?${query}`);
+	const res = await fetch(`${STRAPI_URL}/api/productos?${query}`, {
+		signal: AbortSignal.timeout(6000),
+	});
 	const json = await res.json();
 	return ProductosSchema.parse(json.data);
 }
@@ -96,7 +102,7 @@ export async function getProductBySlug(slug: string): Promise<Producto | null> {
 	// This assumes your UID field in Strapi}is named 'slug'
 	const url = `${STRAPI_URL}/api/productos?filters[slug][$eq]=${encodeURIComponent(slug)}&${qs}`;
 
-	const res = await fetch(url);
+	const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 
 	const json = await res.json();
@@ -122,7 +128,9 @@ export async function getCategories(): Promise<Category[]> {
 	cacheTag("categories");
 	cacheLife("categories"); // MEDIUM refresh (Fixed from "products")
 
-	const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`);
+	const res = await fetch(`${STRAPI_URL}/api/categorias?populate=*`, {
+		signal: AbortSignal.timeout(6000),
+	});
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 	const json = await res.json();
 	return CategoriesSchema.parse(json.data ?? []);
@@ -139,6 +147,7 @@ export async function getProductsByCategory(
 	const encoded = encodeURIComponent(category);
 	const res = await fetch(
 		`${STRAPI_URL}/api/productos?filters[categoria][nombre][$eq]=${encoded}&populate=*`,
+		{ signal: AbortSignal.timeout(6000) },
 	);
 	if (!res.ok) throw new Error(`Strapi API error: ${res.status}`);
 	const json = await res.json();
@@ -171,7 +180,9 @@ export async function getSettings(): Promise<SiteSettings | null> {
 		{ encodeValuesOnly: true },
 	);
 
-	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
+	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`, {
+		signal: AbortSignal.timeout(6000),
+	});
 
 	if (!res.ok) throw new Error(`Strapi Fetch failed: ${res.statusText}`);
 
@@ -189,7 +200,9 @@ export async function getFooterSettings(): Promise<FooterSettings | undefined> {
 	const query = qs.stringify({
 		fields: ["numeroWhatsapp", "linkTiktok", "linkFacebook"],
 	});
-	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`);
+	const res = await fetch(`${STRAPI_URL}/api/configuracion?${query}`, {
+		signal: AbortSignal.timeout(6000),
+	});
 
 	console.log(`${STRAPI_URL}/api/configuracion?${query}`);
 	const { data } = await res.json();

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import ProductDetailClient from "@/app/productos/[slug]/ProductDetailContent";
 import { getFooterSettings, getProductBySlug } from "@/lib/strapi";
-import { fetchWithRetry } from "@/lib/utils";
 
 export default async function ProductPage({
 	params,
@@ -15,8 +14,8 @@ export default async function ProductPage({
 
 	try {
 		[product, footerSettings] = await Promise.all([
-			fetchWithRetry(() => getProductBySlug(slug)),
-			fetchWithRetry(() => getFooterSettings()),
+			getProductBySlug(slug),
+			getFooterSettings(),
 		]);
 
 		if (!product) {
@@ -24,7 +23,8 @@ export default async function ProductPage({
 		}
 	} catch (error) {
 		console.error(`Failed to load data for product ${slug}:`, error);
-		notFound();
+		// Let the error boundary (error.tsx) handle it instead of forcing a 404
+		throw error;
 	}
 
 	return (
